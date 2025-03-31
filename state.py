@@ -1,134 +1,75 @@
-# state.py
-from agent import Agent
+# state.py (updated)
+class Terrain:
+    def __init__(self, width, height, obstacles):
+        self.width = width
+        self.height = height
+        self.obstacles = obstacles
+
+    def is_obstacle(self, x, y):
+        return (x, y) in self.obstacles
+
+class Agent:
+    def __init__(self, x, y, fuel, health, attack_range, accuracy, damage, suppression_per_hit, weapon):
+        self.x = x
+        self.y = y
+        self.fuel = fuel
+        self.health = health
+        self.attack_range = attack_range
+        self.accuracy = accuracy
+        self.damage = damage
+        self.suppression_per_hit = suppression_per_hit
+        self.weapon = weapon
+
+class Enemy:
+    def __init__(self, x, y, health, accuracy, damage, suppression, weapon, attack_range=3):  # Added attack_range
+        self.x = x
+        self.y = y
+        self.health = health
+        self.accuracy = accuracy
+        self.damage = damage
+        self.suppression = suppression
+        self.weapon = weapon
+        self.attack_range = attack_range  # Added attack_range attribute
 
 class State:
-    def __init__(self):
+    def __init__(self, terrain, agents, enemy):
+        self.terrain = terrain
         self.data = {
-            "agents": {
-                "scouts": Agent(
-                    "scouts", 0, 0, 800, attack_range=5, v_max=6.0, health=50, max_health=50,
-                    max_speed="90 km/h",
-                    front_armor="3 / 3",
-                    turret_armor="---",
-                    side_armor=2,
-                    rear_armor=2,
-                    durability=18,
-                    vision_range="2600 m",
-                    night_vision="Advanced",
-                    stealth_modifier=225,
-                    has_smoke_grenades="Yes",
-                    main_weapon={
-                        "name": "25mm Autocannon",
-                        "range": "1800 meters",
-                        "accuracy": "35%",
-                        "stabilized": "21%",
-                        "reaction": "2s",
-                        "rate_of_fire": "115 rpm",
-                        "damage": 2.4,
-                        "suppression": 5,
-                        "penetration": 5,
-                        "he_damage": 2,
-                        "he_suppression": 5,
-                        "he_penetration": 1
-                    },
-                    secondary_weapon={}
-                ),
-                "infantry": Agent(
-                    "infantry", 0, 0, 800, attack_range=2, v_max=4.0, health=75, max_health=75,
-                    survivability="100%",
-                    main_weapon={
-                        "name": "Assault Rifle",
-                        "range": "800 meters",
-                        "accuracy": "10%",
-                        "stabilized": "8%",
-                        "reaction": "1s",
-                        "rate_of_fire": "400 rpm",
-                        "damage": 0.5,
-                        "suppression": 0.5,
-                        "penetration": 0
-                    },
-                    secondary_weapon={
-                        "name": "M72 LAW",
-                        "range": "800 meters",
-                        "accuracy": "55%",
-                        "stabilized": "55%",
-                        "reaction": "1s",
-                        "rate_of_fire": "6.0 rpm",
-                        "damage": 10,
-                        "suppression": 14,
-                        "penetration": 15
-                    }
-                ),
-                "tanks": Agent(
-                    "tanks", 0, 0, 1700, attack_range=3, v_max=3.0, health=150, max_health=150,
-                    max_speed="75 km/h",
-                    front_armor=17,
-                    turret_armor="18 / 19",
-                    side_armor=4,
-                    rear_armor=3,
-                    durability=20,
-                    vision_range="2000 m",
-                    night_vision="Thermal",
-                    stealth_modifier=0,
-                    has_smoke_grenades="Yes",
-                    main_weapon={
-                        "name": "120mm Gun",
-                        "range": "2400 meters",
-                        "accuracy": "75%",
-                        "stabilized": "60%",
-                        "reaction": "2s",
-                        "rate_of_fire": "4.9 rpm",
-                        "damage": 9,
-                        "suppression": 12,
-                        "penetration": 18
-                    },
-                    secondary_weapon={
-                        "name": "7.62mm Machine Gun",
-                        "range": "1200 meters",
-                        "accuracy": "30%",
-                        "stabilized": "18%",
-                        "reaction": "1s",
-                        "rate_of_fire": "197 rpm",
-                        "damage": 0.8,
-                        "suppression": 1,
-                        "penetration": 1
-                    }
-                )
-            },
-            "enemy": Agent(
-                "enemy", 9, 9, float('inf'), attack_range=3, v_max=3.0, health=150, max_health=150,
-                max_speed="75 km/h",
-                front_armor=17,
-                turret_armor="18 / 19",
-                side_armor=4,
-                rear_armor=3,
-                durability=20,
-                vision_range="2000 m",
-                night_vision="Thermal",
-                stealth_modifier=0,
-                has_smoke_grenades="Yes",
-                main_weapon={
-                    "name": "120mm Gun",
-                    "range": "2400 meters",
-                    "accuracy": "75%",
-                    "stabilized": "60%",
-                    "reaction": "2s",
-                    "rate_of_fire": "4.9 rpm",
-                    "damage": 9,
-                    "suppression": 12,
-                    "penetration": 18
-                },
-                secondary_weapon={
-                    "name": "7.62mm Machine Gun",
-                    "range": "1200 meters",
-                    "accuracy": "30%",
-                    "stabilized": "18%",
-                    "reaction": "1s",
-                    "rate_of_fire": "197 rpm",
-                    "damage": 0.8,
-                    "suppression": 1,
-                    "penetration": 1
-                }
-            ),
+            "agents": agents,
+            "enemy": enemy,
             "mission_complete": False
         }
+
+    def get_enemy_position(self):
+        return self.data["enemy"].x, self.data["enemy"].y
+
+    def has_line_of_sight(self, x1, y1, x2, y2):
+        dx = abs(x2 - x1)
+        dy = abs(y2 - y1)
+        x, y = x1, y1
+        sx = 1 if x2 > x1 else -1
+        sy = 1 if y2 > y1 else -1
+        err = dx - dy
+
+        while True:
+            if self.terrain.is_obstacle(x, y):
+                return False
+            if x == x2 and y == y2:
+                break
+            e2 = 2 * err
+            if e2 > -dy:
+                err -= dy
+                x += sx
+            if e2 < dx:
+                err += dx
+                y += sy
+        return True
+
+def initialize_state():
+    terrain = Terrain(10, 10, [(0, 3), (1, 1), (1, 3), (1, 6), (2, 8), (3, 0), (3, 1), (3, 4), (3, 6), (4, 3), (4, 7), (5, 1), (5, 8), (6, 3), (6, 4), (6, 7), (7, 9), (8, 1), (8, 5), (8, 7), (9, 5), (9, 7)])
+    agents = {
+        "infantry": Agent(x=0, y=0, fuel=800, health=75, attack_range=2, accuracy=60, damage=10, suppression_per_hit=0.14, weapon="M72 LAW"),
+        "tanks": Agent(x=0, y=0, fuel=1700, health=150, attack_range=3, accuracy=80, damage=9, suppression_per_hit=0.12, weapon="120mm Gun")
+    }
+    enemy = Enemy(x=9, y=9, health=150, accuracy=75, damage=9, suppression=0.0, weapon="120mm Gun", attack_range=3)
+    return State(terrain, agents, enemy)
