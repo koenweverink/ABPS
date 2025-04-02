@@ -38,32 +38,62 @@ def astar(grid, start, goal):
     return None
 
 def line_of_sight(grid, start, goal):
-    x0, y0 = start; x1, y1 = goal
-    dx = abs(x1 - x0); dy = abs(y1 - y0)
-    x, y = x0, y0
-    sx = -1 if x0 > x1 else 1; sy = -1 if y0 > y1 else 1
-    if dx > dy:
-        err = dx / 2.0
-        while x != x1:
-            if grid[x][y] == 1:
-                return False
+    x0, y0 = start
+    x1, y1 = goal
+    dx = abs(x1 - x0)
+    dy = abs(y1 - y0)
+    sx = 1 if x0 < x1 else -1
+    sy = 1 if y0 < y1 else -1
+    err = dx - dy
+    rows, cols = len(grid), len(grid[0])
+    
+    while True:
+        if not (0 <= x0 < rows and 0 <= y0 < cols) or grid[x0][y0] == 1:
+            return False
+        if x0 == x1 and y0 == y1:
+            return True
+        e2 = 2 * err
+        if e2 > -dy:
+            if sx != 0 and 0 <= x0 + sx < rows:
+                if (x0 == 1 and 0 <= y0 < cols and grid[1][y0] == 1) or \
+                   (x0 == 2 and 0 <= y0 < cols and grid[1][y0] == 1):
+                    return False
             err -= dy
-            if err < 0:
-                y += sy; err += dx
-            x += sx
-    else:
-        err = dy / 2.0
-        while y != y1:
-            if grid[x][y] == 1:
-                return False
-            err -= dx
-            if err < 0:
-                x += sx; err += dy
-            y += sy
-    return grid[x1][y1] == 0
+            x0 += sx
+        if e2 < dx:
+            if sy != 0 and 0 <= x0 < rows:
+                if (x0 == 2 and 0 <= y0 < cols and grid[1][y0] == 1) or \
+                   (x0 == 0 and 0 <= y0 < cols and grid[1][y0] == 1):
+                    return False
+            err += dx
+            y0 += sy
 
 def manhattan(a, b):
     return abs(a[0]-b[0]) + abs(a[1]-b[1])
+
+def find_reposition_target(state, unit_name):
+    grid = state["grid"]
+    enemy_pos = state["enemy"]["pos"]
+    unit = state["units"][unit_name]
+    best = None
+    best_dist = float('inf')
+    rows = len(grid)
+    cols = len(grid[0])
+    for i in range(rows):
+        for j in range(cols):
+            if grid[i][j] != 0 or (i, j) == enemy_pos and state["enemy"]["health"] > 0:
+                continue
+            if astar(grid, unit["pos"], (i, j)) is None:
+                continue
+            if not line_of_sight(grid, (i, j), enemy_pos):
+                continue
+            d = manhattan((i, j), enemy_pos)
+            if d > unit["attack_range"]:
+                continue
+            if d < best_dist:
+                best_dist = d
+                best = (i, j)
+    return best
 
 # ----- HTN Framework Classes -----
 class Task:
@@ -167,7 +197,7 @@ initial_state = {
         "tank": {
             "pos": (0,0),
             "health": 100,
-            "fuel": 100,
+            "fuel": 1000,
             "attack_range": 3,
             "accuracy": 0.8,
             "damage": 40,
@@ -176,7 +206,7 @@ initial_state = {
         "infantry": {
             "pos": (0,1),
             "health": 100,
-            "fuel": 100,
+            "fuel": 1000,
             "attack_range": 2,
             "accuracy": 0.6,
             "damage": 20,
@@ -194,12 +224,8 @@ initial_state = {
         "suppression_per_hit": 10
     },
     "outpost": (4,4),
-    "support_fired": False
-}
-damage_values = {
-    "tank": 40,
-    "infantry": 20,
-    "enemy_tank": 35
+    "support_fired": False,
+    "tank_waited": False
 }
 
 # ----- Friendly Operators (Cell-by-Cell Movement) -----
@@ -234,9 +260,7 @@ move_op = Operator("move", precond_move, effect_move)
 
 def precond_attack(state, unit_name):
     e = state["enemy"]
-    if e["health"] <= 0:
-        return False
-    if unit_name not in state["units"]:
+    if e["health"] <= 0 or unit_name not in state["units"]:
         return False
     unit = state["units"][unit_name]
     pos = unit["pos"]
@@ -270,11 +294,12 @@ def precond_support_fire(state, unit_name):
     unit = state["units"].get(unit_name)
     if not unit:
         return False
-    if not line_of_sight(state["grid"], unit["pos"], state["enemy"]["pos"]):
-        debug_print(f"{unit_name} has no LOS for support fire.")
+    enemy_pos = state["enemy"]["pos"]
+    if not line_of_sight(state["grid"], unit["pos"], enemy_pos):
+        debug_print(f"{unit_name} has no LOS for support fire to {enemy_pos}.")
         return False
-    if manhattan(unit["pos"], state["enemy"]["pos"]) > 4:
-        debug_print(f"{unit_name} is too far for support fire from enemy at {state['enemy']['pos']}.")
+    if manhattan(unit["pos"], enemy_pos) > unit["attack_range"]:
+        debug_print(f"{unit_name} is out of range (range: {unit['attack_range']}) for support fire to {enemy_pos}.")
         return False
     if state.get("support_fired", False):
         debug_print("Support fire already provided this cycle.")
@@ -291,48 +316,129 @@ def effect_support_fire(state, unit_name):
 
 support_fire_op = Operator("support_fire", precond_support_fire, effect_support_fire)
 
+# Wait operator for the tank.
 def precond_wait(state, unit_name):
-    # For the tank, allow waiting if support hasn't been provided.
     if unit_name == "tank":
         if not state.get("support_fired", False):
             return True
         return False
-    # For infantry, allow waiting unconditionally.
     return True
 
 def effect_wait(state, unit_name):
     new_state = copy.deepcopy(state)
+    if unit_name == "tank":
+        new_state["tank_waited"] = True
     debug_print(f"{unit_name} waited.")
     return new_state
 
 wait_op = Operator("wait", precond_wait, effect_wait)
 
+# Reposition operator for infantry using dynamic search.
 def precond_reposition(state, unit_name):
     unit = state["units"].get(unit_name)
-    if not unit:
+    if not unit or unit["fuel"] < 10:
         return False
-    # If the infantry does not have LOS to enemy, reposition is needed.
-    if not line_of_sight(state["grid"], unit["pos"], state["enemy"]["pos"]):
-        return True
-    return False
+    target = find_reposition_target(state, unit_name)
+    if target is None or unit["pos"] == target:
+        debug_print(f"No valid reposition target or already at target for {unit_name}.")
+        return False
+    return True
 
 def effect_reposition(state, unit_name):
     new_state = copy.deepcopy(state)
-    # For simplicity, move infantry to a fixed fallback cell that is assumed to have LOS.
-    fallback = (1,1)
-    new_state["units"][unit_name]["pos"] = fallback
-    new_state["units"][unit_name]["fuel"] -= 10
-    debug_print(f"{unit_name} repositioned to {fallback} (fuel left: {new_state['units'][unit_name]['fuel']})")
+    unit = new_state["units"][unit_name]
+    target = find_reposition_target(new_state, unit_name)
+    if target is None:
+        debug_print(f"No reposition target found for {unit_name}; not repositioning.")
+        return new_state
+    current_pos = unit["pos"]
+    path = astar(new_state["grid"], current_pos, target)
+    if path and len(path) > 1:
+        next_cell = path[1]  # Move one step
+        unit["pos"] = next_cell
+        unit["fuel"] -= 10
+        new_state["tank_waited"] = False
+        debug_print(f"{unit_name} repositioned from {current_pos} to {next_cell} toward {target} (fuel left: {unit['fuel']})")
     return new_state
 
 reposition_op = Operator("reposition", precond_reposition, effect_reposition)
 
+def find_reposition_target(state, unit_name):
+    grid = state["grid"]
+    enemy_pos = state["enemy"]["pos"]
+    unit = state["units"][unit_name]
+    best = None
+    best_dist = float('inf')
+    rows = len(grid)
+    cols = len(grid[0])
+    for i in range(rows):
+        for j in range(cols):
+            if grid[i][j] != 0:
+                continue
+            if astar(grid, unit["pos"], (i,j)) is None:
+                continue
+            if not line_of_sight(grid, (i,j), enemy_pos):
+                continue
+            d = manhattan((i,j), enemy_pos)
+            if d < best_dist:
+                best = (i,j)
+                best_dist = d
+    return best
+
+reposition_op = Operator("reposition", precond_reposition, effect_reposition)
+
+def precond_move_to_safe_position(state, unit_name):
+    unit = state["units"].get(unit_name)
+    if not unit or unit["fuel"] < 10:
+        return False
+    enemy_pos = state["enemy"]["pos"]
+    grid = state["grid"]
+    rows, cols = len(grid), len(grid[0])
+    for i in range(rows):
+        for j in range(cols):
+            if grid[i][j] == 0 and (i, j) != unit["pos"] and astar(grid, unit["pos"], (i, j)) is not None:
+                dist = manhattan((i, j), enemy_pos)
+                if dist > state["enemy"]["attack_range"]:  # Must be > 3
+                    return True
+    return False
+
+def effect_move_to_safe_position(state, unit_name):
+    new_state = copy.deepcopy(state)
+    unit = new_state["units"][unit_name]
+    enemy_pos = new_state["enemy"]["pos"]
+    grid = new_state["grid"]
+    rows, cols = len(grid), len(grid[0])
+    best_pos = None
+    best_dist = float('inf')
+    for i in range(rows):
+        for j in range(cols):
+            if grid[i][j] == 0 and (i, j) != unit["pos"]:
+                path = astar(grid, unit["pos"], (i, j))
+                if path is None:
+                    continue
+                dist = manhattan((i, j), enemy_pos)
+                if dist > state["enemy"]["attack_range"]:
+                    if dist < best_dist:  # Closest safe position
+                        best_pos = (i, j)
+                        best_dist = dist
+    if best_pos:
+        path = astar(grid, unit["pos"], best_pos)
+        next_cell = path[1] if len(path) > 1 else best_pos
+        unit["pos"] = next_cell
+        unit["fuel"] -= 10
+        debug_print(f"{unit_name} moved to safe position {next_cell} (fuel left: {unit['fuel']})")
+    return new_state
+
+move_to_safe_op = Operator("move_to_safe_position", precond_move_to_safe_position, effect_move_to_safe_position)
+
+# ----- Operators Dictionary -----
 operators = {
     "move": move_op,
     "attack": attack_op,
     "support_fire": support_fire_op,
     "wait": wait_op,
-    "reposition": reposition_op
+    "reposition": reposition_op,
+    "move_to_safe_position": move_to_safe_op
 }
 
 # ----- Methods for Friendly HTN Tasks -----
@@ -350,10 +456,9 @@ def subtasks_secure_outpost_original(st):
 secure_outpost_original = Method("secure_outpost", precond_secure_outpost, subtasks_secure_outpost_original)
 
 def precond_neutralize_enemy_with_support(st):
-    return st["enemy"]["health"] > 0
+    return st["enemy"]["health"] > 0 and precond_support_fire(st, "infantry")
 
 def subtasks_neutralize_enemy_with_support(st):
-    # Coordinated method: if infantry has LOS and support not provided, do support_fire.
     if precond_support_fire(st, "infantry"):
         return [Task("support_fire", ["infantry"])]
     if st["units"]["tank"]["pos"] != st["enemy"]["pos"]:
@@ -363,20 +468,55 @@ def subtasks_neutralize_enemy_with_support(st):
 neutralize_enemy_with_support = Method("neutralize_enemy_with_support", precond_neutralize_enemy_with_support, subtasks_neutralize_enemy_with_support)
 
 def precond_neutralize_enemy_with_support_wait(st):
-    # Applicable if enemy is alive and infantry cannot provide support (no LOS).
-    if st["enemy"]["health"] > 0 and not precond_support_fire(st, "infantry"):
-        return True
-    return False
+    return (st["enemy"]["health"] > 0 and 
+            (not line_of_sight(st["grid"], st["units"]["infantry"]["pos"], st["enemy"]["pos"]) or 
+             manhattan(st["units"]["tank"]["pos"], st["enemy"]["pos"]) > st["enemy"]["attack_range"]))
 
 def subtasks_neutralize_enemy_with_support_wait(st):
-    # Wait for the tank, then have infantry reposition, then support fire, then attack.
-    return [Task("wait", ["tank"]),
-            Task("reposition", ["infantry"]),
-            Task("support_fire", ["infantry"]),
-            Task("move", ["tank", st["enemy"]["pos"]]),
-            Task("attack", ["tank"])]
-        
+    tasks = [
+        Task("move_to_safe_position", ["tank"]),
+        Task("wait", ["tank"])
+    ]
+    infantry_pos = st["units"]["infantry"]["pos"]
+    enemy_pos = st["enemy"]["pos"]
+    infantry = st["units"]["infantry"]
+    target = find_reposition_target(st, "infantry")
+    if target and (not line_of_sight(st["grid"], infantry_pos, enemy_pos) or manhattan(infantry_pos, enemy_pos) > infantry["attack_range"]):
+        path = astar(st["grid"], infantry_pos, target)
+        if path:
+            for i in range(1, len(path)):
+                next_pos = path[i]
+                tasks.append(Task("reposition", ["infantry"]))
+                if line_of_sight(st["grid"], next_pos, enemy_pos) and manhattan(next_pos, enemy_pos) <= infantry["attack_range"]:
+                    break
+    tasks.append(Task("support_fire", ["infantry"]))
+    
+    tank_pos = st["units"]["tank"]["pos"]
+    tank = st["units"]["tank"]
+    # Find a position within tank's attack range with LOS
+    attack_target = None
+    for i in range(len(st["grid"])):
+        for j in range(len(st["grid"][0])):
+            if st["grid"][i][j] == 0 and (i, j) != enemy_pos and line_of_sight(st["grid"], (i, j), enemy_pos) and manhattan((i, j), enemy_pos) <= tank["attack_range"]:
+                attack_target = (i, j)
+                break
+        if attack_target:
+            break
+    if attack_target:
+        path_to_attack = astar(st["grid"], tank_pos, attack_target)
+        if path_to_attack:
+            for i in range(1, len(path_to_attack)):
+                tasks.append(Task("move", ["tank", attack_target]))
+    
+    enemy_hp = st["enemy"]["health"]
+    tank_dmg = st["units"]["tank"]["damage"]
+    attacks_needed = (enemy_hp + tank_dmg - 1) // tank_dmg
+    tasks.extend([Task("attack", ["tank"]) for _ in range(attacks_needed)])
+    
+    return tasks
+
 neutralize_enemy_with_support_wait = Method("neutralize_enemy_with_support", precond_neutralize_enemy_with_support_wait, subtasks_neutralize_enemy_with_support_wait)
+
 
 def precond_occupy_outpost(st):
     inf = st["units"].get("infantry")
@@ -391,8 +531,16 @@ def subtasks_secure_outpost_coordinated(st):
     tasks = []
     if st["enemy"]["health"] > 0:
         tasks.append(Task("neutralize_enemy_with_support"))
-    if st["units"].get("infantry", {}).get("pos") != st["outpost"]:
-        tasks.append(Task("occupy_outpost"))
+    if st["units"]["tank"]["pos"] != st["outpost"]:
+        path = astar(st["grid"], st["units"]["tank"]["pos"], st["outpost"])
+        if path:
+            for i in range(1, len(path)):
+                tasks.append(Task("move", ["tank", st["outpost"]]))
+    if st["units"]["infantry"]["pos"] != st["outpost"]:
+        path = astar(st["grid"], st["units"]["infantry"]["pos"], st["outpost"])
+        if path:
+            for i in range(1, len(path)):
+                tasks.append(Task("move", ["infantry", st["outpost"]]))
     return tasks
 
 secure_outpost_coordinated = Method("secure_outpost", precond_secure_outpost, subtasks_secure_outpost_coordinated)
@@ -404,45 +552,59 @@ methods = {
     "occupy_outpost": [occupy_outpost_m]
 }
 
-# ----- Main Simulation Loop (Modified to Prefer Wait Branch) -----
+# ----- Main Simulation Loop (Using a Current Plan) -----
 state = copy.deepcopy(initial_state)
 friendly_tasks = [Task("secure_outpost")]
 max_steps = 50
 step = 0
 executed_plan = []
+current_plan = []  # Holds the candidate plan once generated
+
 while step < max_steps:
     debug_print(f"\n--- Simulation Step {step} ---")
-    debug_print(f"Tank pos: {state['units']['tank']['pos']}, Infantry pos: {state['units']['infantry']['pos']}")
+    debug_print(f"Tank pos: {state['units']['tank']['pos']}, Infantry pos: {state['units']['infantry']['pos']}, Enemy HP: {state['enemy']['health']}")
     
-    candidates = enumerate_plans(state, friendly_tasks, operators, methods)
-    debug_print(f"Candidate Plans: {candidates}")
-    if not candidates:
-        debug_print("No candidate plans found. Exiting simulation.")
+    if not current_plan:
+        candidates = enumerate_plans(state, friendly_tasks, operators, methods)
+        candidates = [plan for plan in candidates if plan]
+        debug_print(f"Candidate Plans: {candidates}")
+        if not candidates:
+            debug_print("No non-empty candidate plans found; replanning with secure_outpost.")
+            friendly_tasks = [Task("secure_outpost")]
+            candidates = enumerate_plans(state, friendly_tasks, operators, methods)
+            candidates = [plan for plan in candidates if plan]
+            if not candidates:
+                debug_print("Still no non-empty plans. Exiting simulation.")
+                break
+        for plan in candidates:
+            if any(action.name == "move_to_safe_position" for action in plan) and any(action.name == "wait" for action in plan):
+                current_plan = plan
+                break
+        else:
+            current_plan = candidates[0]
+        debug_print(f"Chosen candidate plan: {current_plan}")
+    
+    if not current_plan:
+        continue
+    
+    action = current_plan.pop(0)
+    if operators[action.name].applicable(state, *action.args):
+        state = operators[action.name].apply(state, *action.args)
+        debug_print(f"Executed action: {action}")
+        executed_plan.append(action)
+    else:
+        debug_print(f"Action {action} not applicable; skipping and replanning.")
+        current_plan = []
+    
+    if state["enemy"]["health"] <= 0 and state["units"]["tank"]["pos"] == state["outpost"] and state["units"]["infantry"]["pos"] == state["outpost"]:
+        debug_print("Mission complete: enemy neutralized and outpost secured by both units.")
         break
-
-    # Choose a candidate plan that contains a "wait" action if available.
-    chosen_plan = None
-    for plan in candidates:
-        if any(action.name == "wait" for action in plan):
-            chosen_plan = plan
-            break
-    if chosen_plan is None:
-        chosen_plan = candidates[0]
-    debug_print(f"Chosen candidate plan: {chosen_plan}")
+    elif state["enemy"]["health"] <= 0 and (state["units"]["tank"]["pos"] != state["outpost"] or state["units"]["infantry"]["pos"] != state["outpost"]):
+        friendly_tasks = [Task("secure_outpost")]
+        current_plan = []
+    elif not current_plan:
+        friendly_tasks = [Task("secure_outpost")]
     
-    action = chosen_plan[0]
-    state = operators[action.name].apply(state, *action.args)
-    executed_plan.append(action)
-    debug_print(f"Executed action: {action}")
-    
-    friendly_tasks = [Task("secure_outpost")]
-    
-    if state["enemy"]["health"] <= 0 and state["units"].get("infantry", {}).get("pos") == state["outpost"]:
-        debug_print("Mission complete: enemy neutralized and outpost secured.")
-        break
-    if not state["units"]:
-        debug_print("All friendly units defeated.")
-        break
     step += 1
 
 debug_print("\nFinal State:")
