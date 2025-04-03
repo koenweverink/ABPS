@@ -456,14 +456,92 @@ def subtasks_secure_outpost_original(st):
 secure_outpost_original = Method("secure_outpost", precond_secure_outpost, subtasks_secure_outpost_original)
 
 def precond_neutralize_enemy_with_support(st):
-    return st["enemy"]["health"] > 0 and precond_support_fire(st, "infantry")
+    return st["enemy"]["health"] > 0
+
+def find_optimal_position(state, unit_name, enemy_pos):
+    grid = state["grid"]
+    unit = state["units"][unit_name]
+    current_pos = unit["pos"]
+    attack_range = unit["attack_range"]
+    rows, cols = len(grid), len(grid[0])
+    best_pos = None
+    min_dist_to_current = float('inf')
+    
+    for i in range(rows):
+        for j in range(cols):
+            pos = (i, j)
+            if grid[i][j] != 0 or pos == enemy_pos:  # Skip obstacles and enemy pos
+                continue
+            if not line_of_sight(grid, pos, enemy_pos):
+                continue
+            dist_to_enemy = manhattan(pos, enemy_pos)
+            if dist_to_enemy > attack_range:
+                continue
+            dist_to_current = manhattan(pos, current_pos)
+            path = astar(grid, current_pos, pos)
+            if path and dist_to_current < min_dist_to_current:
+                min_dist_to_current = dist_to_current
+                best_pos = pos
+    
+    return best_pos
 
 def subtasks_neutralize_enemy_with_support(st):
-    if precond_support_fire(st, "infantry"):
-        return [Task("support_fire", ["infantry"])]
-    if st["units"]["tank"]["pos"] != st["enemy"]["pos"]:
-        return [Task("move", ["tank", st["enemy"]["pos"]])]
-    return [Task("attack", ["tank"])]
+    tasks = []
+    enemy_pos = st["enemy"]["pos"]  # (2,2)
+    tank_pos = st["units"]["tank"]["pos"]
+    infantry_pos = st["units"]["infantry"]["pos"]
+    tank_range = st["units"]["tank"]["attack_range"]  # 3
+    infantry_range = st["units"]["infantry"]["attack_range"]  # 2
+
+    # Find optimal positions
+    tank_target = find_optimal_position(st, "tank", enemy_pos)
+    infantry_target = find_optimal_position(st, "infantry", enemy_pos)
+
+    # Move tank to its target if not already in range with LOS
+    if tank_target and (not line_of_sight(st["grid"], tank_pos, enemy_pos) or 
+                        manhattan(tank_pos, enemy_pos) > tank_range):
+        path = astar(st["grid"], tank_pos, tank_target)
+        if path:
+            for i in range(1, len(path)):
+                next_pos = path[i]
+                tasks.append(Task("move", ["tank", tank_target]))
+                # Stop moving if in range and has LOS
+                if (line_of_sight(st["grid"], next_pos, enemy_pos) and 
+                    manhattan(next_pos, enemy_pos) <= tank_range):
+                    break
+
+    # Move infantry to its target if not already in range with LOS
+    if infantry_target and (not line_of_sight(st["grid"], infantry_pos, enemy_pos) or 
+                           manhattan(infantry_pos, enemy_pos) > infantry_range):
+        path = astar(st["grid"], infantry_pos, infantry_target)
+        if path:
+            for i in range(1, len(path)):
+                next_pos = path[i]
+                tasks.append(Task("move", ["infantry", infantry_target]))
+                if (line_of_sight(st["grid"], next_pos, enemy_pos) and 
+                    manhattan(next_pos, enemy_pos) <= infantry_range):
+                    break
+
+    # Add support fire and attack if both units are in position
+    tank_in_position = (line_of_sight(st["grid"], tank_pos, enemy_pos) and 
+                        manhattan(tank_pos, enemy_pos) <= tank_range)
+    infantry_in_position = (line_of_sight(st["grid"], infantry_pos, enemy_pos) and 
+                           manhattan(infantry_pos, enemy_pos) <= infantry_range)
+    
+    if tank_in_position and infantry_in_position:
+        tasks.append(Task("support_fire", ["infantry"]))
+        enemy_hp = st["enemy"]["health"]
+        tank_dmg = st["units"]["tank"]["damage"]
+        attacks_needed = (enemy_hp + tank_dmg - 1) // tank_dmg
+        tasks.extend([Task("attack", ["tank"]) for _ in range(attacks_needed)])
+
+    return tasks
+
+neutralize_enemy_with_support = Method(
+    "neutralize_enemy_with_support",
+    precond_neutralize_enemy_with_support,
+    subtasks_neutralize_enemy_with_support
+)
         
 neutralize_enemy_with_support = Method("neutralize_enemy_with_support", precond_neutralize_enemy_with_support, subtasks_neutralize_enemy_with_support)
 
@@ -473,47 +551,87 @@ def precond_neutralize_enemy_with_support_wait(st):
              manhattan(st["units"]["tank"]["pos"], st["enemy"]["pos"]) > st["enemy"]["attack_range"]))
 
 def subtasks_neutralize_enemy_with_support_wait(st):
-    tasks = [
-        Task("move_to_safe_position", ["tank"]),
-        Task("wait", ["tank"])
-    ]
+    tasks = []
+    enemy_pos = st["enemy"]["pos"]  # (2,2)
+    tank_pos = st["units"]["tank"]["pos"]
     infantry_pos = st["units"]["infantry"]["pos"]
-    enemy_pos = st["enemy"]["pos"]
-    infantry = st["units"]["infantry"]
-    target = find_reposition_target(st, "infantry")
-    if target and (not line_of_sight(st["grid"], infantry_pos, enemy_pos) or manhattan(infantry_pos, enemy_pos) > infantry["attack_range"]):
-        path = astar(st["grid"], infantry_pos, target)
+    tank_range = st["units"]["tank"]["attack_range"]  # 3
+    infantry_range = st["units"]["infantry"]["attack_range"]  # 2
+    enemy_range = st["enemy"]["attack_range"]  # 3
+
+    # Find optimal positions within range and with LOS
+    tank_target = find_optimal_position(st, "tank", enemy_pos)
+    infantry_target = find_optimal_position(st, "infantry", enemy_pos)
+
+    # Tank: Move to a safe position (out of enemy range) if needed, then to attack position
+    if (not line_of_sight(st["grid"], tank_pos, enemy_pos) or 
+        manhattan(tank_pos, enemy_pos) > tank_range or 
+        manhattan(tank_pos, enemy_pos) <= enemy_range):
+        if manhattan(tank_pos, enemy_pos) <= enemy_range:  # If in enemy range, move to safe first
+            safe_target = None
+            rows, cols = len(st["grid"]), len(st["grid"][0])
+            for i in range(rows):
+                for j in range(cols):
+                    pos = (i, j)
+                    if (st["grid"][i][j] == 0 and pos != enemy_pos and 
+                        manhattan(pos, enemy_pos) > enemy_range and 
+                        astar(st["grid"], tank_pos, pos)):
+                        safe_target = pos
+                        break
+                if safe_target:
+                    break
+            if safe_target:
+                path = astar(st["grid"], tank_pos, safe_target)
+                for i in range(1, len(path)):
+                    next_pos = path[i]
+                    tasks.append(Task("move", ["tank", safe_target]))
+                    if manhattan(next_pos, enemy_pos) > enemy_range:
+                        break
+                tank_pos = path[-1]  # Update for next step planning
+
+        # Move to attack position if not already in range with LOS
+        if tank_target and (not line_of_sight(st["grid"], tank_pos, enemy_pos) or 
+                            manhattan(tank_pos, enemy_pos) > tank_range):
+            path = astar(st["grid"], tank_pos, tank_target)
+            if path:
+                for i in range(1, len(path)):
+                    next_pos = path[i]
+                    tasks.append(Task("move", ["tank", tank_target]))
+                    if (line_of_sight(st["grid"], next_pos, enemy_pos) and 
+                        manhattan(next_pos, enemy_pos) <= tank_range):
+                        break
+
+    # Tank waits if support hasn’t fired
+    if not st["support_fired"]:
+        tasks.append(Task("wait", ["tank"]))
+
+    # Infantry: Move to attack position if not already in range with LOS
+    if infantry_target and (not line_of_sight(st["grid"], infantry_pos, enemy_pos) or 
+                           manhattan(infantry_pos, enemy_pos) > infantry_range):
+        path = astar(st["grid"], infantry_pos, infantry_target)
         if path:
             for i in range(1, len(path)):
                 next_pos = path[i]
-                tasks.append(Task("reposition", ["infantry"]))
-                if line_of_sight(st["grid"], next_pos, enemy_pos) and manhattan(next_pos, enemy_pos) <= infantry["attack_range"]:
+                tasks.append(Task("move", ["infantry", infantry_target]))
+                if (line_of_sight(st["grid"], next_pos, enemy_pos) and 
+                    manhattan(next_pos, enemy_pos) <= infantry_range):
                     break
-    tasks.append(Task("support_fire", ["infantry"]))
+
+    # Add support fire and attack if both units are in position
+    tank_in_position = (line_of_sight(st["grid"], tank_pos, enemy_pos) and 
+                        manhattan(tank_pos, enemy_pos) <= tank_range)
+    infantry_in_position = (line_of_sight(st["grid"], infantry_pos, enemy_pos) and 
+                           manhattan(infantry_pos, enemy_pos) <= infantry_range)
     
-    tank_pos = st["units"]["tank"]["pos"]
-    tank = st["units"]["tank"]
-    # Find a position within tank's attack range with LOS
-    attack_target = None
-    for i in range(len(st["grid"])):
-        for j in range(len(st["grid"][0])):
-            if st["grid"][i][j] == 0 and (i, j) != enemy_pos and line_of_sight(st["grid"], (i, j), enemy_pos) and manhattan((i, j), enemy_pos) <= tank["attack_range"]:
-                attack_target = (i, j)
-                break
-        if attack_target:
-            break
-    if attack_target:
-        path_to_attack = astar(st["grid"], tank_pos, attack_target)
-        if path_to_attack:
-            for i in range(1, len(path_to_attack)):
-                tasks.append(Task("move", ["tank", attack_target]))
-    
-    enemy_hp = st["enemy"]["health"]
-    tank_dmg = st["units"]["tank"]["damage"]
-    attacks_needed = (enemy_hp + tank_dmg - 1) // tank_dmg
-    tasks.extend([Task("attack", ["tank"]) for _ in range(attacks_needed)])
-    
+    if tank_in_position and infantry_in_position:
+        tasks.append(Task("support_fire", ["infantry"]))
+        enemy_hp = st["enemy"]["health"]
+        tank_dmg = st["units"]["tank"]["damage"]
+        attacks_needed = (enemy_hp + tank_dmg - 1) // tank_dmg
+        tasks.extend([Task("attack", ["tank"]) for _ in range(attacks_needed)])
+
     return tasks
+
 
 neutralize_enemy_with_support_wait = Method("neutralize_enemy_with_support", precond_neutralize_enemy_with_support_wait, subtasks_neutralize_enemy_with_support_wait)
 
@@ -548,7 +666,7 @@ secure_outpost_coordinated = Method("secure_outpost", precond_secure_outpost, su
 methods = {
     "secure_outpost": [secure_outpost_original, secure_outpost_coordinated],
     "neutralize_enemy": [],
-    "neutralize_enemy_with_support": [neutralize_enemy_with_support_wait, neutralize_enemy_with_support],
+    "neutralize_enemy_with_support": [neutralize_enemy_with_support, neutralize_enemy_with_support_wait],
     "occupy_outpost": [occupy_outpost_m]
 }
 
