@@ -113,7 +113,7 @@ def create_enemy_state():
     }
 
 ###############################
-# HTN Domain and Planner (unchanged)
+# HTN Domain and Planner (modified for Plan 2)
 ###############################
 
 def enemy_not_in_range(state):
@@ -139,6 +139,12 @@ tank_plan1_domain = {
 
 infantry_plan1_domain = {
     "SecureOutpostMission": [
+        # If tank health < 25% and enemy alive, infantry attacks enemy
+        (lambda state: state.get("tank_health", 20) / state.get("tank_max_health", 20) < 0.25 and state["enemy"]["enemy_alive"] and manhattan(state["position"], state["enemy"]["enemy_position"]) > state["friendly_attack_range"],
+         ["MoveToEnemy", "AttackEnemy"]),
+        (lambda state: state.get("tank_health", 20) / state.get("tank_max_health", 20) < 0.25 and state["enemy"]["enemy_alive"] and manhattan(state["position"], state["enemy"]["enemy_position"]) <= state["friendly_attack_range"],
+         ["AttackEnemy"]),
+        # Default behavior when tank health >= 25%
         (lambda state: state["position"] != state["enemy"]["outpost_position"] and not state["enemy"]["outpost_secured"],
          ["MoveToOutpost", "SecureOutpost"]),
         (lambda state: state["position"] == state["enemy"]["outpost_position"] and not state["enemy"]["outpost_secured"],
@@ -146,6 +152,7 @@ infantry_plan1_domain = {
     ]
 }
 
+# Updated Plan 2 domain with tank health condition for infantry
 both_plan2_domain = {
     "EngageThenSecureMission": [
         (enemy_not_in_range, ["MoveToEnemy", "AttackEnemy"]),
@@ -158,26 +165,32 @@ both_plan2_domain = {
 class HTNPlanner:
     def __init__(self, domain): self.domain = domain
     def plan(self, task, state):
-        if task not in self.domain: return [task]
+        if task not in self.domain: 
+            return [task]
         for condition, subtasks in self.domain[task]:
             if condition(state):
                 plan = []
                 for subtask in subtasks:
                     sub_plan = self.plan(subtask, state)
-                    if sub_plan is None: break
+                    if sub_plan is None: 
+                        break
                     plan.extend(sub_plan)
-                else: return plan
+                else: 
+                    return plan
         return None
 
 ###############################
-# Team Commander (unchanged)
+# Team Commander (modified to share tank health)
 ###############################
 
 class TeamCommander:
-    def __init__(self, friendly_units): self.friendly_units = friendly_units
+    def __init__(self, friendly_units): 
+        self.friendly_units = friendly_units
+    
     def assign_roles(self):
         for unit in self.friendly_units:
             unit.state["role"] = "attacker" if isinstance(unit, FriendlyTank) else "outpost_securer"
+    
     def communicate_enemy_position(self):
         for unit in self.friendly_units:
             if has_line_of_sight(unit.state["position"], unit.state["enemy"]["enemy_position"]):
@@ -185,6 +198,15 @@ class TeamCommander:
                 for other in self.friendly_units:
                     other.state["enemy"]["enemy_position"] = observed
                 return
+    
+    def share_tank_health(self):
+        tank = next((unit for unit in self.friendly_units if isinstance(unit, FriendlyTank)), None)
+        if tank:
+            tank_health = tank.state["friendly_health"]
+            tank_max_health = tank.state["max_health"]
+            for unit in self.friendly_units:
+                unit.state["tank_health"] = tank_health
+                unit.state["tank_max_health"] = tank_max_health
 
 ###############################
 # Friendly Unit Classes (unchanged)
@@ -196,14 +218,33 @@ class FriendlyUnit:
         self.state = state
         self.planner = HTNPlanner(domain)
         self.current_plan = []
+        self.last_enemy_pos = state["enemy"]["enemy_position"]
+        self.last_health = state["friendly_health"]
 
-    def update_plan(self):
+    def update_plan(self, force_replan=False):
         mission = "DestroyEnemyMission" if isinstance(self, FriendlyTank) and self.planner.domain == tank_plan1_domain else \
                   "SecureOutpostMission" if isinstance(self, FriendlyInfantry) and self.planner.domain == infantry_plan1_domain else \
                   "EngageThenSecureMission"
-        plan = self.planner.plan(mission, self.state)
-        self.current_plan = plan if plan else []
-        print(f"{self.name} new plan: {self.current_plan}")
+        # Force replan only for infantry in Plan 1 when tank health < 25%
+        if force_replan and self.planner.domain == infantry_plan1_domain and isinstance(self, FriendlyInfantry):
+            new_plan = self.planner.plan(mission, self.state)
+            self.current_plan = new_plan if new_plan else []
+            print(f"{self.name} replanned due to tank health < 25%: {self.current_plan}")
+        elif not self.current_plan:  # Normal replan only if no plan exists
+            new_plan = self.planner.plan(mission, self.state)
+            self.current_plan = new_plan if new_plan else []
+            print(f"{self.name} replanned: {self.current_plan}")
+        else:
+            print(f"{self.name} current plan: {self.current_plan}")
+        self.last_enemy_pos = self.state["enemy"]["enemy_position"]
+        self.last_health = self.state["friendly_health"]
+
+    def should_replan(self):
+        # For infantry in Plan 1, force replan only when tank health < 25%
+        if self.planner.domain == infantry_plan1_domain and isinstance(self, FriendlyInfantry):
+            tank_health_low = self.state.get("tank_health", 20) / self.state.get("tank_max_health", 20) < 0.25
+            return tank_health_low
+        return False  # Tank only replans when plan is empty
 
     def attack_enemy(self):
         enemy_data = self.state["enemy"]
@@ -217,32 +258,45 @@ class FriendlyUnit:
                     D = self.state["penetration"] - enemy_data.get("enemy_armor", 0)
                     if random.random() < get_penetration_probability(D):
                         enemy_data["enemy_health"] -= self.state["damage"]
-                        if enemy_data["enemy_health"] <= 0: enemy_data["enemy_alive"] = False
+                        if enemy_data["enemy_health"] <= 0: 
+                            enemy_data["enemy_alive"] = False
                     enemy_data["suppression"][self.name] = enemy_data["suppression"].get(self.name, 0) + self.state["suppression"]
-
-    def hold_position(self):
-        enemy_pos = self.state["enemy"]["enemy_position"]
-        if manhattan(self.state["position"], enemy_pos) <= self.state["friendly_attack_range"] and has_line_of_sight(self.state["position"], enemy_pos):
-            self.attack_enemy()
 
     def execute_next_task(self):
         if self.current_plan:
-            task = self.current_plan.pop(0)
+            task = self.current_plan[0]  # Peek at the task
             if task == "MoveToEnemy":
-                self.state["position"] = next_step(self.state["position"], self.get_goal_position())
-            elif task == "AttackEnemy": self.attack_enemy()
+                current_pos = self.state["position"]
+                goal_pos = self.get_goal_position()
+                next_pos = next_step(current_pos, goal_pos)
+                self.state["position"] = next_pos
+                # Keep MoveToEnemy until in attack range
+                if manhattan(next_pos, goal_pos) <= self.state["friendly_attack_range"] and has_line_of_sight(next_pos, goal_pos):
+                    self.current_plan.pop(0)  # Remove only when in range with LOS
+            elif task == "AttackEnemy":
+                self.attack_enemy()
+                self.current_plan.pop(0)  # Remove after attacking
             elif task == "MoveToOutpost":
-                self.state["position"] = next_step(self.state["position"], self.state["enemy"]["outpost_position"])
+                current_pos = self.state["position"]
+                goal_pos = self.state["enemy"]["outpost_position"]
+                next_pos = next_step(current_pos, goal_pos)
+                self.state["position"] = next_pos
+                # Keep MoveToOutpost until at outpost
+                if next_pos == goal_pos:
+                    self.current_plan.pop(0)  # Remove only when at outpost
             elif task == "SecureOutpost":
                 if self.state["position"] == self.state["enemy"]["outpost_position"]:
                     self.state["enemy"]["outpost_secured"] = True
-                else: self.current_plan.insert(0, "SecureOutpost")
-            elif task == "HoldPosition": self.hold_position()
+                    self.current_plan.pop(0)  # Remove after securing
+                else:
+                    self.current_plan.pop(0)  # Remove and rely on replanning to add MoveToOutpost if needed
 
     def get_goal_position(self):
         if isinstance(self, FriendlyTank) and self.planner.domain == tank_plan1_domain:
             return self.state["enemy"]["enemy_position"] if self.state["enemy"]["enemy_alive"] else self.state["position"]
         elif isinstance(self, FriendlyInfantry) and self.planner.domain == infantry_plan1_domain:
+            if self.state.get("tank_health", 20) / self.state.get("tank_max_health", 20) < 0.25 and self.state["enemy"]["enemy_alive"]:
+                return self.state["enemy"]["enemy_position"]
             return self.state["enemy"]["outpost_position"]
         else:
             return self.state["enemy"]["enemy_position"] if self.state["enemy"]["enemy_alive"] else self.state["enemy"]["outpost_position"]
@@ -264,7 +318,7 @@ def enemy_attack(target_state, effective_accuracy):
             target_state["suppression_from_enemy"] = target_state.get("suppression_from_enemy", 0) + target_state["enemy"]["enemy_suppression"]
 
 ###############################
-# Simulation Class (modified)
+# Simulation Class (modified to share tank health)
 ###############################
 
 class Simulation:
@@ -373,6 +427,8 @@ class Simulation:
 
     def run(self, max_steps=50):
         self.step_count = 0
+        for unit in self.friendly_units:
+            unit.update_plan(force_replan=True)
         for _ in range(max_steps):
             if not self.friendly_units[0].state["enemy"]["enemy_alive"] and self.friendly_units[0].state["enemy"]["outpost_secured"]:
                 if self.visualize: 
@@ -402,9 +458,14 @@ class Simulation:
         if self.visualize: print(f"\n--- Simulation Step {self.step_count} ---")
         self.team_commander.assign_roles()
         self.team_commander.communicate_enemy_position()
+        self.team_commander.share_tank_health()  # Share tank health every step
         self.update_enemy_behavior()
         for unit in self.friendly_units:
-            unit.update_plan()
+            if unit.should_replan():
+                if self.visualize: print(f"{unit.name} triggered replanning due to tank health < 25%.")
+                unit.update_plan(force_replan=True)
+            else:
+                unit.update_plan()
             unit.execute_next_task()
             goal = unit.get_goal_position()
             if self.visualize:
@@ -419,7 +480,7 @@ class Simulation:
             print(f"Global enemy state: {self.friendly_units[0].state['enemy']}")
 
 ###############################
-# Main Simulation Setup (modified)
+# Main Simulation Setup (unchanged)
 ###############################
 
 if __name__ == "__main__":
@@ -432,11 +493,9 @@ if __name__ == "__main__":
         "rate_of_fire": 294, "damage": 0.8, "suppression": 0.01, "penetration": 1, "friendly_attack_range": 2, "role": "outpost_securer"
     }
 
-    # User input to choose mode
     mode = input("Enter mode (1: Test Plan 1, 2: Test Plan 2, 3: Compare Plans): ")
 
     if mode in ["1", "2"]:
-        # Test a single plan with debug output
         plan_name = "Plan 1" if mode == "1" else "Plan 2"
         domain_tank = tank_plan1_domain if mode == "1" else both_plan2_domain
         domain_infantry = infantry_plan1_domain if mode == "1" else both_plan2_domain
@@ -458,13 +517,11 @@ if __name__ == "__main__":
         print(f"Number of Steps Taken: {result['steps_taken']}")
 
     elif mode == "3":
-        # Compare plans with multiple runs
         plan1_scores = []
         plan2_scores = []
         num_runs = 10
 
         for i in range(num_runs):
-            # Plan 1
             enemy_state1 = create_enemy_state()
             tank_state1 = tank_state_template.copy(); tank_state1["enemy"] = enemy_state1
             infantry_state1 = infantry_state_template.copy(); infantry_state1["enemy"] = enemy_state1
@@ -475,7 +532,6 @@ if __name__ == "__main__":
             plan1_scores.append(result1)
             print(f"Plan 1, Run {i+1}: Score = {result1['score']:.1f}")
 
-            # Plan 2
             enemy_state2 = create_enemy_state()
             tank_state2 = tank_state_template.copy(); tank_state2["enemy"] = enemy_state2
             infantry_state2 = infantry_state_template.copy(); infantry_state2["enemy"] = enemy_state2
@@ -486,7 +542,6 @@ if __name__ == "__main__":
             plan2_scores.append(result2)
             print(f"Plan 2, Run {i+1}: Score = {result2['score']:.1f}")
 
-        # Evaluate and pick the best plan
         avg_plan1_score = np.mean([run["score"] for run in plan1_scores])
         avg_plan2_score = np.mean([run["score"] for run in plan2_scores])
 
@@ -498,7 +553,6 @@ if __name__ == "__main__":
         best_domain_tank = tank_plan1_domain if best_plan == "Plan 1" else both_plan2_domain
         best_domain_infantry = infantry_plan1_domain if best_plan == "Plan 1" else both_plan2_domain
 
-        # Run the best plan with visuals and debug output
         print(f"\nRunning Best Plan ({best_plan}) with Visualization...")
         enemy_state_best = create_enemy_state()
         tank_state_best = tank_state_template.copy(); tank_state_best["enemy"] = enemy_state_best
