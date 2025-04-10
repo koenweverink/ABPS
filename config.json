@@ -1,0 +1,32 @@
+# Example config files (save these separately as JSON)
+CONFIG = {
+    "grid": {"width": 10, "height": 10, "obstacles": [[3, 3], [3, 4], [3, 5], [4, 5], [6, 6]]},
+    "units": {
+        "FriendlyTank": {
+            "position": [0, 0], "health": 20, "max_health": 20, "armor": 17, "accuracy": 0.75,
+            "rate_of_fire": 4.9, "damage": 9, "suppression": 0.12, "penetration": 18, "attack_range": 3, "role": "attacker"
+        },
+        "FriendlyInfantry": {
+            "position": [0, 1], "health": 1, "max_health": 1, "armor": 0, "accuracy": 0.50,
+            "rate_of_fire": 294, "damage": 0.8, "suppression": 0.01, "penetration": 1, "attack_range": 2, "role": "outpost_securer"
+        },
+        "EnemyTank": {
+            "position": [7, 7], "health": 20, "max_health": 20, "armor": 17, "accuracy": 0.7,
+            "rate_of_fire": 4.9, "damage": 9, "suppression": 0.12, "penetration": 18, "attack_range": 3,
+            "patrol_points": [[7, 7], [7, 5], [5, 5], [5, 7]], "detection_range": 5, "retreat_point": [9, 9]
+        }
+    },
+    "simulation": {
+        "outpost_position": [9, 0], "max_steps": 50
+    },
+    "plans": {
+        "Plan1": {
+            "tank": "DestroyEnemyMission",
+            "infantry": "SecureOutpostMission"
+        },
+        "Plan2": {
+            "tank": "EngageThenSecureMission",
+            "infantry": "EngageThenSecureMission"
+        }
+    }
+}
