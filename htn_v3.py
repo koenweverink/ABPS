@@ -1,6 +1,7 @@
 import random
 import heapq
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
 import itertools
 
@@ -8,16 +9,33 @@ import itertools
 # Grid, Obstacles, and LOS (unchanged)
 ###############################
 
-GRID_WIDTH = 20
-GRID_HEIGHT = 20
-obstacles = {(i, j) for i in range(8, 12) for j in range(8, 12)}
+GRID_WIDTH = 50
+GRID_HEIGHT = 50
+CELL_SIZE = 100
+
+# Make a river obstacle in the first third of the grid with 3 bridges.
+river_columns = range(round(GRID_WIDTH/3), (round(GRID_WIDTH/3)) + 5)  # River is 5 cells wide
+bridge_centers = [10, 25, 40]   # These values can be adjusted to your liking
+bridge_group_size = 2           # Height of each bridge (number of rows with no obstacles)
+bridge_rows = set()
+for center in bridge_centers:
+    bridge_rows.update(range(center - bridge_group_size // 2, center - bridge_group_size // 2 + bridge_group_size))
+
+# River obstacles
+river = {(x, y) for x in river_columns for y in range(GRID_HEIGHT) if y not in bridge_rows}
+
+# forest in top right corner
+forest = {(x, y) for x in range(GRID_WIDTH - 20, GRID_WIDTH - 5) for y in range(GRID_HEIGHT - 20, GRID_HEIGHT - 5)}
+
+# Create obstacles in the grid, excluding the river and bridge rows.
+obstacles = {} 
 
 def in_bounds(pos): 
     return 0 <= pos[0] < GRID_WIDTH and 0 <= pos[1] < GRID_HEIGHT
 
 def neighbors(pos): 
     return [p for p in [(pos[0]+1, pos[1]), (pos[0]-1, pos[1]), (pos[0], pos[1]+1), (pos[0], pos[1]-1)]
-            if in_bounds(p) and p not in obstacles]
+            if in_bounds(p) and p not in obstacles and p not in river]
 
 def manhattan(p, q): 
     return abs(p[0]-q[0]) + abs(p[1]-q[1])
@@ -120,51 +138,55 @@ def select_enemy_for_unit(enemy_units, friendly_unit):
 
 def create_enemy_state(index=0):
     """Create a distinct enemy state based on an index."""
+def create_enemy_state(index=0):
+    """Create a distinct enemy state based on an index using grid dimensions."""
     if index == 0:
+        # For EnemyTank1, place it near the top right but a few cells down.
         state = {
             "name": "EnemyTank1",
-            "enemy_position": (19, 13),
+            "enemy_position": (GRID_WIDTH - 1, GRID_HEIGHT - 5),
             "enemy_alive": True,
             "enemy_health": 20,
             "max_health": 20,
             "enemy_armor": 17,
-            "outpost_position": (19, 0),
+            "outpost_position": (GRID_WIDTH - 1, 0),
             "outpost_secured": False,
-            "enemy_attack_range": 3,
+            "enemy_attack_range": 2400 / CELL_SIZE,
             "enemy_accuracy": 0.7,
             "enemy_penetration": 18,
             "enemy_damage": 9,
             "enemy_suppression": 0.12,
             "rate_of_fire": 4.9,
             "suppression": {},
-            "patrol_points": [(19, 13), (0, 13)],
+            "patrol_points": [(GRID_WIDTH - 1, GRID_HEIGHT - 5), (0, GRID_HEIGHT - 5)],
             "current_patrol_index": 0,
-            "detection_range": 5,
-            "retreat_point": (19, 19)
+            "vision_range": 2000 / CELL_SIZE,
+            "retreat_point": (GRID_WIDTH - 1, GRID_HEIGHT - 1)
         }
     else:
         state = {
             "name": "EnemyTank2",
-            "enemy_position": (17, 1),
+            "enemy_position": (GRID_WIDTH - 3, 2),
             "enemy_alive": True,
             "enemy_health": 20,
             "max_health": 20,
             "enemy_armor": 17,
-            "outpost_position": (19, 0),
+            "outpost_position": (GRID_WIDTH - 1, 0),
             "outpost_secured": False,
-            "enemy_attack_range": 3,
+            "enemy_attack_range": 2400 / CELL_SIZE,
             "enemy_accuracy": 0.7,
             "enemy_penetration": 18,
             "enemy_damage": 9,
             "enemy_suppression": 0.12,
             "rate_of_fire": 4.9,
             "suppression": {},
-            "patrol_points": [(17, 1), (14, 5)],
+            "patrol_points": [(GRID_WIDTH - 3, 2), (GRID_WIDTH // 2, GRID_HEIGHT // 2)],
             "current_patrol_index": 0,
-            "detection_range": 5,
-            "retreat_point": (9, 9)
+            "vision_range": 2000 / CELL_SIZE,
+            "retreat_point": (GRID_WIDTH - 1, GRID_HEIGHT - 1)
         }
     return state
+
 
 ###############################
 # HTN Domains and Planners
@@ -196,7 +218,7 @@ enemy_plan_domain = {
         (lambda state: any(manhattan(state["enemy_position"], u.state["position"]) <= state["enemy_attack_range"] and 
                            has_line_of_sight(state["enemy_position"], u.state["position"])
                            for u in state["friendly_units"]), ["AttackTarget"]),
-        (lambda state: any(manhattan(state["enemy_position"], u.state["position"]) <= state["detection_range"] and 
+        (lambda state: any(manhattan(state["enemy_position"], u.state["position"]) <= state["vision_range"] and 
                            has_line_of_sight(state["enemy_position"], u.state["position"])
                            for u in state["friendly_units"]), ["ChaseTarget"]),
         (lambda state: True, ["Patrol"])
@@ -477,6 +499,9 @@ class FriendlyInfantry(FriendlyUnit):
 class FriendlyArtillery(FriendlyUnit): 
     pass
 
+class FriendlyScout(FriendlyUnit):
+    pass
+
 ###############################
 # Simulation Class (supports multiple enemy units)
 ###############################
@@ -573,27 +598,67 @@ class Simulation:
         }
 
     def update_plot(self):
+
+        major_step = 500
         self.ax.clear()
-        self.ax.set_xlim(-1, GRID_WIDTH)
-        self.ax.set_ylim(-1, GRID_HEIGHT)
-        self.ax.set_xticks(range(GRID_WIDTH))
-        self.ax.set_yticks(range(GRID_HEIGHT))
+        self.fig.set_size_inches(8, 8)
+
+        # Set axis limits in physical meters.
+        self.ax.set_xlim(-CELL_SIZE/2, GRID_WIDTH * CELL_SIZE - CELL_SIZE/2)
+        self.ax.set_ylim(-CELL_SIZE/2, GRID_HEIGHT * CELL_SIZE - CELL_SIZE/2)
+        
+        # Define major ticks every 500 m.
+        self.ax.set_xticks(np.arange(0, (GRID_WIDTH+1)*CELL_SIZE, major_step))
+        self.ax.set_yticks(np.arange(0, (GRID_HEIGHT+1)*CELL_SIZE, major_step))
+        self.ax.xaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f} m"))
+        self.ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f} m"))
+        
         self.ax.grid(True)
+        self.ax.set_aspect("equal", adjustable="box")
+
+        # Draw obstacles (convert grid coords to physical coordinates)
         for obs in obstacles:
-            self.ax.add_patch(plt.Rectangle(obs, 1, 1, color='black'))
+            self.ax.add_patch(plt.Rectangle((obs[0] * CELL_SIZE, obs[1] * CELL_SIZE),
+                                            CELL_SIZE, CELL_SIZE, color='black'))
+        
+        for r in river:
+            self.ax.add_patch(plt.Rectangle((r[0] * CELL_SIZE, r[1] * CELL_SIZE),
+                                            CELL_SIZE, CELL_SIZE, color='blue'))
+            
+        for f in forest:
+            self.ax.add_patch(plt.Rectangle((f[0] * CELL_SIZE, f[1] * CELL_SIZE),
+                                            CELL_SIZE, CELL_SIZE, color='green'))
+
+        # Draw the outpost (using grid to physical conversion)
         if self.enemy_units:
             outpost = self.enemy_units[0].state["outpost_position"]
-            self.ax.plot(outpost[0]+0.5, outpost[1]+0.5, marker='*', markersize=15, color='magenta', label='Outpost')
+            outpost_x = outpost[0] * CELL_SIZE + CELL_SIZE/2
+            outpost_y = outpost[1] * CELL_SIZE + CELL_SIZE/2
+            self.ax.plot(outpost_x, outpost_y, marker='*', markersize=12, color='magenta', label='Outpost')
+
+        # Draw enemies.
         for enemy in self.enemy_units:
             if enemy.state["enemy_alive"]:
-                enemy_pos = enemy.state["enemy_position"]
-                self.ax.plot(enemy_pos[0]+0.5, enemy_pos[1]+0.5, marker='s', markersize=12, color='green', label='Enemy')
+                ex, ey = enemy.state["enemy_position"]
+                center_x = ex * CELL_SIZE + CELL_SIZE / 2
+                center_y = ey * CELL_SIZE + CELL_SIZE / 2
+                self.ax.plot(center_x, center_y, marker='s', markersize=12, color='green', label='Enemy')
+                # Draw enemy health bar above the enemy.
                 frac = enemy.state["enemy_health"] / enemy.state["max_health"]
-                bar_width = 0.8 * frac
-                self.ax.add_patch(plt.Rectangle((enemy_pos[0]+0.1, enemy_pos[1]+0.8), bar_width, 0.1, color='green'))
-                self.ax.add_patch(plt.Rectangle((enemy_pos[0]+0.1, enemy_pos[1]+0.8), 0.8, 0.1, fill=False, edgecolor='black'))
+                bar_width = 100  # width in meters
+                bar_height = 15  # height in meters
+                bar_x = center_x - bar_width/2
+                bar_y = center_y + 100  # 40 m above the center
+                self.ax.add_patch(plt.Rectangle((bar_x, bar_y), bar_width*frac, bar_height, color='green', zorder=5))
+                self.ax.add_patch(plt.Rectangle((bar_x, bar_y), bar_width, bar_height, fill=False, edgecolor='black', zorder=5))
+        
+        # Draw friendlies.
         for unit in self.friendly_units:
             pos = unit.state["position"]
+            center_x = pos[0] * CELL_SIZE + CELL_SIZE/2
+            center_y = pos[1] * CELL_SIZE + CELL_SIZE/2
+
+            # Color by role.
             if unit.state.get("role") == "attacker":
                 color = 'red'
             elif unit.state.get("role") == "outpost_securer":
@@ -602,18 +667,29 @@ class Simulation:
                 color = 'orange'
             else:
                 color = 'gray'
-            markersize = 12 if unit.state.get("armor", 0) > 0 else 8
-            self.ax.plot(pos[0]+0.5, pos[1]+0.5, marker='o', markersize=markersize, color=color)
-            self.ax.text(pos[0]+0.2, pos[1]+0.2, unit.name, fontsize=9, color='black')
-            max_hp = unit.state["max_health"]
+
+            # Plot the friendly unit.
+            markersize = 12  # Marker size in points.
+            self.ax.plot(center_x, center_y, marker='o', markersize=markersize, color=color, zorder=5)
+
+            # Put unit name above its marker. Use an offset in meters.
+            self.ax.text(center_x + 40, center_y + 40, unit.name, fontsize=8, color='black', zorder=5)
+
+            # Draw the health bar above the unit.
             hp = unit.state["friendly_health"]
+            max_hp = unit.state["max_health"]
             frac = hp / max_hp if max_hp > 0 else 0
-            bar_width = 0.8 * frac
-            self.ax.add_patch(plt.Rectangle((pos[0]+0.1, pos[1]+0.8), bar_width, 0.1, color='green'))
-            self.ax.add_patch(plt.Rectangle((pos[0]+0.1, pos[1]+0.8), 0.8, 0.1, fill=False, edgecolor='black'))
+            bar_width = 100  # width in meters (adjust as needed)
+            bar_height = 15  # height in meters
+            bar_x = center_x - bar_width/2
+            bar_y = center_y + 60  # place the bar 60 m above the center
+            self.ax.add_patch(plt.Rectangle((bar_x, bar_y), bar_width * frac, bar_height, color='green', zorder=5))
+            self.ax.add_patch(plt.Rectangle((bar_x, bar_y), bar_width, bar_height, fill=False, edgecolor='black', zorder=5))
+
         self.ax.set_title(f"Simulation Step {self.step_count} - {self.plan_name}")
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
+
 
     def step(self):
         self.step_count += 1
@@ -725,7 +801,7 @@ if __name__ == "__main__":
         "damage": 9,
         "suppression": 0.12,
         "penetration": 18,
-        "friendly_attack_range": 3,
+        "friendly_attack_range": 2400 / CELL_SIZE,
         "role": "attacker"
     }
     # Friendly infantry state template
@@ -739,7 +815,7 @@ if __name__ == "__main__":
         "damage": 0.8,
         "suppression": 0.01,
         "penetration": 1,
-        "friendly_attack_range": 2,
+        "friendly_attack_range": 1200 / CELL_SIZE,
         "role": "outpost_securer"
     }
     # New friendly artillery state template
@@ -753,8 +829,23 @@ if __name__ == "__main__":
         "damage": 3.5,
         "suppression": 15,
         "penetration": 1,
-        "friendly_attack_range": 8,
+        "friendly_attack_range": 4000 / CELL_SIZE, 
         "role": "support"
+    }
+
+    scout_state_template = {
+        "position": (1, 1),
+        "friendly_health": 18,
+        "max_health": 18,
+        "armor": 3,
+        "friendly_accuracy": 0.35,
+        "rate_of_fire": 115,
+        "damage": 2.4,
+        "suppression": 5,
+        "penetration": 5,
+        "vision_range": 2000 / CELL_SIZE,
+        "friendly_attack_range": 1800 / CELL_SIZE,
+        "role": "scout"
     }
 
     # ----------------------------
@@ -866,7 +957,7 @@ if __name__ == "__main__":
         # Enemy Target Assignment Dimension
         # ----------------------------
         # Each friendly unit independently chooses between enemy 1 (index 0) or enemy 2 (index 1)
-        num_friendlies = 3
+        num_friendlies = 4
         enemy_target_combinations = list(itertools.product([0, 1], repeat=num_friendlies))
         # For friendly candidate combinations we simply assign the same candidate to all friendlies.
         friendly_candidate_combinations = list(itertools.product([candidate_domain], repeat=num_friendlies))
@@ -879,7 +970,7 @@ if __name__ == "__main__":
         enemy_target_usage = {0: {"count": 0}, 1: {"count": 0}}
         
         combination_results = []
-        runs_per_combination = 10
+        runs_per_combination = 2
         
         for (friendly_combo, enemy_targets) in full_combinations:
             # friendly_combo is a tuple of 3 copies of candidate_domain.
@@ -898,23 +989,27 @@ if __name__ == "__main__":
                 tank_state = tank_state_template.copy()
                 infantry_state = infantry_state_template.copy()
                 artillery_state = artillery_state_template.copy()
+                scout_state = scout_state_template.copy()
 
                 # Assign enemy state by reference.
                 tank_state["enemy"] = enemy_state1
                 infantry_state["enemy"] = enemy_state1
                 artillery_state["enemy"] = enemy_state1
+                scout_state["enemy"] = enemy_state1
 
                 # Important: assign target_enemy by reference from enemy_unit.state rather than using enemy_state1/2 directly.
                 tank_state["target_enemy"] = enemy_unit1.state if enemy_targets[0] == 0 else enemy_unit2.state
                 infantry_state["target_enemy"] = enemy_unit1.state if enemy_targets[1] == 0 else enemy_unit2.state
                 artillery_state["target_enemy"] = enemy_unit1.state if enemy_targets[2] == 0 else enemy_unit2.state
-
+                scout_state["target_enemy"] = enemy_unit1.state if enemy_targets[3] == 0 else enemy_unit2.state
                 
                 # Create friendly units using candidate_domain.
                 tank_unit = FriendlyTank("FriendlyTank", tank_state, candidate_domain)
                 infantry_unit = FriendlyInfantry("FriendlyInfantry", infantry_state, candidate_domain)
                 artillery_unit = FriendlyArtillery("FriendlyArtillery", artillery_state, candidate_domain)
-                friendly_units = [tank_unit, infantry_unit, artillery_unit]
+                scout_unit = FriendlyScout("FriendlyScout", scout_state, candidate_domain)
+
+                friendly_units = [tank_unit, infantry_unit, artillery_unit, scout_unit]
                 
                 # Override update_plan so that candidate mission is used.
                 for unit in friendly_units:
@@ -972,17 +1067,21 @@ if __name__ == "__main__":
             tank_state = tank_state_template.copy()
             infantry_state = infantry_state_template.copy()
             artillery_state = artillery_state_template.copy()
+            scout_state = scout_state_template.copy()
             tank_state["enemy"] = enemy_state1
             infantry_state["enemy"] = enemy_state1
             artillery_state["enemy"] = enemy_state1
+            scout_state["enemy"] = enemy_state1
             tank_state["target_enemy"] = enemy_state1 if best_enemy_targets[0] == 0 else enemy_state2
             infantry_state["target_enemy"] = enemy_state1 if best_enemy_targets[1] == 0 else enemy_state2
             artillery_state["target_enemy"] = enemy_state1 if best_enemy_targets[2] == 0 else enemy_state2
+            scout_state["target_enemy"] = enemy_state1 if best_enemy_targets[3] == 0 else enemy_state2
             
             tank_unit = FriendlyTank("FriendlyTank", tank_state, secure_outpost_domain)
             infantry_unit = FriendlyInfantry("FriendlyInfantry", infantry_state, secure_outpost_domain)
             artillery_unit = FriendlyArtillery("FriendlyArtillery", artillery_state, secure_outpost_domain)
-            friendly_units = [tank_unit, infantry_unit, artillery_unit]
+            scout_unit = FriendlyScout("FriendlyScout", scout_state, secure_outpost_domain)
+            friendly_units = [tank_unit, infantry_unit, artillery_unit, scout_unit]
             
             commander = TeamCommander(friendly_units)
             sim = Simulation(friendly_units, enemy_units, commander,
