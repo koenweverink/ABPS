@@ -64,7 +64,7 @@ def astar(start, goal, enemy_units=None, unit="unknown"):
             break
         for nxt in neighbors(current):
             # Skip invalid cells based on unit type
-            if unit in ["tank", "artillery"]:
+            if unit in ["tank", "artillery", "anti-tank"]:
                 if is_in_cover(nxt):
                     continue
             # Base cost
@@ -649,6 +649,9 @@ class FriendlyArtillery(FriendlyUnit):
 class FriendlyScout(FriendlyUnit):
     def __init__(self, name, state, domain, simulation=None):
         super().__init__(name, state, domain, simulation)
+class FriendlyAntiTank(FriendlyUnit):
+    def __init__(self, name, state, domain, simulation=None):
+        super().__init__(name, state, domain, simulation)
 
 ###############################
 # TeamCommander and Simulation Classes
@@ -846,6 +849,8 @@ class Simulation:
                 color = 'orange'
             elif unit.state.get("type") == "scout":
                 color = 'cyan'
+            elif unit.state.get("type") == "anti-tank":
+                color = 'purple'
             else:
                 color = 'gray'
             self.ax.plot(cx, cy, marker='o', markersize=12, color=color, zorder=5)
@@ -1001,6 +1006,24 @@ if __name__ == "__main__":
         "scout_steps": 0,
         "stealth_modifier": 225
     }
+    anti_tank_state_template = {
+        "type": "anti-tank",
+        "position": (2, 2),
+        "friendly_health": 18,
+        "max_health": 18,
+        "armor": 2,
+        "friendly_accuracy": 0.90,
+        "rate_of_fire": 6.3,
+        "damage": 15,
+        "suppression": 0.10,
+        "penetration": 22,
+        "vision_range": 2000 / CELL_SIZE,
+        "friendly_attack_range": 2800 / CELL_SIZE,
+        "all_enemies_spotted": False,
+        "total_enemies": 2,
+        "scout_steps": 0,
+        "stealth_modifier": 50
+    }
 
     candidate_domain = secure_outpost_domain
 
@@ -1026,8 +1049,9 @@ if __name__ == "__main__":
     infantry_state = infantry_state_template.copy()
     artillery_state = artillery_state_template.copy()
     scout_state = scout_state_template.copy()
+    anti_tank_state_template = anti_tank_state_template.copy()
 
-    for state in [tank_state, infantry_state, artillery_state, scout_state]:
+    for state in [tank_state, infantry_state, artillery_state, scout_state, anti_tank_state_template]:
         state["enemy"] = enemy_state1
         state["target_enemy"] = enemy_state1
         state["outpost_position"] = enemy_state1["outpost_position"]
@@ -1038,7 +1062,8 @@ if __name__ == "__main__":
     infantry = FriendlyInfantry("FriendlyInfantry", infantry_state, candidate_domain)
     artillery = FriendlyArtillery("FriendlyArtillery", artillery_state, candidate_domain)
     scout = FriendlyScout("FriendlyScout", scout_state, candidate_domain)
-    friendly_units = [tank, infantry, artillery, scout]
+    anti_tank = FriendlyAntiTank("FriendlyAntiTank", anti_tank_state_template, candidate_domain)
+    friendly_units = [tank, infantry, artillery, scout, anti_tank]
 
     # Initialize commander and simulation
     commander = TeamCommander(friendly_units)
