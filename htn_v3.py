@@ -3,7 +3,7 @@ import heapq
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
-import itertools
+import math
 
 ###############################
 # Grid, Obstacles, and LOS
@@ -46,15 +46,14 @@ def manhattan(p, q):
 def is_in_enemy_vision(pos, enemy_units):
     for enemy in enemy_units:
         if enemy.state["enemy_alive"]:
-            distance = manhattan(pos, enemy.state["enemy_position"])
-            has_los = has_line_of_sight(pos, enemy.state["enemy_position"])
+            distance = manhattan(pos, enemy.state["position"])
+            has_los = has_line_of_sight(pos, enemy.state["position"])
             vision_range = enemy.state.get("vision_range", 20)
             if distance <= vision_range and has_los:
                 return True
     return False
 
 def astar(start, goal, enemy_units=None, unit="unknown"):
-    # print(f"A* pathfinding for {unit} from {start} to {goal}")
     frontier = [(0, start)]
     came_from = {start: None}
     cost_so_far = {start: 0}
@@ -137,7 +136,6 @@ def has_line_of_sight(start, end):
     end_in_cover = end in forest or end in forest_edge
     start_forest_edge = start in forest_edge
     end_forest_edge = end in forest_edge
-    # Check if line passes through inner forest cells
     los_clear = all(pos not in forest for pos in line[1:-1])
     if start_forest_edge and not (end in forest or end in forest_edge):
         if los_clear:
@@ -169,12 +167,10 @@ def get_effective_vision_range(base_vision_range, stealth_modifier, in_cover, ha
 
 def generate_candidate_positions(enemy_units, vision_range=26):
     candidates = []
-    # Collect all patrol points
     patrol_points = set()
     for enemy in enemy_units:
         if enemy.state["enemy_alive"]:
             patrol_points.update(enemy.state.get("patrol_points", []))
-    # Find positions in forest or forest edge within vision range
     for pos in forest:
         if is_in_cover(pos) or is_forest_edge(pos):
             for patrol_pos in patrol_points:
@@ -182,13 +178,12 @@ def generate_candidate_positions(enemy_units, vision_range=26):
                 if distance <= vision_range and has_line_of_sight(pos, patrol_pos):
                     candidates.append(pos)
                     break
-    # Sort by proximity to enemies and cover status
     def score_position(pos):
         min_distance = min(manhattan(pos, p) for p in patrol_points) if patrol_points else float('inf')
         cover_score = 2 if is_forest_edge(pos) else 1 if is_in_cover(pos) else 0
-        return (min_distance, -cover_score)  # Minimize distance, maximize cover
+        return (min_distance, -cover_score)
     candidates.sort(key=score_position)
-    return candidates[:4]  # Limit to 4 candidates
+    return candidates[:4]
 
 ###############################
 # Helper Functions
@@ -210,18 +205,21 @@ def get_penetration_probability(D):
         return 0.66 + (0.29/6) * D
     else:
         return 0.95
+    
+def sign(x):
+    return 1 if x > 0 else -1 if x < 0 else 0
 
 def select_enemy_for_unit(enemy_units, friendly_unit):
     viable = [e for e in enemy_units if e.state["enemy_alive"]]
     if not viable:
         return None
-    closest_enemy = min(viable, key=lambda e: manhattan(friendly_unit.state["position"], e.state["enemy_position"]))
+    closest_enemy = min(viable, key=lambda e: manhattan(friendly_unit.state["position"], e.state["position"]))
     return closest_enemy.state
 
 def enemy_in_range_with_los(state):
     return (state["enemy"].get("enemy_alive", False) and
-            manhattan(state["position"], state["enemy"]["enemy_position"]) <= state["friendly_attack_range"] and
-            has_line_of_sight(state["position"], state["enemy"]["enemy_position"]))
+            manhattan(state["position"], state["enemy"]["position"]) <= state["friendly_attack_range"] and
+            has_line_of_sight(state["position"], state["enemy"]["position"]))
 
 ###############################
 # Global Enemy State Creation
@@ -231,20 +229,23 @@ def create_enemy_state(index=0):
     if index == 0:
         state = {
             "name": "EnemyTank1",
-            "enemy_position": (GRID_WIDTH - 1, GRID_HEIGHT - 3),
+            "position": (GRID_WIDTH - 1, GRID_HEIGHT - 3),
+            "facing": (0, 1),
             "enemy_alive": True,
-            "enemy_health": 20,
+            "health": 20,
             "max_health": 20,
-            "enemy_armor": 17,
+            "armor_front": 17,
+            "armor_side": 4,
+            "armor_rear": 3,
             "outpost_position": (GRID_WIDTH - 1, 0),
             "outpost_secured": False,
-            "enemy_attack_range": 2400 / CELL_SIZE,
-            "enemy_accuracy": 0.7,
-            "enemy_penetration": 18,
-            "enemy_damage": 9,
-            "enemy_suppression": 0.12,
+            "attack_range": 2400 / CELL_SIZE,
+            "accuracy": 0.7,
+            "penetration": 18,
+            "damage": 9,
+            "suppression": 0.12,
             "rate_of_fire": 4.9,
-            "suppression": {},
+            "suppression_from_enemy": 0.0,
             "patrol_points": [(GRID_WIDTH - 1, GRID_HEIGHT - 3), (GRID_WIDTH - 20, GRID_HEIGHT - 3)],
             "current_patrol_index": 0,
             "vision_range": 2000 / CELL_SIZE,
@@ -254,21 +255,24 @@ def create_enemy_state(index=0):
     else:
         state = {
             "name": "EnemyTank2",
-            "enemy_position": (GRID_WIDTH - 1, 2),
+            "position": (GRID_WIDTH - 1, GRID_HEIGHT // 2),
+            "facing": (0, 1),
             "enemy_alive": True,
-            "enemy_health": 20,
+            "health": 20,
             "max_health": 20,
-            "enemy_armor": 17,
+            "armor_front": 17,
+            "armor_side": 4,
+            "armor_rear": 3,
             "outpost_position": (GRID_WIDTH - 1, 0),
             "outpost_secured": False,
-            "enemy_attack_range": 2400 / CELL_SIZE,
-            "enemy_accuracy": 0.7,
-            "enemy_penetration": 18,
-            "enemy_damage": 9,
-            "enemy_suppression": 0.12,
+            "attack_range": 2400 / CELL_SIZE,
+            "accuracy": 0.7,
+            "penetration": 18,
+            "damage": 9,
+            "suppression": 0.12,
             "rate_of_fire": 4.9,
-            "suppression": {},
-            "patrol_points": [(GRID_WIDTH - 1, 2), (GRID_WIDTH - 3, 2)],
+            "suppression_from_enemy": 0.0,
+            "patrol_points": [(GRID_WIDTH - 1, GRID_HEIGHT // 2), (GRID_WIDTH - 3, GRID_HEIGHT // 2)],
             "current_patrol_index": 0,
             "vision_range": 2000 / CELL_SIZE,
             "retreat_point": (GRID_WIDTH - 1, GRID_HEIGHT - 1),
@@ -284,39 +288,70 @@ secure_outpost_domain = {
     "SecureOutpostMission": [
         (lambda state: state["type"] == "scout" and not state.get("all_enemies_spotted", False),
          ["ScoutSearch"]),
+        (lambda state: state["type"] == "scout" and state.get("all_enemies_spotted", False),
+         ["MaintainOverwatch"]),
+        # (lambda state: state["type"] != "scout" and not state.get("all_enemies_spotted", False) and
+        #  state.get("target_enemy", {}).get("enemy_alive", False) and
+        #  manhattan(state["position"], state["target_enemy"]["position"]) <= state["friendly_attack_range"] and
+        #  has_line_of_sight(state["position"], state["target_enemy"]["position"]),
+        #  ["AttackEnemy"]),
+        # (lambda state: state["type"] != "scout" and not state.get("all_enemies_spotted", False) and
+        #  state.get("target_enemy", {}).get("enemy_alive", False),
+        #  ["Move", "AttackEnemy"]),
         (lambda state: state["type"] != "scout" and not state.get("all_enemies_spotted", False),
          ["Hold"]),
-        (lambda state: state.get("all_enemies_spotted", False) and state.get("target_enemy", {}).get("enemy_alive", False),
-         ["DefeatEnemies", "Move", "SecureOutpost"]),
-        (lambda state: state.get("all_enemies_spotted", False) and not state.get("target_enemy", {}).get("enemy_alive", False) and
-         state["position"] != state["outpost_position"],
-         ["Move", "SecureOutpost"]),
-        (lambda state: state.get("all_enemies_spotted", False) and not state.get("target_enemy", {}).get("enemy_alive", False) and
-         state["position"] == state["outpost_position"],
-         ["Hold"])
+        (lambda s: s.get("all_enemies_spotted", False) and s.get("target_enemy", {}).get("enemy_alive", False),
+         ["ExecuteCoordinatedAttack"]),
+    ],
+    "ExecuteCoordinatedAttack": [
+        (lambda s: True,
+         ["EstablishFireSupport",
+          "ManeuverToFlank",
+          "AssaultTarget",
+          "MaintainOverwatch"])
+    ],
+    "EstablishFireSupport": [
+        (lambda s: s.get("type") in ("artillery", "infantry"),
+        ["Move", "AttackEnemy"]),
+        (lambda s: True, [])
+    ],
+    "ManeuverToFlank": [
+        (lambda s: s.get("type") == "infantry",
+         ["Move"]),
+         (lambda s: True, [])
+    ],
+    "AssaultTarget": [
+        (lambda s: s.get("type") in ("tank", "anti-tank"),
+         ["Move", "AttackEnemy"]),
+        (lambda s: True, [])
+    ],
+    "MaintainOverwatch": [
+        (lambda s: s.get("type") in ("scout"),
+         ["Hold"]),
+        (lambda s: True, [])
     ],
     "DefeatEnemies": [
         (lambda state: state.get("target_enemy", {}).get("enemy_alive", False) and 
                     enemy_in_range_with_los({**state, "enemy": state["target_enemy"]}),
          ["AttackEnemy"]),
         (lambda state: state.get("target_enemy", {}).get("enemy_alive", False) and 
-                    manhattan(state["position"], state["target_enemy"]["enemy_position"]) > state["friendly_attack_range"],
+                    manhattan(state["position"], state["target_enemy"]["position"]) > state["friendly_attack_range"],
          ["Move", "AttackEnemy"])
     ],
     "ScoutSearch": [
         (lambda state: len(set(e["name"] for e in state.get("visible_enemies", []))) >= state.get("total_enemies", 2),
          ["SetAllEnemiesSpotted"]),
-        (lambda state: state.get("scout_steps", 0) >= 200,  # Fallback after 200 steps
+        (lambda state: state.get("scout_steps", 0) >= 200,
          ["SetAllEnemiesSpotted"]),
         (lambda state: True, ["Move", "SetAllEnemiesSpotted"])
     ]
 }
 
 def enemy_not_in_range_friendly(state):
-    return state["enemy"].get("enemy_alive", False) and manhattan(state["position"], state["enemy"]["enemy_position"]) > state["friendly_attack_range"]
+    return state["enemy"].get("enemy_alive", False) and manhattan(state["position"], state["enemy"]["position"]) > state["friendly_attack_range"]
 
 def enemy_in_range_friendly(state):
-    return state["enemy"].get("enemy_alive", False) and manhattan(state["position"], state["enemy"]["enemy_position"]) <= state["friendly_attack_range"]
+    return state["enemy"].get("enemy_alive", False) and manhattan(state["position"], state["enemy"]["position"]) <= state["friendly_attack_range"]
 
 class HTNPlanner:
     def __init__(self, domain):
@@ -351,41 +386,24 @@ class EnemyUnit:
         self.current_plan = []
     def update_plan(self, friendly_units):
         combined_state = self.state.copy()
-
-        # Filter for visible units
         visible_units = []
         for unit in friendly_units:
-            if unit.state.get("friendly_health", 0) > 0:
-                distance = manhattan(self.state["enemy_position"], unit.state["position"])
-                has_los = has_line_of_sight(self.state["enemy_position"], unit.state["position"])
+            if unit.state.get("health", 0) > 0:
+                distance = manhattan(self.state["position"], unit.state["position"])
+                has_los = has_line_of_sight(self.state["position"], unit.state["position"])
                 stealth_modifier = unit.state.get("stealth_modifier", 0)
                 in_cover = is_in_cover(unit.state["position"])
                 effective_vision_range = get_effective_vision_range(
                     self.state.get("vision_range", 20), stealth_modifier, in_cover, has_los)
                 is_edge = is_forest_edge(unit.state["position"])
-                print(f"{self.state['name']} checking {unit.name} at {unit.state['position']}: "
-                    f"distance={distance:.2f}, effective_vision={effective_vision_range:.2f}, "
-                    f"has_los={has_los}, in_cover={in_cover}, stealth_modifier={stealth_modifier}, "
-                    f"is_forest_edge={is_edge}")
                 if distance <= effective_vision_range and has_los:
                     visible_units.append(unit)
-                    print(f"{self.state['name']} spotted {unit.name} at {unit.state['position']} "
-                        f"(distance: {distance:.2f}, effective vision range: {effective_vision_range:.2f})")
-                else:
-                    print(f"{self.state['name']} failed to spot {unit.name} at {unit.state['position']} "
-                        f"(distance: {distance:.2f}, effective vision range: {effective_vision_range:.2f}, has_los: {has_los})")
-
-        # Pass only visible units to the planner
         combined_state["friendly_units"] = visible_units
         if visible_units:
-            target = min(visible_units, key=lambda u: manhattan(self.state["enemy_position"], u.state["position"]))
+            target = min(visible_units, key=lambda u: manhattan(self.state["position"], u.state["position"]))
             combined_state["target_position"] = target.state["position"]
-            print(f"{self.state['name']} targeting {target.name} at {target.state['position']}")
         else:
-            combined_state["target_position"] = self.state["enemy_position"]
-            print(f"{self.state['name']} no visible enemies")
-
-        # Always use DefendAreaMission
+            combined_state["target_position"] = self.state["position"]
         mission = "DefendAreaMission"
         new_plan = self.planner.plan(mission, combined_state)
         self.current_plan = new_plan if new_plan else []
@@ -395,57 +413,95 @@ class EnemyUnit:
             return
         task = self.current_plan[0]
         if task == "Patrol":
+            old_pos = self.state["position"]
             idx = self.state["current_patrol_index"]
             target = self.state["patrol_points"][idx]
-            self.state["enemy_position"] = next_step(self.state["enemy_position"], target, )
-            if self.state["enemy_position"] == target:
+            self.state["position"] = next_step(self.state["position"], target)
+            new_pos = self.state["position"]
+            if self.state["position"] == target:
                 self.state["current_patrol_index"] = (idx + 1) % len(self.state["patrol_points"])
                 self.current_plan.pop(0)
+            dx, dy = new_pos[0] - old_pos[0], new_pos[1] - old_pos[1]
+            if dx or dy:
+                self.state["facing"] = (sign(dx), sign(dy))
         elif task == "ChaseTarget":
-            target = min(friendly_units, key=lambda u: manhattan(self.state["enemy_position"], u.state["position"])).state["position"]
-            self.state["enemy_position"] = next_step(self.state["enemy_position"], target)
-            if manhattan(self.state["enemy_position"], target) <= self.state["enemy_attack_range"]:
+            old_pos = self.state["position"]
+            target = min(friendly_units, key=lambda u: manhattan(self.state["position"], u.state["position"])).state["position"]
+            self.state["position"] = next_step(self.state["position"], target)
+            new_pos = self.state["position"]
+            if manhattan(self.state["position"], target) <= self.state["attack_range"]:
                 self.current_plan.pop(0)
+            dx, dy = new_pos[0] - old_pos[0], new_pos[1] - old_pos[1]
+            if dx or dy:
+                self.state["facing"] = (sign(dx), sign(dy))
         elif task == "AttackEnemy":
             target_unit = None
             min_dist = float('inf')
             for u in friendly_units:
-                d = manhattan(self.state["enemy_position"], u.state["position"])
-                if d <= self.state["enemy_attack_range"] and has_line_of_sight(self.state["enemy_position"], u.state["position"]):
+                d = manhattan(self.state["position"], u.state["position"])
+                if d <= self.state["attack_range"] and has_line_of_sight(self.state["position"], u.state["position"]):
                     if d < min_dist:
                         min_dist = d
                         target_unit = u
             if target_unit:
+                tx, ty = target_unit.state["position"]
+                x, y = self.state["position"]
+                dx, dy = tx - x, ty - y
+                self.state["facing"] = (sign(dx), sign(dy))
+
                 num_attacks = get_num_attacks(self.state["rate_of_fire"])
-                total_suppression = sum(self.state["suppression"].values())
-                effective_accuracy = max(0, self.state["enemy_accuracy"] - total_suppression)
+                effective_accuracy = max(0, self.state["accuracy"] - self.state["suppression_from_enemy"])
+
+                print(f"{self.name} attacks {target_unit.name} {num_attacks} times, effective accuracy: {effective_accuracy:.2f}, "
+                      f"suppression_from_enemy: {self.state['suppression_from_enemy']:.2f}")
+
                 for _ in range(num_attacks):
                     if random.random() < effective_accuracy:
-                        D = self.state["enemy_penetration"] - target_unit.state.get("armor", 0)
+                        fx, fy = target_unit.state.get("facing", (0, 1))
+                        forward_dot = fx * dx + fy * dy
+                        side_dot = -fx * dy + fy * dx
+                        if forward_dot > abs(side_dot):
+                            direction = "front"
+                        elif forward_dot < -abs(side_dot):
+                            direction = "rear"
+                        else:
+                            direction = "side"
+
+                        print(f"{self.name} attacking {target_unit.name} from the {direction} side")
+
+                        arm_val = target_unit.state[f"armor_{direction}"]
+                        print(f"target's armor value: {arm_val}")
+                        D = self.state["penetration"] - arm_val
                         if random.random() < get_penetration_probability(D):
-                            target_unit.state["friendly_health"] -= self.state["enemy_damage"]
-                            if target_unit.state["friendly_health"] <= 0:
+                            target_unit.state["health"] -= self.state["damage"]
+                            target_unit.state["suppression_from_enemy"] += self.state["suppression"]
+                            print(f"{self.name} hits {target_unit.name}, health now {target_unit.state['health']}, "
+                                  f"applied {self.state['suppression']} suppression")
+                            if target_unit.state["health"] <= 0:
                                 print(f"{target_unit.name} destroyed by {self.name}!")
-                        target_unit.state["suppression_from_enemy"] = target_unit.state.get("suppression_from_enemy", 0) + self.state["enemy_suppression"]
-            self.current_plan.pop(0)
+                                target_unit.state["enemy_alive"] = False
+                self.current_plan.pop(0)
+            else:
+                print(f"{self.name} cannot attack; no valid target in range or LOS.")
+                self.current_plan.pop(0)
         elif task == "Retreat":
             retreat = self.state.get("retreat_point", (9, 9))
-            self.state["enemy_position"] = next_step(self.state["enemy_position"], retreat)
-            if self.state["enemy_position"] == retreat:
+            self.state["position"] = next_step(self.state["position"], retreat)
+            if self.state["position"] == retreat:
                 self.current_plan.pop(0)
     def get_goal_position(self):
         if not self.current_plan:
-            return self.state["enemy_position"]
+            return self.state["position"]
         t = self.current_plan[0]
         if t == "Patrol":
             idx = self.state["current_patrol_index"]
             return self.state["patrol_points"][idx]
         elif t in ["ChaseTarget", "AttackEnemy"]:
             if "friendly_units" in self.state and self.state["friendly_units"]:
-                return min(self.state["friendly_units"], key=lambda u: manhattan(self.state["enemy_position"], u.state["position"])).state["position"]
+                return min(self.state["friendly_units"], key=lambda u: manhattan(self.state["position"], u.state["position"])).state["position"]
         elif t == "Retreat":
             return self.state.get("retreat_point", (9, 9))
-        return self.state["enemy_position"]
+        return self.state["position"]
 
 class EnemyTank(EnemyUnit):
     def __init__(self, name, state, domain):
@@ -461,17 +517,17 @@ class FriendlyUnit:
         self.state = state
         self.planner = HTNPlanner(domain)
         self.current_plan = []
-        self.last_enemy_pos = state["target_enemy"]["enemy_position"] if "target_enemy" in state else state.get("outpost_position", (0, 0))
-        self.last_health = state["friendly_health"]
-        self.sim = simulation  # Reference to Simulation for enemy_units access
+        self.last_enemy_pos = state["target_enemy"]["position"] if "target_enemy" in state else state.get("outpost_position", (0, 0))
+        self.last_health = state["health"]
+        self.sim = simulation
 
     def update_plan(self, force_replan=False):
         mission = list(self.planner.domain.keys())[0]
         # Keep AttackEnemy if in range and LOS
         if (self.state.get("all_enemies_spotted", False) and
             self.state.get("target_enemy", {}).get("enemy_alive", False) and
-            manhattan(self.state["position"], self.state["target_enemy"]["enemy_position"]) <= self.state["friendly_attack_range"] and
-            has_line_of_sight(self.state["position"], self.state["target_enemy"]["enemy_position"])):
+            manhattan(self.state["position"], self.state["target_enemy"]["position"]) <= self.state["friendly_attack_range"] and
+            has_line_of_sight(self.state["position"], self.state["target_enemy"]["position"])):
             self.current_plan = ["AttackEnemy"] + self.current_plan[1:] if self.current_plan else ["AttackEnemy"]
             print(f"{self.name} already in attack position; keeping plan: {self.current_plan}")
             return
@@ -480,19 +536,30 @@ class FriendlyUnit:
             (self.state.get("all_enemies_spotted", False) and self.current_plan == ["Hold"])):
             new_plan = self.planner.plan(mission, self.state)
             if not new_plan:
-                new_plan = ["Move", "SecureOutpost"] if self.state["position"] != self.state["outpost_position"] else ["Hold"]
+                # Fallback plan if planner fails
+                if self.state.get("target_enemy", {}).get("enemy_alive", False):
+                    new_plan = ["Move", "AttackEnemy"]
+                else:
+                    new_plan = ["Hold"]
             self.current_plan = new_plan
-            print(f"{self.name} replanned: {self.current_plan}")
+            print(f"{self.name} replanned: {self.current_plan}, "
+                  f"target_enemy: {self.state.get('target_enemy', {}).get('name', 'None')}, "
+                  f"all_enemies_spotted: {self.state.get('all_enemies_spotted', False)}")
         else:
-            print(f"{self.name} current plan: {self.current_plan}")
-        self.last_enemy_pos = self.state["target_enemy"]["enemy_position"] if self.state.get("target_enemy", {}) else self.state["outpost_position"]
-        self.last_health = self.state["friendly_health"]
+            print(f"{self.name} current plan: {self.current_plan}, "
+                  f"target_enemy: {self.state.get('target_enemy', {}).get('name', 'None')}, "
+                  f"all_enemies_spotted: {self.state.get('all_enemies_spotted', False)}")
+        self.last_enemy_pos = self.state["target_enemy"]["position"] if self.state.get("target_enemy", {}) else self.state["outpost_position"]
+        self.last_health = self.state["health"]
 
     def execute_next_task(self):
-        if not self.current_plan or self.state["friendly_health"] <= 0:
+        if not self.current_plan or self.state["health"] <= 0:
+            print(f"{self.name} cannot execute task: plan empty or health <= 0 (health: {self.state['health']})")
             return
         task = self.current_plan[0]
+        print(f"{self.name} executing task: {task}")
         if task == "Move":
+            old_pos = self.state["position"]
             next_task = self.current_plan[1] if len(self.current_plan) > 1 else None
             if next_task == "AttackEnemy":
                 if not self.state.get("target_enemy", {}).get("enemy_alive", False):
@@ -500,14 +567,18 @@ class FriendlyUnit:
                     self.current_plan.pop(0)
                     self.update_plan(force_replan=True)
                     return
-                goal = self.state["target_enemy"]["enemy_position"]
-                if (self.state["target_enemy"]["enemy_alive"] and
-                    manhattan(self.state["position"], goal) <= self.state["friendly_attack_range"] and
-                    has_line_of_sight(self.state["position"], goal)):
+                goal = self.state["target_enemy"]["position"]
+                if (manhattan(self.state["position"], goal) <= self.state["friendly_attack_range"]
+                    and has_line_of_sight(self.state["position"], goal)):
                     print(f"{self.name} reached enemy range and LOS; stopping move.")
                     self.current_plan.pop(0)
                 else:
-                    self.state["position"] = next_step(self.state["position"], goal, self.sim.enemy_units if hasattr(self, 'sim') else [], unit=self.state["type"])
+                    self.state["position"] = next_step(
+                        self.state["position"],
+                        goal,
+                        self.sim.enemy_units if hasattr(self, 'sim') else [],
+                        unit=self.state["type"]
+                    )
                     print(f"{self.name} moves toward enemy at {goal}, new position: {self.state['position']}")
             elif next_task == "SecureOutpost":
                 goal = self.state["outpost_position"]
@@ -515,14 +586,18 @@ class FriendlyUnit:
                     print(f"{self.name} reached outpost; stopping move.")
                     self.current_plan.pop(0)
                 else:
-                    self.state["position"] = next_step(self.state["position"], goal, self.sim.enemy_units if hasattr(self, 'sim') else [], unit=self.state["type"])
+                    self.state["position"] = next_step(
+                        self.state["position"],
+                        goal,
+                        self.sim.enemy_units if hasattr(self, 'sim') else [],
+                        unit=self.state["type"]
+                    )
                     print(f"{self.name} moves toward outpost at {goal}, new position: {self.state['position']}")
             elif next_task == "SetAllEnemiesSpotted" and self.state["type"] == "scout":
                 candidate_positions = self.state.get("candidate_positions", [])
                 if candidate_positions:
                     idx = self.state.get("current_candidate_index", 0)
                     candidate = candidate_positions[idx]
-                    # Store current visible enemies before moving
                     visible_enemy_names_before = set(e["name"] for e in self.state.get("visible_enemies", []))
                     self.state["scout_steps"] = self.state.get("scout_steps", 0) + 1
                     if len(visible_enemy_names_before) >= self.state.get("total_enemies", 2):
@@ -534,12 +609,10 @@ class FriendlyUnit:
                         self.state["all_enemies_spotted"] = True
                         self.current_plan.pop(0)
                     else:
-                        # Use stealthy pathfinding
                         path = astar(self.state["position"], candidate, self.sim.enemy_units if hasattr(self, 'sim') else [], unit=self.state["type"])
                         next_pos = path[1] if len(path) >= 2 else self.state["position"]
                         self.state["position"] = next_pos
                         print(f"{self.name} moves stealthily toward candidate position {candidate}, new position: {self.state['position']}")
-                        # Check for new enemies after moving (assumes update_friendly_enemy_info runs after this)
                         visible_enemy_names_after = set(e["name"] for e in self.state.get("visible_enemies", []))
                         print(f"{self.name} visible enemies: {visible_enemy_names_after}, scout_steps: {self.state['scout_steps']}")
                         if visible_enemy_names_after > visible_enemy_names_before:
@@ -562,39 +635,83 @@ class FriendlyUnit:
                 else:
                     self.state["position"] = next_step(self.state["position"], goal)
                     print(f"{self.name} moves towards {goal}, new position: {self.state['position']}")
-        # Rest of the method remains unchanged
+            new_pos = self.state["position"]
+            dx, dy = new_pos[0] - old_pos[0], new_pos[1] - old_pos[1]
+            if dx or dy:
+                self.state["facing"] = (sign(dx), sign(dy))
         elif task == "AttackEnemy":
-            if not self.state.get("target_enemy", {}).get("enemy_alive", False):
-                print(f"{self.name} cannot attack; target enemy is already destroyed. Replanning.")
+            tx, ty = self.state["target_enemy"]["position"]
+            x, y = self.state["position"]
+            dx, dy = tx - x, ty - y
+            self.state["facing"] = (sign(dx), sign(dy))
+            target_unit = None
+            for u in self.sim.enemy_units:
+                if u.state.get("name") == self.state["target_enemy"]["name"]:
+                    target_unit = u
+                    break
+            if not target_unit or not target_unit.state["enemy_alive"]:
+                print(f"{self.name} cannot attack; target {self.state['target_enemy']['name']} is dead or invalid. Replanning.")
                 self.current_plan.pop(0)
                 self.update_plan(force_replan=True)
                 return
-            target_pos = self.state["target_enemy"]["enemy_position"]
-            distance = manhattan(self.state["position"], target_pos)
-            has_los = has_line_of_sight(self.state["position"], target_pos)
-            if (distance <= self.state["friendly_attack_range"] and has_los):
-                num_attacks = get_num_attacks(self.state["rate_of_fire"])
-                total_suppression = sum(self.state.get("suppression_from_enemy", 0).values()) if isinstance(self.state.get("suppression_from_enemy"), dict) else self.state.get("suppression_from_enemy", 0)
-                effective_accuracy = max(0, self.state["friendly_accuracy"] - total_suppression)
-                print(f"{self.name} attacks {self.state['target_enemy']['name']} with {num_attacks} attacks, accuracy: {effective_accuracy:.2f}")
-                for _ in range(num_attacks):
-                    if random.random() < effective_accuracy:
-                        D = self.state["penetration"] - self.state["target_enemy"]["enemy_armor"]
-                        if random.random() < get_penetration_probability(D):
-                            self.state["target_enemy"]["enemy_health"] -= self.state["damage"]
-                            print(f"{self.name} hits {self.state['target_enemy']['name']}, dealing {self.state['damage']} damage. Enemy health: {self.state['target_enemy']['enemy_health']}")
-                            if self.state["target_enemy"]["enemy_health"] <= 0:
-                                self.state["target_enemy"]["enemy_alive"] = False
-                                print(f"{self.name} destroyed {self.state['target_enemy']['name']}!")
-                                self.current_plan.pop(0)
-                                self.update_plan(force_replan=True)
-                                return
-                        self.state["target_enemy"]["suppression"] = self.state["target_enemy"].get("suppression", {})
-                        self.state["target_enemy"]["suppression"][self.name] = self.state["suppression"]
-            else:
-                print(f"{self.name} cannot attack; enemy at {target_pos} is out of range (distance: {distance}, max: {self.state['friendly_attack_range']}) or no LOS (has_los: {has_los}). Replanning.")
+            distance = manhattan(self.state["position"], target_unit.state["position"])
+            has_los = has_line_of_sight(self.state["position"], target_unit.state["position"])
+            if distance > self.state["friendly_attack_range"] or not has_los:
+                print(f"{self.name} cannot attack {target_unit.name}; out of range (distance: {distance}, "
+                      f"attack_range: {self.state['friendly_attack_range']}) or no LOS (has_los: {has_los}). Replanning.")
                 self.current_plan.pop(0)
                 self.update_plan(force_replan=True)
+                return
+            
+            target_pos = target_unit.state["position"]
+            dx = target_pos[0] - self.state["position"][0]
+            dy = target_pos[1] - self.state["position"][1]
+            norm = math.sqrt(dx**2 + dy**2)
+            if norm > 0:
+                dx, dy = dx / norm, dy / norm
+            else:
+                dx, dy = 0, 0
+            self.state["facing"] = dx, dy
+            print(f"{self.name} attacking {target_unit.name} at {target_pos}, facing: {self.state['facing']}")
+
+            attack_dir = (dx, dy)
+            target_facing = target_unit.state.get("facing", (0, 1))
+            target_norm = math.sqrt(target_facing[0]**2 + target_facing[1]**2)
+            if target_norm > 0:
+                target_fx, target_fy = target_facing[0] / target_norm, target_facing[1] / target_norm
+            else:
+                target_fx, target_fy = 0, 0
+
+            dot_product = attack_dir[0] * target_fx + attack_dir[1] * target_fy
+            dot_product = max(min(dot_product, 1), -1)
+            angle_deg = math.degrees(math.acos(dot_product))
+            if angle_deg <= 45:
+                direction = "front"
+            elif angle_deg <= 135:
+                direction = "side"
+            else:
+                direction = "rear"
+            print(f"{self.name} attacking {target_unit.name} from the {direction} side")
+
+            armor_val = target_unit.state[f"armor_{direction}"]
+            D = self.state["penetration"] - armor_val
+            num_attacks = get_num_attacks(self.state["rate_of_fire"])
+            effective_accuracy = max(0, self.state["friendly_accuracy"] - self.state["suppression_from_enemy"])
+            print(f"{self.name} attacks {target_unit.name} {num_attacks} times, effective accuracy: {effective_accuracy:.2f}, "
+                  f"from the {direction} (armor {armor_val}, D={D}), suppression_from_enemy: {self.state['suppression_from_enemy']:.2f}")
+            for _ in range(num_attacks):
+                if random.random() < effective_accuracy and random.random() < get_penetration_probability(D):
+                    target_unit.state["health"] -= self.state["damage"]
+                    target_unit.state["suppression_from_enemy"] += self.state["suppression"]
+                    print(f"{self.name} hits {target_unit.name}, health now {target_unit.state['health']}, "
+                          f"applied {self.state['suppression']} suppression")
+                    if target_unit.state["health"] <= 0:
+                        target_unit.state["enemy_alive"] = False
+                        print(f"{self.name} destroyed {target_unit.name}!")
+                        self.current_plan.pop(0)
+                        self.update_plan(force_replan=True)
+                        return
+            self.current_plan.pop(0)
         elif task == "SecureOutpost":
             if self.state["position"] == self.state["outpost_position"]:
                 self.state["outpost_secured"] = True
@@ -610,6 +727,8 @@ class FriendlyUnit:
                 self.current_plan == ["Hold"]):
                 print(f"{self.name} all enemies spotted; replanning.")
                 self.update_plan(force_replan=True)
+            else:
+                self.current_plan.pop(0)
         elif task == "SetAllEnemiesSpotted":
             visible_enemy_names = set(e["name"] for e in self.state.get("visible_enemies", []))
             self.state["scout_steps"] = self.state.get("scout_steps", 0) + 1
@@ -624,17 +743,27 @@ class FriendlyUnit:
             self.current_plan.pop(0)
 
     def get_goal_position(self):
+        if self.current_plan and self.current_plan[0] == "Move" and len(self.current_plan) > 1 and self.current_plan[1] == "ManeuverToFlank":
+            ex, ey = self.state["target_enemy"]["position"]
+            fx, fy = self.state["facing"]
+            left = (-fy, fx)
+            right = (fy, -fx)
+            for perp in (left, right):
+                flank = (ex + perp[0]*2, ey + perp[1]*2)
+                if in_bounds(flank) and flank not in obstacles and flank not in river:
+                    return flank
+            return self.state["target_enemy"]["position"]
         if self.current_plan:
             if len(self.current_plan) > 1:
                 if self.current_plan[1] == "AttackEnemy":
-                    return self.state["target_enemy"]["enemy_position"] if self.state.get("target_enemy", {}).get("enemy_alive", False) else self.state["outpost_position"]
+                    return self.state["target_enemy"]["position"] if self.state.get("target_enemy", {}).get("enemy_alive", False) else self.state["outpost_position"]
                 elif self.current_plan[1] == "SecureOutpost":
                     return self.state["outpost_position"]
                 elif self.current_plan[1] == "SetAllEnemiesSpotted" and self.state["type"] == "scout":
                     idx = self.state.get("current_candidate_index", 0)
                     return self.state["candidate_positions"][idx]
             if self.current_plan[0] == "AttackEnemy":
-                return self.state["target_enemy"]["enemy_position"] if self.state.get("target_enemy", {}).get("enemy_alive", False) else self.state["outpost_position"]
+                return self.state["target_enemy"]["position"] if self.state.get("target_enemy", {}).get("enemy_alive", False) else self.state["outpost_position"]
         return self.state["outpost_position"]
 
 class FriendlyTank(FriendlyUnit):
@@ -664,7 +793,7 @@ class TeamCommander:
         tank = next((u for u in self.friendly_units if u.state["type"] == "tank"), None)
         if tank:
             for u in self.friendly_units:
-                u.state["tank_health"] = tank.state["friendly_health"]
+                u.state["tank_health"] = tank.state["health"]
                 u.state["tank_max_health"] = tank.state["max_health"]
 
 class Simulation:
@@ -678,12 +807,11 @@ class Simulation:
             u.state["visible_enemies"] = []
             u.state["total_enemies"] = len(self.enemy_units)
             u.state["scout_steps"] = 0
-            # Set dynamic candidate positions for scout
             if u.state["type"] == "scout":
                 u.state["candidate_positions"] = generate_candidate_positions(self.enemy_units, u.state["vision_range"])
                 if not u.state["candidate_positions"]:
-                    u.state["candidate_positions"] = [(40, 45), (40, 2), (25, 45), (45, 5)]  # Fallback
-            u.sim = self  # Set simulation reference
+                    u.state["candidate_positions"] = [(40, 45), (40, 2), (25, 45), (45, 5)]
+            u.sim = self
         self.step_count = 0
         self.visualize = visualize
         self.plan_name = plan_name
@@ -692,14 +820,14 @@ class Simulation:
             self.fig, self.ax = plt.subplots(figsize=(8,8))
 
     def update_enemy_behavior(self):
-        friendly_units = [u for u in self.friendly_units if u.state.get("friendly_health", 0) > 0]
+        friendly_units = [u for u in self.friendly_units if u.state.get("health", 0) > 0]
         for enemy in self.enemy_units:
             if enemy.state["enemy_alive"]:
                 enemy.update_plan(friendly_units)
                 enemy.execute_next_task(friendly_units)
                 enemy.current_goal = enemy.get_goal_position()
                 if self.visualize:
-                    print(f"{enemy.state['name']} position: {enemy.state['enemy_position']}")
+                    print(f"{enemy.state['name']} position: {enemy.state['position']}")
                     print(f"{enemy.state['name']}'s current goal: {enemy.current_goal}")
 
     def update_friendly_enemy_info(self):
@@ -710,9 +838,9 @@ class Simulation:
             new_visible = []
             for e in self.enemy_units:
                 if e.state["enemy_alive"]:
-                    distance = manhattan(scout.state["position"], e.state["enemy_position"])
-                    has_los = has_line_of_sight(scout.state["position"], e.state["enemy_position"])
-                    in_cover = is_in_cover(e.state["enemy_position"])
+                    distance = manhattan(scout.state["position"], e.state["position"])
+                    has_los = has_line_of_sight(scout.state["position"], e.state["position"])
+                    in_cover = is_in_cover(e.state["position"])
                     stealth_modifier = e.state.get("stealth_modifier", 0)
                     effective_vision_range = get_effective_vision_range(
                         scout.state.get("vision_range", 0),
@@ -722,12 +850,12 @@ class Simulation:
                     )
                     if distance <= effective_vision_range and has_los:
                         new_visible.append(e.state)
-                        print(f"{scout.name} spotted {e.state['name']} at {e.state['enemy_position']} "
+                        print(f"{scout.name} spotted {e.state['name']} at {e.state['position']} "
                             f"(distance: {distance:.2f}, effective vision range: {effective_vision_range:.2f}, "
                             f"stealth_modifier: {stealth_modifier}, in_cover: {in_cover}, has_los: {has_los}, "
                             f"is_forest_edge: {is_forest_edge(scout.state['position'])})")
                     elif self.visualize:
-                        print(f"{scout.name} failed to spot {e.state['name']} at {e.state['enemy_position']} "
+                        print(f"{scout.name} failed to spot {e.state['name']} at {e.state['position']} "
                             f"(distance: {distance:.2f}, effective vision range: {effective_vision_range:.2f}, "
                             f"stealth_modifier: {stealth_modifier}, in_cover: {in_cover}, has_los: {has_los}, "
                             f"is_forest_edge: {is_forest_edge(scout.state['position'])})")
@@ -736,7 +864,7 @@ class Simulation:
                 if enemy["name"] not in current_names:
                     scout.state["visible_enemies"].append(enemy)
                     current_names.add(enemy["name"])
-                    print(f"{scout.name} newly spotted {enemy['name']} at {enemy['enemy_position']}")
+                    print(f"{scout.name} newly spotted {enemy['name']} at {enemy['position']}")
             all_enemies_spotted = len(set(e["name"] for e in scout.state["visible_enemies"])) >= len(self.enemy_units)
             if all_enemies_spotted:
                 scout.state["all_enemies_spotted"] = True
@@ -750,8 +878,8 @@ class Simulation:
                 closest_enemy = None
                 min_distance = float('inf')
                 for e in active_enemies:
-                    distance = manhattan(u.state["position"], e.state["enemy_position"])
-                    has_los = has_line_of_sight(e.state["enemy_position"], u.state["position"])
+                    distance = manhattan(u.state["position"], e.state["position"])
+                    has_los = has_line_of_sight(e.state["position"], u.state["position"])
                     in_cover = is_in_cover(u.state["position"])
                     stealth_modifier = u.state.get("stealth_modifier", 0)
                     effective_vision_range = get_effective_vision_range(
@@ -764,45 +892,33 @@ class Simulation:
                         if distance < min_distance:
                             min_distance = distance
                             closest_enemy = e.state
-                        print(f"{e.state['name']} spotted {u.name} at {u.state['position']} "
-                            f"(distance: {distance:.2f}, effective vision range: {effective_vision_range:.2f}, "
-                            f"stealth_modifier: {stealth_modifier}, in_cover: {in_cover}, has_los: {has_los}, "
-                            f"is_forest_edge: {is_forest_edge(u.state['position'])})")
-                    elif self.visualize:
-                        print(f"{e.state['name']} failed to spot {u.name} at {u.state['position']} "
-                            f"(distance: {distance:.2f}, effective vision range: {effective_vision_range:.2f}, "
-                            f"stealth_modifier: {stealth_modifier}, in_cover: {in_cover}, has_los: {has_los}, "
-                            f"is_forest_edge: {is_forest_edge(u.state['position'])})")
-                # Update enemy state with closest spotted friendly unit or clear if none spotted
                 e.state["enemy"] = closest_enemy or {}
                 if self.visualize:
                     print(f"{e.state['name']} state['enemy']: {e.state['enemy'].get('name', 'None')}")
             else:
-                # No active enemies, clear enemy state
                 for e in self.enemy_units:
                     e.state["enemy"] = {}
                     if self.visualize:
                         print(f"{e.state['name']} state['enemy']: None (no active enemies)")
-            # Update friendly unit state
             if self.visualize:
                 print(f"{u.name} at {u.state['position']}, visible enemies: {[e['name'] for e in u.state.get('visible_enemies', [])]}")
         if scout and self.visualize:
             print(f"Scout at {scout.state['position']}, visible enemies: {[e['name'] for e in scout.state.get('visible_enemies', [])]}, scout_steps: {scout.state.get('scout_steps', 0)}")
 
     def evaluate_plan(self):
-        total_friendly = sum(u.state["friendly_health"] for u in self.friendly_units)
+        total_friendly = sum(u.state["health"] for u in self.friendly_units)
         max_friendly = sum(u.state["max_health"] for u in self.friendly_units)
-        enemy_health = sum(e.state["enemy_health"] for e in self.enemy_units if e.state["enemy_alive"])
+        health = sum(e.state["health"] for e in self.enemy_units if e.state["enemy_alive"])
         max_enemy = sum(e.state["max_health"] for e in self.enemy_units)
         outpost_secured = any(u.state.get("outpost_secured", False) for u in self.friendly_units)
         steps = self.step_count
         friendly_ratio = total_friendly / max_friendly if max_friendly > 0 else 0
-        enemy_ratio = enemy_health / max_enemy if max_enemy > 0 else 0
+        enemy_ratio = health / max_enemy if max_enemy > 0 else 0
         score = (friendly_ratio * 20) - (enemy_ratio * 20) + (10 if outpost_secured else -10) - 0.1 * steps
         return {
             "score": score,
-            "friendly_health": total_friendly,
-            "enemy_health": enemy_health,
+            "health": total_friendly,
+            "enemy_health": health,
             "outpost_secured": outpost_secured,
             "steps_taken": steps
         }
@@ -819,24 +935,46 @@ class Simulation:
         self.ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f} m"))
         self.ax.grid(True)
         self.ax.set_aspect("equal", adjustable="box")
+        
+        # Draw river
         for r in river:
-            self.ax.add_patch(plt.Rectangle((r[0]*CELL_SIZE, r[1]*CELL_SIZE), CELL_SIZE, CELL_SIZE, color='blue'))
+            self.ax.add_patch(plt.Rectangle((r[0]*CELL_SIZE, r[1]*CELL_SIZE), CELL_SIZE, CELL_SIZE, color='blue', zorder=1))
+        
+        # Draw forest
         for f in forest:
-            self.ax.add_patch(plt.Rectangle((f[0]*CELL_SIZE, f[1]*CELL_SIZE), CELL_SIZE, CELL_SIZE, color='green'))
+            self.ax.add_patch(plt.Rectangle((f[0]*CELL_SIZE, f[1]*CELL_SIZE), CELL_SIZE, CELL_SIZE, color='green', zorder=1))
+        
+        # Draw forest edge
         for cell in forest_edge:
-            self.ax.add_patch(plt.Rectangle((cell[0]*CELL_SIZE, cell[1]*CELL_SIZE), CELL_SIZE, CELL_SIZE, facecolor='lightgreen'))
+            self.ax.add_patch(plt.Rectangle((cell[0]*CELL_SIZE, cell[1]*CELL_SIZE), CELL_SIZE, CELL_SIZE, facecolor='lightgreen', zorder=1))
+        
+        # Draw outpost
         if self.friendly_units:
             outpost = self.friendly_units[0].state["outpost_position"]
             ox = outpost[0] * CELL_SIZE + CELL_SIZE/2
             oy = outpost[1] * CELL_SIZE + CELL_SIZE/2
-            self.ax.plot(ox, oy, marker='*', markersize=12, color='magenta', label='Outpost')
+            self.ax.plot(ox, oy, marker='*', markersize=12, color='magenta', label='Outpost', zorder=5)
+        
+        # Draw enemy units and their facing arrows
         for enemy in self.enemy_units:
             if enemy.state["enemy_alive"]:
-                ex, ey = enemy.state["enemy_position"]
+                ex, ey = enemy.state["position"]
                 cx = ex * CELL_SIZE + CELL_SIZE / 2
                 cy = ey * CELL_SIZE + CELL_SIZE / 2
-                self.ax.plot(cx, cy, marker='s', markersize=12, color='green', label='Enemy')
-                self.ax.text(cx + 40, cy + 40, enemy.state["name"], fontsize=8, color='black', zorder=5)
+                self.ax.plot(cx, cy, marker='s', markersize=12, color='green', label='Enemy' if enemy == self.enemy_units[0] else '', zorder=5)
+                self.ax.text(cx + 40, cy + 40, enemy.state["name"], fontsize=8, color='black', zorder=6)
+                fx, fy = enemy.state["facing"]
+                norm = (fx**2 + fy**2)**0.5
+                print(f"{enemy.state['name']} at {enemy.state['position']}: facing=({fx}, {fy}), norm={norm}")
+                if norm > 0:
+                    fx, fy = fx/norm, fy/norm
+                    arrow_length = CELL_SIZE * 2  # 300 meters (3 grid cells)
+                    self.ax.quiver(cx, cy, fx * arrow_length, fy * arrow_length, color='green', edgecolor='black', linewidth=0.5, width=0.015, scale=1, scale_units='xy', angles='xy', zorder=4)
+                    print(f"Drawing arrow for {enemy.state['name']}: ({cx}, {cy}) -> ({fx * arrow_length}, {fy * arrow_length})")
+                else:
+                    print(f"No arrow drawn for {enemy.state['name']}: norm=0")
+        
+        # Draw friendly units and their facing arrows
         for unit in self.friendly_units:
             pos = unit.state["position"]
             cx = pos[0] * CELL_SIZE + CELL_SIZE/2
@@ -853,11 +991,29 @@ class Simulation:
                 color = 'purple'
             else:
                 color = 'gray'
-            self.ax.plot(cx, cy, marker='o', markersize=12, color=color, zorder=5)
-            self.ax.text(cx + 40, cy + 40, unit.name, fontsize=8, color='black', zorder=5)
+            self.ax.plot(cx, cy, marker='o', markersize=12, color=color, label=unit.state.get("type").capitalize() if unit == self.friendly_units[0] else '', zorder=5)
+            self.ax.text(cx + 40, cy + 40, unit.name, fontsize=8, color='black', zorder=6)
+            fx, fy = unit.state["facing"]
+            norm = (fx**2 + fy**2)**0.5
+            print(f"{unit.name} at {unit.state['position']}: facing=({fx}, {fy}), norm={norm}")
+            if norm > 0:
+                fx, fy = fx/norm, fy/norm
+                arrow_length = CELL_SIZE * 2  # 300 meters (3 grid cells)
+                self.ax.quiver(cx, cy, fx * arrow_length, fy * arrow_length, color=color, edgecolor='black', linewidth=0.5, width=0.015, scale=1, scale_units='xy', angles='xy', zorder=4)
+                print(f"Drawing arrow for {unit.name}: ({cx}, {cy}) -> ({fx * arrow_length}, {fy * arrow_length})")
+            else:
+                print(f"No arrow drawn for {unit.name}: norm=0")
+        
+        # Add legend with unique labels
+        handles, labels = self.ax.get_legend_handles_labels()
+        unique = dict(zip(labels, handles))
+        self.ax.legend(unique.values(), unique.keys(), loc='upper right')
+        
         self.ax.set_title(f"Simulation Step {self.step_count} - {self.plan_name}")
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
+        plt.draw()
+        plt.pause(0.01)  # Force refresh
 
     def step(self):
         self.step_count += 1
@@ -871,9 +1027,11 @@ class Simulation:
                 not unit.state.get("target_enemy", {}).get("enemy_alive", False)):
                 print(f"{unit.name} target enemy is dead or invalid; replanning.")
                 unit.update_plan(force_replan=True)
+            else:
+                unit.update_plan()  # Ensure plan is updated each step
             print(f"{unit.name} current plan: {unit.current_plan}, all_enemies_spotted: {unit.state.get('all_enemies_spotted', False)}")
             if "target_enemy" in unit.state and unit.state["target_enemy"]:
-                print(f"{unit.name} targeting enemy: {unit.state['target_enemy']['name']} at {unit.state['target_enemy']['enemy_position']}")
+                print(f"{unit.name} targeting enemy: {unit.state['target_enemy']['name']} at {unit.state['target_enemy']['position']}")
             unit.execute_next_task()
             if self.visualize:
                 print(f"{unit.name}'s current goal: {unit.get_goal_position()}")
@@ -888,11 +1046,6 @@ class Simulation:
                 else:
                     unit.state["target_enemy"] = {}
                     unit.state["enemy"] = {}
-        if self.visualize:
-            for unit in self.friendly_units:
-                print(f"State for {unit.name}: {unit.state}")
-            for enemy in self.enemy_units:
-                print(f"State for {enemy.name}: {enemy.state}")
 
     def run(self, max_steps=200):
         self.step_count = 0
@@ -912,7 +1065,7 @@ class Simulation:
             if self.visualize:
                 self.update_plot()
                 plt.pause(0.05)
-            alive_friendlies = [u for u in self.friendly_units if u.state["friendly_health"] > 0]
+            alive_friendlies = [u for u in self.friendly_units if u.state["health"] > 0]
             if len(alive_friendlies) < len(self.friendly_units):
                 for dead in set(self.friendly_units) - set(alive_friendlies):
                     if self.visualize:
@@ -937,10 +1090,13 @@ class Simulation:
 if __name__ == "__main__":
     tank_state_template = {
         "type": "tank",
-        "position": (0, 0),
-        "friendly_health": 20,
+        "position": (15, 20),
+        "facing": (0, 1),
+        "health": 20,
         "max_health": 20,
-        "armor": 17,
+        "armor_front": 17,
+        "armor_side": 4,
+        "armor_rear": 3,
         "friendly_accuracy": 0.75,
         "rate_of_fire": 4.9,
         "damage": 9,
@@ -949,15 +1105,19 @@ if __name__ == "__main__":
         "friendly_attack_range": 2400 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
+        "suppression_from_enemy": 0.0,
         "scout_steps": 0,
         "stealth_modifier": 0
     }
     infantry_state_template = {
         "type": "infantry",
-        "position": (0, 1),
-        "friendly_health": 1,
+        "position": (14, 20),
+        "facing": (0, 1),
+        "health": 1,
         "max_health": 1,
-        "armor": 0,
+        "armor_front": 0,
+        "armor_side": 0,
+        "armor_rear": 0,
         "friendly_accuracy": 0.50,
         "rate_of_fire": 294,
         "damage": 0.8,
@@ -966,15 +1126,19 @@ if __name__ == "__main__":
         "friendly_attack_range": 1200 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
+        "suppression_from_enemy": 0.0,
         "scout_steps": 0,
         "stealth_modifier": 0
     }
     artillery_state_template = {
         "type": "artillery",
-        "position": (1, 0),
-        "friendly_health": 18,
+        "position": (14, 19),
+        "facing": (0, 1),
+        "health": 18,
         "max_health": 18,
-        "armor": 2,
+        "armor_front": 2,
+        "armor_side": 1,
+        "armor_rear": 1,
         "friendly_accuracy": 0.85,
         "rate_of_fire": 8.6,
         "damage": 3.5,
@@ -983,19 +1147,23 @@ if __name__ == "__main__":
         "friendly_attack_range": 4000 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
+        "suppression_from_enemy": 0.0,
         "scout_steps": 0,
         "stealth_modifier": 0
     }
     scout_state_template = {
         "type": "scout",
         "position": (30, 30),
-        "friendly_health": 18,
+        "facing": (0, 1),
+        "health": 18,
         "max_health": 18,
-        "armor": 3,
+        "armor_front": 3,
+        "armor_side": 2,
+        "armor_rear": 2,
         "friendly_accuracy": 0.35,
         "rate_of_fire": 115,
         "damage": 2.4,
-        "suppression": 5,
+        "suppression": 0.05,
         "penetration": 5,
         "vision_range": 2600 / CELL_SIZE,
         "friendly_attack_range": 1800 / CELL_SIZE,
@@ -1003,15 +1171,19 @@ if __name__ == "__main__":
         "candidate_positions": [],
         "current_candidate_index": 0,
         "total_enemies": 2,
+        "suppression_from_enemy": 0.0,
         "scout_steps": 0,
         "stealth_modifier": 225
     }
     anti_tank_state_template = {
         "type": "anti-tank",
-        "position": (2, 2),
-        "friendly_health": 18,
+        "position": (15, 19),
+        "facing": (0, 1),
+        "health": 18,
         "max_health": 18,
-        "armor": 2,
+        "armor_front": 2,
+        "armor_side": 1,
+        "armor_rear": 1,
         "friendly_accuracy": 0.90,
         "rate_of_fire": 6.3,
         "damage": 15,
@@ -1021,6 +1193,7 @@ if __name__ == "__main__":
         "friendly_attack_range": 2800 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
+        "suppression_from_enemy": 0.0,
         "scout_steps": 0,
         "stealth_modifier": 50
     }
@@ -1031,11 +1204,11 @@ if __name__ == "__main__":
     enemy_state2 = create_enemy_state(index=1)
 
     enemy_domain = {"DefendAreaMission": [
-            (lambda state: any(manhattan(state["enemy_position"], u.state["position"]) <= state["enemy_attack_range"] and 
-                                has_line_of_sight(state["enemy_position"], u.state["position"]) 
+            (lambda state: any(manhattan(state["position"], u.state["position"]) <= state["attack_range"] and 
+                                has_line_of_sight(state["position"], u.state["position"]) 
                                 for u in state["friendly_units"]), ["AttackEnemy"]),
-            (lambda state: any(manhattan(state["enemy_position"], u.state["position"]) <= state["vision_range"] and 
-                                has_line_of_sight(state["enemy_position"], u.state["position"]) 
+            (lambda state: any(manhattan(state["position"], u.state["position"]) <= state["vision_range"] and 
+                                has_line_of_sight(state["position"], u.state["position"]) 
                                 for u in state["friendly_units"]), ["ChaseTarget"]),
             (lambda state: True, ["Patrol"])
         ]
@@ -1049,34 +1222,31 @@ if __name__ == "__main__":
     infantry_state = infantry_state_template.copy()
     artillery_state = artillery_state_template.copy()
     scout_state = scout_state_template.copy()
-    anti_tank_state_template = anti_tank_state_template.copy()
+    anti_tank_state = anti_tank_state_template.copy()
 
-    for state in [tank_state, infantry_state, artillery_state, scout_state, anti_tank_state_template]:
+    for state in [tank_state, infantry_state, artillery_state, scout_state, anti_tank_state]:
         state["enemy"] = enemy_state1
         state["target_enemy"] = enemy_state1
         state["outpost_position"] = enemy_state1["outpost_position"]
         state["visible_enemies"] = []
 
-    # Create friendly units first
     tank = FriendlyTank("FriendlyTank", tank_state, candidate_domain)
     infantry = FriendlyInfantry("FriendlyInfantry", infantry_state, candidate_domain)
     artillery = FriendlyArtillery("FriendlyArtillery", artillery_state, candidate_domain)
     scout = FriendlyScout("FriendlyScout", scout_state, candidate_domain)
-    anti_tank = FriendlyAntiTank("FriendlyAntiTank", anti_tank_state_template, candidate_domain)
+    anti_tank = FriendlyAntiTank("FriendlyAntiTank", anti_tank_state, candidate_domain)
     friendly_units = [tank, infantry, artillery, scout, anti_tank]
 
-    # Initialize commander and simulation
     commander = TeamCommander(friendly_units)
     sim = Simulation(friendly_units, enemy_units, commander, visualize=True, plan_name="Mode1_Test")
 
-    # Set simulation reference for units
     for unit in friendly_units:
         unit.sim = sim
 
     result = sim.run(max_steps=300)
     print("\n=== Plan Evaluation ===")
     print(f"Score: {result['score']:.1f}")
-    print(f"Total Friendly Health Remaining: {result['friendly_health']}")
+    print(f"Total Friendly Health Remaining: {result['health']}")
     print(f"Enemy Health Remaining: {result['enemy_health']}")
     print(f"Outpost Secured: {result['outpost_secured']}")
     print(f"Steps Taken: {result['steps_taken']}")
