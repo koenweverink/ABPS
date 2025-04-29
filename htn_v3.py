@@ -88,7 +88,7 @@ def astar(start, goal, enemy_units=None, unit="unknown"):
                     continue
             # Penalty for enemy vision
             if enemy_units and is_in_enemy_vision(nxt, enemy_units):
-                new_cost += 10  # Avoid enemy vision cones
+                new_cost += 3  # Avoid enemy vision cones
             if nxt not in cost_so_far or new_cost < cost_so_far[nxt]:
                 cost_so_far[nxt] = new_cost
                 priority = new_cost + manhattan(nxt, goal)
@@ -316,123 +316,31 @@ def create_enemy_state(index=0):
 
 secure_outpost_domain = {
     "SecureOutpostMission": [
-        (lambda state: state["type"] == "scout" and not state.get("all_enemies_spotted", False),
-         ["ScoutSearch"]),
-        (lambda state: state["type"] == "scout" and state.get("all_enemies_spotted", False),
-         ["MaintainOverwatch"]),
-        # (lambda state: state["type"] != "scout" and not state.get("all_enemies_spotted", False) and
-        #  state.get("target_enemy", {}).get("enemy_alive", False) and
-        #  manhattan(state["position"], state["target_enemy"]["position"]) <= state["friendly_attack_range"] and
-        #  has_line_of_sight(state["position"], state["target_enemy"]["position"]),
-        #  ["AttackEnemy"]),
-        # (lambda state: state["type"] != "scout" and not state.get("all_enemies_spotted", False) and
-        #  state.get("target_enemy", {}).get("enemy_alive", False),
-        #  ["Move", "AttackEnemy"]),
-        (lambda s: s.get("all_enemies_spotted", False)
-               and not s.get("target_enemy", {}).get("enemy_alive", False),
-            ["Move", "SecureOutpost"]),
-        (lambda s: s.get("all_enemies_spotted", False) and s.get("target_enemy", {}).get("enemy_alive", False),
-            ["ExecuteCoordinatedAttack"]),
-        # (lambda s: s["type"] != "scout" 
-        #        and s.get("target_enemy",{}).get("enemy_alive", False),
-        #     ["DefeatEnemies"]),
-        (lambda state: state["type"] != "scout" and not state.get("all_enemies_spotted", False),
-            ["Hold"]),
+        # Always sequence DefeatEnemies followed by SecureOutpost
+        (lambda state: True, ["DefeatEnemies", "SecureOutpost"]),
     ],
-    
-   # top-level coordinated attack spawns three role-based subtasks
-    "ExecuteCoordinatedAttack": [
-        (lambda s: True,
-         ["InfantryFlank",
-          "ArmorEngage",
-          "ArtillerySuppress"])
-    ],
-
-    # ————————————————————————————————————————————————
-    # 1) InfantryFlank: move to precomputed flank point, then wait on Hold
-    #    until everyone is in_position, then AttackEnemy
-    "InfantryFlank": [
-        # non-infantry skip
-        (lambda s: s["type"] != "infantry", []),
-
-        # if not at my flank‐point, move there
-        (lambda s: s["position"] != get_flank_point(s),
-         ["Move"]),
-
-        # now at my flank but squad not fully in place? hold
-        (lambda s: not s.get("in_position", False),
-         ["Hold"]),
-
-        # once all are in_position and I’m in range+LOS, attack
-        (lambda s:
-            s.get("in_position", False)
-            and manhattan(s["position"], get_flank_point(s)) <= s["friendly_attack_range"]
-            and has_line_of_sight(s["position"], get_flank_point(s)),
-         ["AttackEnemy"])
-    ],
-
-    # ————————————————————————————————————————————————
-    # 2) ArmorEngage: tanks/ATGs move into range, then hold until all are ready, then shoot
-    "ArmorEngage": [
-        (lambda s: s["type"] not in ("tank","anti-tank"), []),
-
-        # if out of range or no LOS, move in
-        (lambda s:
-            manhattan(s["position"], s["target_enemy"]["position"]) > s["friendly_attack_range"]
-            or not has_line_of_sight(s["position"], s["target_enemy"]["position"]),
-         ["Move"]),
-
-        # in my own firing position, but wait for the rest
-        (lambda s: not s.get("in_position", False),
-         ["Hold"]),
-
-        # once all are in_position and I’m in range+LOS, attack
-        (lambda s:
-            s.get("in_position", False)
-            and manhattan(s["position"], s["target_enemy"]["position"]) <= s["friendly_attack_range"]
-            and has_line_of_sight(s["position"], s["target_enemy"]["position"]),
-         ["AttackEnemy"])
-    ],
-
-    # ————————————————————————————————————————————————
-    # 3) ArtillerySuppress: same pattern for artillery
-    "ArtillerySuppress": [
-        (lambda s: s["type"] != "artillery", []),
-
-        # move until in range + LOS
-        (lambda s:
-            manhattan(s["position"], s["target_enemy"]["position"]) > s["friendly_attack_range"]
-            or not has_line_of_sight(s["position"], s["target_enemy"]["position"]),
-         ["Move"]),
-
-        # in range but squad not fully in position? hold
-        (lambda s: not s.get("in_position", False),
-         ["Hold"]),
-
-        # once everyone is set, fire
-        (lambda s:
-            s.get("in_position", False)
-            and manhattan(s["position"], s["target_enemy"]["position"]) <= s["friendly_attack_range"]
-            and has_line_of_sight(s["position"], s["target_enemy"]["position"]),
-         ["AttackEnemy"])
-    ],
-
-
     "DefeatEnemies": [
-        (lambda state: state.get("target_enemy", {}).get("enemy_alive", False) and 
-                    enemy_in_range_with_los({**state, "enemy": state["target_enemy"]}),
-         ["AttackEnemy"]),
-        (lambda state: state.get("target_enemy", {}).get("enemy_alive", False) and 
-                    manhattan(state["position"], state["target_enemy"]["position"]) > state["friendly_attack_range"],
-         ["Move", "AttackEnemy"])
+        # Generate Move and AttackEnemy tasks for each alive enemy
+        (lambda state: any(e.get("enemy_alive", False) for e in state.get("all_enemies", [])),
+         lambda state: [
+             task
+             for enemy in state.get("all_enemies", [])
+             if enemy.get("enemy_alive", False)
+             for task in [("Move", enemy["name"]), ("AttackEnemy", enemy["name"])]
+         ]),
+        # If no enemies are alive, no tasks needed
+        (lambda state: not any(e.get("enemy_alive", False) for e in state.get("all_enemies", [])), []),
     ],
-    "ScoutSearch": [
-        (lambda state: len(set(e["name"] for e in state.get("visible_enemies", []))) >= state.get("total_enemies", 2),
-         ["SetAllEnemiesSpotted"]),
-        (lambda state: state.get("scout_steps", 0) >= 200,
-         ["SetAllEnemiesSpotted"]),
-        (lambda state: True, ["Move", "SetAllEnemiesSpotted"])
-    ]
+    "SecureOutpost": [
+        # Move to outpost position
+        (lambda state: state["position"] != state["outpost_position"], [("Move", "outpost")]),
+        # If already at outpost, secure it
+        (lambda state: state["position"] == state["outpost_position"], ["SecureOutpostNoArg"]),
+    ],
+    "SecureOutpostNoArg": [
+        # Dummy task to mark outpost as secured
+        (lambda state: True, ["SecureOutpostNoArg"]),
+    ],
 }
 
 def enemy_not_in_range_friendly(state):
@@ -444,22 +352,27 @@ def enemy_in_range_friendly(state):
 class HTNPlanner:
     def __init__(self, domain):
         self.domain = domain
+
     def plan(self, task, state):
-        if task not in self.domain:
-            return [task]
-        for condition, subtasks in self.domain[task]:
+        # Handle task as tuple (task_name, arg) or string
+        task_name = task[0] if isinstance(task, tuple) else task
+        task_arg = task[1] if isinstance(task, tuple) else None
+
+        if task_name not in self.domain:
+            return [task]  # Primitive task, return as-is
+
+        for condition, subtasks in self.domain[task_name]:
             if condition(state):
+                # If subtasks is a lambda, evaluate it to get the task list
+                task_list = subtasks(state) if callable(subtasks) else subtasks
                 plan = []
-                for subtask in subtasks:
-                    if subtask in self.domain:
-                        sub_plan = self.plan(subtask, state)
-                    else:
-                        sub_plan = [subtask]
+                for subtask in task_list:
+                    # Recursively plan each subtask
+                    sub_plan = self.plan(subtask, state)
                     if sub_plan is None:
-                        break
+                        return None
                     plan.extend(sub_plan)
-                else:
-                    return plan
+                return plan
         return None
 
 ###############################
@@ -618,274 +531,168 @@ class FriendlyUnit:
         self.state = state
         self.planner = HTNPlanner(domain)
         self.current_plan = []
-        self.last_enemy_pos = state["target_enemy"]["position"] if "target_enemy" in state else state.get("outpost_position", (0, 0))
+        self.last_enemy_pos = state["outpost_position"]
         self.last_health = state["health"]
         self.sim = simulation
 
     def update_plan(self, force_replan=False):
-        mission = list(self.planner.domain.keys())[0]
-        # Keep AttackEnemy if in range and LOS
-        if (self.state.get("all_enemies_spotted", False) and
-            self.state.get("target_enemy", {}).get("enemy_alive", False) and
-            manhattan(self.state["position"], self.state["target_enemy"]["position"]) <= self.state["friendly_attack_range"] and
-            has_line_of_sight(self.state["position"], self.state["target_enemy"]["position"])):
-            self.current_plan = ["AttackEnemy"] + self.current_plan[1:] if self.current_plan else ["AttackEnemy"]
-            logger.info(f"{self.name} already in attack position; keeping plan: {self.current_plan}")
-            return
-        # Replan if forced, no plan, or need to act after spotting enemies
-        if (force_replan or not self.current_plan or
-            (self.state.get("all_enemies_spotted", False) and self.current_plan == ["Hold"])):
+        mission = "SecureOutpostMission"
+        if force_replan or not self.current_plan:
+            # Ensure state has all_enemies
+            self.state["all_enemies"] = [e.state for e in self.sim.enemy_units]
             new_plan = self.planner.plan(mission, self.state)
             if not new_plan:
-                # Fallback plan if planner fails
-                if self.state.get("target_enemy", {}).get("enemy_alive", False):
-                    new_plan = ["Move", "AttackEnemy"]
-                else:
-                    new_plan = ["Hold"]
+                new_plan = [("Hold", None)]  # Fallback
             self.current_plan = new_plan
-            logger.info(f"{self.name} replanned: {self.current_plan}, "
-                  f"target_enemy: {self.state.get('target_enemy', {}).get('name', 'None')}, "
-                  f"all_enemies_spotted: {self.state.get('all_enemies_spotted', False)}")
+            logger.info(f"{self.name} replanned: {self.current_plan}")
         else:
-            logger.info(f"{self.name} current plan: {self.current_plan}, "
-                  f"target_enemy: {self.state.get('target_enemy', {}).get('name', 'None')}, "
-                  f"all_enemies_spotted: {self.state.get('all_enemies_spotted', False)}")
-        self.last_enemy_pos = self.state["target_enemy"]["position"] if self.state.get("target_enemy", {}) else self.state["outpost_position"]
+            logger.info(f"{self.name} current plan: {self.current_plan}")
         self.last_health = self.state["health"]
 
     def execute_next_task(self):
         logger.info(f"{self.name} is facing {self.state['facing']}")
         if not self.current_plan or self.state["health"] <= 0:
-            logger.info(f"{self.name} cannot execute task: plan empty or health <= 0 (health: {self.state['health']})")
+            logger.info(f"{self.name} cannot execute task: plan empty or health <= 0")
             return
         task = self.current_plan[0]
+        task_name = task[0] if isinstance(task, tuple) else task
+        task_arg = task[1] if isinstance(task, tuple) else None
         logger.info(f"{self.name} executing task: {task}")
-        if task == "Move":
+
+        if task_name == "Move":
             old_pos = self.state["position"]
-            next_task = self.current_plan[1] if len(self.current_plan) > 1 else None
-            if next_task == "AttackEnemy":
-                if not self.state.get("target_enemy", {}).get("enemy_alive", False):
-                    logger.info(f"{self.name} cannot move to attack; no valid enemy target. Replanning.")
-                    self.current_plan.pop(0)
-                    self.update_plan(force_replan=True)
-                    return
-                goal = self.state["target_enemy"]["position"]
-                if (manhattan(self.state["position"], goal) <= self.state["friendly_attack_range"]
-                    and has_line_of_sight(self.state["position"], goal)):
-                    logger.info(f"{self.name} reached enemy range and LOS; stopping move.")
-                    self.current_plan.pop(0)
-                else:
-                    self.state["position"] = next_step(
-                        self.state["position"],
-                        goal,
-                        self.sim.enemy_units if hasattr(self, 'sim') else [],
-                        unit=self.state["type"]
-                    )
-                    logger.info(f"{self.name} moves toward enemy at {goal}, new position: {self.state['position']}")
-            elif next_task == "SecureOutpost":
-                goal = self.state["outpost_position"]
-                if self.state["position"] == goal:
-                    logger.info(f"{self.name} reached outpost; stopping move.")
-                    self.current_plan.pop(0)
-                else:
-                    self.state["position"] = next_step(
-                        self.state["position"],
-                        goal,
-                        self.sim.enemy_units if hasattr(self, 'sim') else [],
-                        unit=self.state["type"]
-                    )
-                    logger.info(f"{self.name} moves toward outpost at {goal}, new position: {self.state['position']}")
-            elif next_task == "SetAllEnemiesSpotted" and self.state["type"] == "scout":
-                candidate_positions = self.state.get("candidate_positions", [])
-                if candidate_positions:
-                    idx = self.state.get("current_candidate_index", 0)
-                    candidate = candidate_positions[idx]
-                    visible_enemy_names_before = set(e["name"] for e in self.state.get("visible_enemies", []))
-                    self.state["scout_steps"] = self.state.get("scout_steps", 0) + 1
-                    if len(visible_enemy_names_before) >= self.state.get("total_enemies", 2):
-                        logger.info(f"{self.name} has spotted all enemies: {visible_enemy_names_before}; setting all_enemies_spotted flag.")
-                        self.state["all_enemies_spotted"] = True
+            goal = self.get_goal_position(task)
+            # Check if the next task is AttackEnemy and we're in range
+            if (len(self.current_plan) > 1 and 
+                isinstance(self.current_plan[1], tuple) and 
+                self.current_plan[1][0] == "AttackEnemy" and 
+                task_arg == self.current_plan[1][1]):
+                target_unit = None
+                for e in self.sim.enemy_units:
+                    if e.state.get("name") == task_arg:
+                        target_unit = e
+                        break
+                if target_unit and target_unit.state["enemy_alive"]:
+                    distance = manhattan(self.state["position"], target_unit.state["position"])
+                    has_los = has_line_of_sight(self.state["position"], target_unit.state["position"])
+                    logger.info(f"{self.name} to {task_arg}: distance={distance}, attack_range={self.state['friendly_attack_range']}, has_los={has_los}")
+                    if distance <= self.state["friendly_attack_range"] and has_los:
+                        logger.info(f"{self.name} within attack range of {task_arg} at distance {distance}; stopping move.")
                         self.current_plan.pop(0)
-                    elif self.state["scout_steps"] >= 200:
-                        logger.info(f"{self.name} reached max scout steps (200); forcing all_enemies_spotted flag.")
-                        self.state["all_enemies_spotted"] = True
-                        self.current_plan.pop(0)
-                    else:
-                        path = astar(self.state["position"], candidate, self.sim.enemy_units if hasattr(self, 'sim') else [], unit=self.state["type"])
-                        next_pos = path[1] if len(path) >= 2 else self.state["position"]
-                        self.state["position"] = next_pos
-                        logger.info(f"{self.name} moves stealthily toward candidate position {candidate}, new position: {self.state['position']}")
-                        visible_enemy_names_after = set(e["name"] for e in self.state.get("visible_enemies", []))
-                        logger.info(f"{self.name} visible enemies: {visible_enemy_names_after}, scout_steps: {self.state['scout_steps']}")
-                        if visible_enemy_names_after > visible_enemy_names_before:
-                            logger.info(f"{self.name} spotted new enemies {visible_enemy_names_after - visible_enemy_names_before}; moving to next candidate position.")
-                            idx = (idx + 1) % len(candidate_positions)
-                            self.state["current_candidate_index"] = idx
-                        elif self.state["position"] == candidate:
-                            logger.info(f"{self.name} reached candidate position {candidate}; moving to next candidate.")
-                            idx = (idx + 1) % len(candidate_positions)
-                            self.state["current_candidate_index"] = idx
-                else:
-                    logger.info(f"{self.name} has no candidate positions; setting all_enemies_spotted flag.")
-                    self.state["all_enemies_spotted"] = True
-                    self.current_plan.pop(0)
+                        return
+            # Proceed with move if not in range
+            if self.state["position"] == goal:
+                logger.info(f"{self.name} reached goal {goal}; stopping move.")
+                self.current_plan.pop(0)
             else:
-                goal = self.get_goal_position()
-                if self.state["position"] == goal:
-                    logger.info(f"{self.name} reached goal {goal}; stopping move.")
-                    self.current_plan.pop(0)
-                else:
-                    self.state["position"] = next_step(self.state["position"], goal)
-                    logger.info(f"{self.name} moves towards {goal}, new position: {self.state['position']}")
+                self.state["position"] = next_step(
+                    self.state["position"],
+                    goal,
+                    self.sim.enemy_units,
+                    unit=self.state["type"]
+                )
+                logger.info(f"{self.name} moves toward {goal}, new position: {self.state['position']}")
             new_pos = self.state["position"]
             dx, dy = new_pos[0] - old_pos[0], new_pos[1] - old_pos[1]
             if dx or dy:
                 self.state["facing"] = (sign(dx), sign(dy))
-        elif task == "AttackEnemy":
+
+        elif task_name == "AttackEnemy":
             self.sim.engagement_status[self.name] = True
-            tx, ty = self.state["target_enemy"]["position"]
-            x, y = self.state["position"]
-            dx, dy = tx - x, ty - y
-            self.state["facing"] = (sign(dx), sign(dy))
             target_unit = None
-            for u in self.sim.enemy_units:
-                if u.state.get("name") == self.state["target_enemy"]["name"]:
-                    target_unit = u
+            for e in self.sim.enemy_units:
+                if e.state.get("name") == task_arg:
+                    target_unit = e
                     break
             if not target_unit or not target_unit.state["enemy_alive"]:
-                logger.info(f"{self.name} cannot attack; target {self.state['target_enemy']['name']} is dead or invalid. Replanning.")
+                logger.info(f"{self.name} cannot attack; target {task_arg} is dead or invalid.")
                 self.current_plan.pop(0)
                 self.update_plan(force_replan=True)
                 return
+            tx, ty = target_unit.state["position"]
+            x, y = self.state["position"]
             distance = manhattan(self.state["position"], target_unit.state["position"])
             has_los = has_line_of_sight(self.state["position"], target_unit.state["position"])
             if distance > self.state["friendly_attack_range"] or not has_los:
-                logger.info(f"{self.name} cannot attack {target_unit.name}; out of range (distance: {distance}, "
-                      f"attack_range: {self.state['friendly_attack_range']}) or no LOS (has_los: {has_los}). Replanning.")
+                logger.info(f"{self.name} cannot attack {target_unit.name}; out of range or no LOS.")
                 self.current_plan.pop(0)
                 self.update_plan(force_replan=True)
                 return
-            
+            dx, dy = tx - x, ty - y
+            self.state["facing"] = (sign(dx), sign(dy))
+
             num_attacks = get_num_attacks(self.state["rate_of_fire"])
             effective_accuracy = max(0, self.state["friendly_accuracy"] - self.state["suppression_from_enemy"])
+            logger.info(f"{self.name} attacks {target_unit.name} {num_attacks} times, accuracy: {effective_accuracy:.2f}")
 
-            logger.info(f"{self.name} attacks {target_unit.name} {num_attacks} times, effective accuracy: {effective_accuracy:.2f}, "
-                  f"suppression_from_enemy: {self.state['suppression_from_enemy']:.2f}")
-            
             for _ in range(num_attacks):
                 if random.random() < effective_accuracy:
-                    target_pos = target_unit.state["position"]
-                    dx = target_pos[0] - self.state["position"][0]
-                    dy = target_pos[1] - self.state["position"][1]
+                    dx = tx - x
+                    dy = ty - y
                     norm = math.sqrt(dx**2 + dy**2)
-                    if norm > 0:
-                        dx, dy = dx / norm, dy / norm
-                    else:
-                        dx, dy = 0, 0
-                    self.state["facing"] = dx, dy
-                    logger.info(f"{self.name} attacking {target_unit.name} at {target_pos}, facing: {self.state['facing']}")
-
+                    dx, dy = (dx / norm, dy / norm) if norm > 0 else (0, 0)
+                    self.state["facing"] = (dx, dy)
                     attack_dir = (dx, dy)
                     target_facing = target_unit.state.get("facing", (0, 1))
                     target_norm = math.sqrt(target_facing[0]**2 + target_facing[1]**2)
-                    if target_norm > 0:
-                        target_fx, target_fy = target_facing[0] / target_norm, target_facing[1] / target_norm
-                    else:
-                        target_fx, target_fy = 0, 0
-
+                    target_fx, target_fy = (target_facing[0] / target_norm, target_facing[1] / target_norm) if target_norm > 0 else (0, 0)
                     dot_product = attack_dir[0] * target_fx + attack_dir[1] * target_fy
                     dot_product = max(min(dot_product, 1), -1)
                     angle_deg = math.degrees(math.acos(dot_product))
-                    if angle_deg <= 45:
-                        direction = "rear"
-                    elif angle_deg <= 135:
-                        direction = "side"
-                    else:
-                        direction = "front"
-                    logger.info(f"{self.name} attacking {target_unit.name} from the {direction} side")
+                    direction = "rear" if angle_deg <= 45 else "side" if angle_deg <= 135 else "front"
+                    logger.info(f"{self.name} attacking {target_unit.name} from the {direction}")
 
                     armor_val = target_unit.state[f"armor_{direction}"]
                     D = self.state["penetration"] - armor_val
-                    num_attacks = get_num_attacks(self.state["rate_of_fire"])
-                    effective_accuracy = max(0, self.state["friendly_accuracy"] - self.state["suppression_from_enemy"])
-                    logger.info(f"{self.name} attacks {target_unit.name} {num_attacks} times, effective accuracy: {effective_accuracy:.2f}, "
-                        f"from the {direction} (armor {armor_val}, D={D}), suppression_from_enemy: {self.state['suppression_from_enemy']:.2f}")
-
-                    target_unit.state["suppression_from_enemy"] += self.state["suppression"]
-                    logger.info(f"{self.name} hits {target_unit.name}, applying {self.state['suppression']} suppression")
                     if random.random() < get_penetration_probability(D):
                         target_unit.state["health"] -= self.state["damage"]
-                        logger.info(f"{self.name} penetrates {target_unit.name}'s armor, health now {target_unit.state['health']}") 
+                        target_unit.state["suppression_from_enemy"] += self.state["suppression"]
+                        logger.info(f"{self.name} penetrates {target_unit.name}, health now {target_unit.state['health']}")
                         if target_unit.state["health"] <= 0:
                             target_unit.state["enemy_alive"] = False
                             logger.info(f"{self.name} destroyed {target_unit.name}!")
                             self.current_plan.pop(0)
-                            self.update_plan(force_replan=True)
+                            # Force all units to replan
+                            for unit in self.sim.friendly_units:
+                                unit.update_plan(force_replan=True)
                             return
-            self.current_plan.pop(0)
-        elif task == "SecureOutpost":
+            # Do not pop the task if the enemy is still alive
+            if target_unit.state["enemy_alive"]:
+                logger.info(f"{self.name} continues attacking {target_unit.name}, health remaining: {target_unit.state['health']}")
+            else:
+                self.current_plan.pop(0)
+
+        elif task_name == "SecureOutpostNoArg":
             if self.state["position"] == self.state["outpost_position"]:
                 self.state["outpost_secured"] = True
                 logger.info(f"{self.name} secures the outpost!")
                 self.current_plan.pop(0)
             else:
-                logger.info(f"{self.name} cannot secure the outpost; not at target location.")
+                logger.info(f"{self.name} cannot secure outpost; not at target location.")
                 self.current_plan.pop(0)
-        elif task == "WaitForUnit":
-            # Task format: ("WaitForUnit", unit_name)
-            wait_for_unit = self.current_plan[0][1]
-            if self.simulation.engagement_status.get(wait_for_unit, False):
-                logger.info(f"{self.name} done waiting: {wait_for_unit} is engaging")
-                self.current_plan = self.current_plan[1:]  # Proceed to next task
-            else:
-                logger.info(f"{self.name} waiting for {wait_for_unit} to engage")
-                # Stay in place (do nothing)
-        elif task == "Hold":
+
+        elif task_name == "Hold":
             logger.info(f"{self.name} holds position at {self.state['position']}.")
-            if (self.state["type"] != "scout" and
-                self.state.get("all_enemies_spotted", False) and
-                self.current_plan == ["Hold"]):
-                logger.info(f"{self.name} all enemies spotted; replanning.")
-                self.update_plan(force_replan=True)
-            else:
-                self.current_plan.pop(0)
-        elif task == "SetAllEnemiesSpotted":
-            visible_enemy_names = set(e["name"] for e in self.state.get("visible_enemies", []))
-            self.state["scout_steps"] = self.state.get("scout_steps", 0) + 1
-            if len(visible_enemy_names) >= self.state.get("total_enemies", 2):
-                logger.info(f"{self.name} sets all_enemies_spotted flag to True. Spotted enemies: {visible_enemy_names}")
-                self.state["all_enemies_spotted"] = True
-            elif self.state["scout_steps"] >= 200:
-                logger.info(f"{self.name} reached max scout steps (200) in SetAllEnemiesSpotted; forcing all_enemies_spotted flag.")
-                self.state["all_enemies_spotted"] = True
-            else:
-                logger.info(f"{self.name} cannot set all_enemies_spotted; only spotted: {visible_enemy_names}, scout_steps: {self.state['scout_steps']}")
             self.current_plan.pop(0)
 
-    def get_goal_position(self):
-        if self.current_plan and self.current_plan[0] == "Move" and self.state.get("all_enemies_spotted", False):
-            # We know we're inside the coordinated attack (because only then all_enemies_spotted==True
-            # and the first subtask is a Move)
-            if self.state["type"] == "infantry":
-                return get_flank_point(self.state)
-            else:
-                return self.state["target_enemy"]["position"]
-        
-        if self.current_plan and self.current_plan[0] == "AttackEnemy":
-            return self.state["target_enemy"]["position"]
-            
-        if self.current_plan:
-            if len(self.current_plan) > 1:
-                if self.current_plan[1] == "AttackEnemy":
-                    return self.state["target_enemy"]["position"] if self.state.get("target_enemy", {}).get("enemy_alive", False) else self.state["outpost_position"]
-                elif self.current_plan[1] == "SecureOutpost":
-                    return self.state["outpost_position"]
-                elif self.current_plan[1] == "SetAllEnemiesSpotted" and self.state["type"] == "scout":
-                    idx = self.state.get("current_candidate_index", 0)
-                    return self.state["candidate_positions"][idx]
-            if self.current_plan[0] == "AttackEnemy":
-                return self.state["target_enemy"]["position"] if self.state.get("target_enemy", {}).get("enemy_alive", False) else self.state["outpost_position"]
-        return self.state["outpost_position"]
+    def get_goal_position(self, task=None):
+        if not task:
+            task = self.current_plan[0] if self.current_plan else ("Hold", None)
+        task_name = task[0] if isinstance(task, tuple) else task
+        task_arg = task[1] if isinstance(task, tuple) else None
+
+        if task_name == "Move":
+            if task_arg == "outpost":
+                return self.state["outpost_position"]
+            for enemy in self.state.get("all_enemies", []):
+                if enemy["name"] == task_arg and enemy.get("enemy_alive", False):
+                    return enemy["position"]
+        elif task_name == "AttackEnemy":
+            for enemy in self.state.get("all_enemies", []):
+                if enemy["name"] == task_arg and enemy.get("enemy_alive", False):
+                    return enemy["position"]
+        return self.state["position"]  # Default: stay put
+
 
 class FriendlyTank(FriendlyUnit):
     def __init__(self, name, state, domain, simulation=None):
@@ -927,6 +734,7 @@ class Simulation:
         for u in self.friendly_units:
             u.state["enemy"] = active_enemy.state if active_enemy else {}
             u.state["visible_enemies"] = []
+            u.state["all_enemies"] = [e.state for e in self.enemy_units]  # Add all enemies
             u.state["total_enemies"] = len(self.enemy_units)
             u.state["scout_steps"] = 0
             if u.state["type"] == "scout":
@@ -1169,38 +977,25 @@ class Simulation:
         self.update_enemy_behavior()
         self.team_commander.share_tank_health()
         for unit in self.friendly_units:
-            if ("AttackEnemy" in unit.current_plan and 
-                not unit.state.get("target_enemy", {}).get("enemy_alive", False)):
+            if (isinstance(unit.current_plan[0], tuple) and unit.current_plan[0][0] == "AttackEnemy" and
+                not any(e.state["name"] == unit.current_plan[0][1] and e.state["enemy_alive"]
+                        for e in self.enemy_units)):
                 logger.info(f"{unit.name} target enemy is dead or invalid; replanning.")
                 unit.update_plan(force_replan=True)
             else:
-                unit.update_plan()  # Ensure plan is updated each step
-            logger.info(f"{unit.name} current plan: {unit.current_plan}, all_enemies_spotted: {unit.state.get('all_enemies_spotted', False)}")
-            if "target_enemy" in unit.state and unit.state["target_enemy"]:
-                logger.info(f"{unit.name} targeting enemy: {unit.state['target_enemy']['name']} at {unit.state['target_enemy']['position']}")
+                unit.update_plan()
+            logger.info(f"{unit.name} current plan: {unit.current_plan}")
+            if unit.current_plan and isinstance(unit.current_plan[0], tuple) and unit.current_plan[0][1]:
+                logger.info(f"{unit.name} targeting: {unit.current_plan[0][1]}")
             unit.execute_next_task()
             if self.visualize:
                 logger.info(f"{unit.name}'s current goal: {unit.get_goal_position()}")
-            if not unit.state.get("target_enemy", {}).get("enemy_alive", False):
-                new_target_state = select_enemy_for_unit(self.enemy_units, unit)
-                if new_target_state is not None:
-                    logger.info(f"{unit.name} switching target to {new_target_state['name']}")
-                    unit.state["target_enemy"] = new_target_state
-                    unit.state["enemy"] = new_target_state
+            # Update target if current target is dead
+            if unit.current_plan and isinstance(unit.current_plan[0], tuple) and unit.current_plan[0][0] == "AttackEnemy":
+                target_alive = any(e.state["name"] == unit.current_plan[0][1] and e.state["enemy_alive"]
+                                for e in self.enemy_units)
+                if not target_alive:
                     unit.update_plan(force_replan=True)
-                else:
-                    unit.state["target_enemy"] = {}
-                    unit.state["enemy"] = {}
-            
-            for enemy in self.enemy_units:
-                if enemy.state["enemy_alive"]:
-                    if "target" in enemy.state and enemy.state["target"]:
-                        self.engagement_status[enemy.state["name"]] = True
-                    else:
-                        self.engagement_status[enemy.state["name"]] = False
-
-        self.update_in_position_flag()  # Update in_position flag for all units
-
 
     def run(self, max_steps=200):
         self.step_count = 0
@@ -1308,7 +1103,7 @@ if __name__ == "__main__":
     }
     scout_state_template = {
         "type": "scout",
-        "position": (30, 30),
+        "position": (16, 20),
         "facing": (0, 1),
         "health": 18,
         "max_health": 18,
