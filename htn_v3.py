@@ -20,36 +20,133 @@ logger = logging.getLogger("Sim")
 # Grid, Obstacles, and LOS
 ###############################
 
-GRID_WIDTH = 50
+GRID_WIDTH = 75
 GRID_HEIGHT = 50
 CELL_SIZE = 100
+random.seed(42)  # For reproducibility
 
-# Create a river (vertical obstacle) with 3 bridges.
-river_columns = range(round(GRID_WIDTH/3), round(GRID_WIDTH/3) + 5)  # 5 cells wide
-bridge_centers = [10, 25, 40]
-bridge_group_size = 2
-bridge_rows = set()
-for center in bridge_centers:
-    bridge_rows.update(range(center - bridge_group_size // 2, center - bridge_group_size // 2 + bridge_group_size))
-river = {(x, y) for x in river_columns for y in range(GRID_HEIGHT) if y not in bridge_rows}
+def get_line(start, end):
+    x1, y1 = start
+    x2, y2 = end
+    line = []
+    dx, dy = abs(x2 - x1), abs(y2 - y1)
+    x, y = x1, y1
+    sx = 1 if x2 > x1 else -1
+    sy = 1 if y2 > y1 else -1
+    if dx > dy:
+        err = dx / 2.0
+        while x != x2:
+            line.append((x, y))
+            err -= dy
+            if err < 0:
+                y += sy
+                err += dx
+            x += sx
+    else:
+        err = dy / 2.0
+        while y != y2:
+            line.append((x, y))
+            err -= dx
+            if err < 0:
+                x += sx
+                err += dy
+            y += sy
+    line.append((x, y))
+    return line
 
-# Inner forest (excluding edges)
-forest = {(x, y) for x in range(GRID_WIDTH - 19, GRID_WIDTH - 5) for y in range(GRID_HEIGHT - 19, GRID_HEIGHT - 5)}
-# Forest edges (perimeter of the original forest area)
-forest_edge = (
-    {(x, y) for x in range(GRID_WIDTH - 20, GRID_WIDTH - 4) for y in [GRID_HEIGHT - 20, GRID_HEIGHT - 5]} |
-    {(x, y) for x in [GRID_WIDTH - 20, GRID_WIDTH - 5] for y in range(GRID_HEIGHT - 19, GRID_HEIGHT - 5)}
-)
+# create a river in the bottom left corner
+river = set()
+for x in range(0, GRID_WIDTH):
+    for y in range(0, GRID_HEIGHT):
+        if (x < 7 and y < 25):
+            river.add((x, y))
+        elif (7 <= x < 25 and 20 <= y < 25):
+            river.add((x, y))
+        elif (x >= 50 and 35 <= y < 40):
+            river.add((x, y))
+        for i in range(0, 5):
+            for pos in get_line((25, 20+i), (49, 35+i)):
+                river.add(pos)
 
-# In this example the obstacles come only from the river and forest.
-obstacles = set()
+for x in range(11, 14):
+    for y in range(20, 25):
+        river.discard((x, y))
+
+for i in range(6):
+    for pos in get_line((40, 21 + i), (34, 29 + i)):
+        river.discard(pos)
+
+for x in range(61, 64):
+    for y in range(35, 40):
+        river.discard((x, y))
+
+def init_forest(p, width, height):
+    return {
+        (x,y)
+        for x in range(width)
+        for y in range(height)
+        if random.random() < p and not (x,y) in river
+    }
+
+# count how many of the 8 neighbors of (x,y) are in forest
+def count_neighbors(forest, x, y):
+    n = 0
+    for dx in (-1,0,1):
+        for dy in (-1,0,1):
+            if dx==0 and dy==0: continue
+            if (x+dx, y+dy) in forest:
+                n += 1
+    return n
+
+def smooth_forest(forest, width, height, survive=4, birth=5):
+    new = set()
+    for x in range(width):
+        for y in range(height):
+            n = count_neighbors(forest, x, y)
+            if ( (x,y) in forest and n >= survive ) or ( (x,y) not in forest and n >= birth ):
+                new.add((x,y))
+    return new
+
+# generate + smooth
+forest = init_forest(p=0.45, width=GRID_WIDTH, height=GRID_HEIGHT)
+for _ in range(4):
+    forest = smooth_forest(forest, GRID_WIDTH, GRID_HEIGHT)
+
+# create cliffs
+cliff_defs = [((10,25),(20,25),(0, 1))]
+cliffs = {}
+for s,e,n in cliff_defs:
+    for c in get_line(s,e):
+        cliffs[c] = n
+
+climb_entries = {
+    (cx - nx, cy - ny): (cx, cy)
+    for (cx, cy), (nx, ny) in cliffs.items()
+}
 
 def in_bounds(pos):
     return 0 <= pos[0] < GRID_WIDTH and 0 <= pos[1] < GRID_HEIGHT
 
 def neighbors(pos):
-    return [p for p in [(pos[0]+1, pos[1]), (pos[0]-1, pos[1]), (pos[0], pos[1]+1), (pos[0], pos[1]-1)]
-            if in_bounds(p) and p not in obstacles and p not in river]
+    results = []
+    for p in [(pos[0]-1,pos[1]), (pos[0]+1,pos[1]), (pos[0],pos[1]-1), (pos[0],pos[1]+1)]:
+        if not in_bounds(p) or p in river:
+            continue
+        if pos in cliffs:
+            nx, ny = cliffs[pos]
+            entry = (pos[0] - nx, pos[1] - ny)
+            if p != entry:
+                continue
+
+        if p in cliffs:
+            if climb_entries.get(pos) != p:
+                continue
+        results.append(p)
+    return results
+
+# create a forest edge
+forest_edge = [pos for pos in forest if any(n not in forest for n in neighbors(pos))]
+forest -= set(forest_edge)
 
 def manhattan(p, q):
     return abs(p[0]-q[0]) + abs(p[1]-q[1])
@@ -108,38 +205,9 @@ def next_step(start, goal, enemy_units=None, unit="unknown"):
     path = astar(start, goal, enemy_units, unit)
     return path[1] if len(path) >= 2 else start
 
-def get_line(start, end):
-    x1, y1 = start
-    x2, y2 = end
-    line = []
-    dx, dy = abs(x2 - x1), abs(y2 - y1)
-    x, y = x1, y1
-    sx = 1 if x2 > x1 else -1
-    sy = 1 if y2 > y1 else -1
-    if dx > dy:
-        err = dx / 2.0
-        while x != x2:
-            line.append((x, y))
-            err -= dy
-            if err < 0:
-                y += sy
-                err += dx
-            x += sx
-    else:
-        err = dy / 2.0
-        while y != y2:
-            line.append((x, y))
-            err -= dx
-            if err < 0:
-                x += sx
-                err += dy
-            y += sy
-    line.append((x, y))
-    return line
-
 def has_line_of_sight(start, end):
     line = get_line(start, end)
-    blocks_los = all(pos not in obstacles and pos not in river for pos in line[1:-1])
+    blocks_los = all(pos not in river for pos in line[1:-1])
     if not blocks_los:
         return False
     start_in_cover = start in forest or start in forest_edge
@@ -243,7 +311,7 @@ def get_flank_point(state):
     for dx, dy in perp_dirs:
         candidate = (ex + 2*dx, ey + 2*dy)
         # only pick if it’s in bounds and not blocked
-        if in_bounds(candidate) and candidate not in obstacles and candidate not in river:
+        if in_bounds(candidate) and candidate not in river:
             # and ensure it’s outside enemy’s attack range
             if manhattan(candidate, (ex, ey)) > state["target_enemy"]["attack_range"]:
                 return candidate
@@ -909,6 +977,34 @@ class Simulation:
         # Draw forest edge
         for cell in forest_edge:
             self.ax.add_patch(plt.Rectangle((cell[0]*CELL_SIZE, cell[1]*CELL_SIZE), CELL_SIZE, CELL_SIZE, facecolor='lightgreen', zorder=1))
+
+        # Draw cliff
+        for c in cliffs:
+            self.ax.add_patch(plt.Rectangle((c[0]*CELL_SIZE, c[1]*CELL_SIZE), CELL_SIZE, CELL_SIZE, color='brown', zorder=1))
+
+        # Draw climb-entry markers
+        for entry, cliff_cell in climb_entries.items():
+            ex, ey = entry
+            cx, cy = cliff_cell
+            self.ax.add_patch(plt.Rectangle((ex*CELL_SIZE, ey*CELL_SIZE), CELL_SIZE, CELL_SIZE, color='forestgreen', alpha=0.6, zorder=2))
+
+            self.ax.annotate(
+                '',
+                xy=(
+                    cx*CELL_SIZE + CELL_SIZE/2,
+                    cy*CELL_SIZE + CELL_SIZE/2
+                ),
+                xytext=(
+                    ex*CELL_SIZE + CELL_SIZE/2,
+                    ey*CELL_SIZE + CELL_SIZE/2
+                ),
+                arrowprops=dict(
+                    arrowstyle='->',
+                    color='black',
+                    lw=1.5
+                ),
+                zorder=3
+            )
         
         # Draw outpost
         if self.friendly_units:
@@ -957,11 +1053,6 @@ class Simulation:
                 fx, fy = fx/norm, fy/norm
                 arrow_length = CELL_SIZE * 2  # 300 meters (3 grid cells)
                 self.ax.quiver(cx, cy, fx * arrow_length, fy * arrow_length, color=color, edgecolor='black', linewidth=0.5, width=0.015, scale=1, scale_units='xy', angles='xy', zorder=4)
-        
-        # Add legend with unique labels
-        handles, labels = self.ax.get_legend_handles_labels()
-        unique = dict(zip(labels, handles))
-        self.ax.legend(unique.values(), unique.keys(), loc='upper right')
         
         self.ax.set_title(f"Simulation Step {self.step_count} - {self.plan_name}")
         self.fig.canvas.draw()
