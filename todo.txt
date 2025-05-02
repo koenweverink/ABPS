@@ -1,6 +1,4 @@
 - add correct enemies
-- make sure sim ends and print evaluation
 - add speed / speed in 
 - add points of interest
 - run without plot
-- 

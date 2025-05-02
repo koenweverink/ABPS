@@ -255,47 +255,6 @@ def sign(x):
     return 1 if x > 0 else -1 if x < 0 else 0
 
 ###############################
-# Global Enemy State Creation
-###############################
-
-def create_enemy_state(index=0):
-    GROUP_SIZE = 10
-    BASE_HEALTH = 20
-    state = {
-        "name": f"EnemyTankGroup{index+1}",
-        "position": (GRID_WIDTH - 1, GRID_HEIGHT - 3 if index == 0 else GRID_HEIGHT // 2),
-        "facing": (0, 1),
-        "enemy_alive": True,
-        "health": BASE_HEALTH * GROUP_SIZE,
-        "max_health": BASE_HEALTH * GROUP_SIZE,
-        "base_health": BASE_HEALTH,
-        "group_size": GROUP_SIZE,
-        "current_group_size": GROUP_SIZE,
-        "cumulative_damage": 0.0,
-        "armor_front": 17,
-        "armor_side": 4,
-        "armor_rear": 3,
-        "outpost_position": (GRID_WIDTH - 1, 0),
-        "outpost_secured": False,
-        "attack_range": 2400 / CELL_SIZE,
-        "accuracy": 0.7,
-        "penetration": 18,
-        "damage": 9,
-        "suppression": 0.12,
-        "base_rate_of_fire": 4.9,
-        "suppression_from_enemy": 0.0,
-        "patrol_points": [
-            [(GRID_WIDTH - 1, GRID_HEIGHT - 3), (GRID_WIDTH - 20, GRID_HEIGHT - 3)] if index == 0
-            else [(GRID_WIDTH - 1, GRID_HEIGHT // 2), (GRID_WIDTH - 3, GRID_HEIGHT // 2)]
-        ][0],
-        "current_patrol_index": 0,
-        "vision_range": 2000 / CELL_SIZE,
-        "retreat_point": (GRID_WIDTH - 1, GRID_HEIGHT - 1),
-        "stealth_modifier": 0
-    }
-    return state
-
-###############################
 # HTN Domains and Planners
 ###############################
 
@@ -316,9 +275,6 @@ secure_outpost_domain = {
     "SecureOutpost": [
         (lambda state: state["position"] != state["outpost_position"], [("Move", "outpost")]),
         (lambda state: state["position"] == state["outpost_position"], ["SecureOutpostNoArg"]),
-    ],
-    "SecureOutpostNoArg": [
-        (lambda state: True, ["Hold"]),
     ],
 }
 
@@ -523,6 +479,18 @@ class EnemyUnit:
                 not self.state["enemy_alive"])
 
 class EnemyTank(EnemyUnit):
+    def __init__(self, name, state, domain):
+        super().__init__(name, state, domain)
+
+class EnemyInfantry(EnemyUnit):
+    def __init__(self, name, state, domain):
+        super().__init__(name, state, domain)
+
+class EnemyAntiTank(EnemyUnit):
+    def __init__(self, name, state, domain):
+        super().__init__(name, state, domain)
+
+class EnemyArtillery(EnemyUnit):
     def __init__(self, name, state, domain):
         super().__init__(name, state, domain)
 
@@ -780,8 +748,8 @@ class Simulation:
 
         if self.visualize:
             plt.ion()
-            self.fig, self.ax = plt.subplots(figsize=(8, 8))
-            self.fig.set_size_inches(8, 8)
+            self.fig, self.ax = plt.subplots(figsize=(14, 8))
+            self.fig.set_size_inches(14, 8)
             self.ax.set_aspect("equal", adjustable="box")
             self.ax.set_xlim(-CELL_SIZE/2, GRID_WIDTH * CELL_SIZE - CELL_SIZE/2)
             self.ax.set_ylim(-CELL_SIZE/2, GRID_HEIGHT * CELL_SIZE - CELL_SIZE/2)
@@ -838,31 +806,61 @@ class Simulation:
                     marker='*', markersize=10, color='magenta', label='Outpost', zorder=5
                 )
 
-            # Initialize unit plots
+            # Initialize enemy plots, styling by type
+            style_map = {
+                "tank":      {"marker": "s", "color": "darkgreen",  "label": "Enemy Tanks"},
+                "infantry":  {"marker": "^", "color": "saddlebrown","label": "Enemy Infantry"},
+                "anti-tank": {"marker": "X", "color": "gray",       "label": "Enemy AT"},
+                "artillery": {"marker": "D", "color": "purple",     "label": "Enemy Artillery"},
+            }
+            seen_types = set()
             self.enemy_markers = []
-            self.enemy_arrows = []
-            self.enemy_texts = []
+            self.enemy_arrows  = []
+            self.enemy_texts   = []
+
             for enemy in self.enemy_units:
+                typ = enemy.state["type"]
+                style = style_map.get(typ,
+                    {"marker": "o", "color": "green", "label": "Enemy"})
+                # only label the first of each type
+                lbl = style["label"] if typ not in seen_types else None
+                seen_types.add(typ)
+
                 ex, ey = enemy.state["position"]
+                cx, cy = ex*CELL_SIZE + CELL_SIZE/2, ey*CELL_SIZE + CELL_SIZE/2
+
+                # Plot the unit marker
                 marker, = self.ax.plot(
-                    ex * CELL_SIZE + CELL_SIZE/2,
-                    ey * CELL_SIZE + CELL_SIZE/2,
-                    marker='s', markersize=8, color='green', zorder=5
+                    cx, cy,
+                    marker     = style["marker"],
+                    markersize = 8,
+                    color      = style["color"],
+                    label      = lbl,
+                    zorder     = 5
                 )
                 self.enemy_markers.append(marker)
+
+                # Plot the facing arrow
                 arrow = self.ax.quiver(
-                    ex * CELL_SIZE + CELL_SIZE/2,
-                    ey * CELL_SIZE + CELL_SIZE/2,
-                    0, 0,
-                    color='green', edgecolor='black', linewidth=0.5, width=0.008,
-                    scale=1, scale_units='xy', angles='xy', zorder=4
+                    cx, cy, 0, 0,
+                    color       = style["color"],
+                    edgecolor   = "black",
+                    linewidth   = 0.5,
+                    width       = 0.008,
+                    scale       = 1,
+                    scale_units = 'xy',
+                    angles      = 'xy',
+                    zorder      = 4
                 )
                 self.enemy_arrows.append(arrow)
+
+                # Plot the strength text
                 text = self.ax.text(
-                    ex * CELL_SIZE + CELL_SIZE/2 + 15,
-                    ey * CELL_SIZE + CELL_SIZE/2 + 15,
+                    cx + 15, cy + 15,
                     f"{enemy.state['current_group_size']}/{enemy.state['health']:.0f}",
-                    fontsize=6, color='black', zorder=6
+                    fontsize = 6,
+                    color    = "black",
+                    zorder   = 6
                 )
                 self.enemy_texts.append(text)
 
@@ -902,7 +900,12 @@ class Simulation:
                 )
                 self.friendly_texts.append(text)
 
-            self.ax.legend()
+            self.ax.legend(
+                loc='upper left',
+                bbox_to_anchor=(1.02, 1),
+                borderaxespad=0
+            )
+            self.fig.subplots_adjust(right=0.8)
             self.fig.canvas.draw()
             self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
             plt.pause(0.1)  # Allow canvas to stabilize
@@ -991,31 +994,31 @@ class Simulation:
         # Update enemy units
         for i, enemy in enumerate(self.enemy_units):
             if i >= len(self.enemy_markers):  # Safety check
-                break
-            if enemy.needs_update():
-                enemy.last_position = enemy.state["position"]
-                enemy.last_health = enemy.state["health"]
-                enemy.last_group_size = enemy.state["current_group_size"]
-                if enemy.state["enemy_alive"]:
-                    ex, ey = enemy.state["position"]
-                    cx, cy = ex * CELL_SIZE + CELL_SIZE/2, ey * CELL_SIZE + CELL_SIZE/2
-                    self.enemy_markers[i].set_data([cx], [cy])
-                    self.enemy_texts[i].set_position((cx + 15, cy + 15))
-                    self.enemy_texts[i].set_text(f"{enemy.state['current_group_size']}/{enemy.state['health']:.0f}")
-                    fx, fy = enemy.state["facing"]
-                    norm = (fx**2 + fy**2)**0.5
-                    if norm > 0:
-                        fx, fy = fx/norm, fy/norm
-                    else:
-                        fx, fy = 0, 0
-                    arrow_length = CELL_SIZE * 1.2
-                    self.enemy_arrows[i].set_UVC(fx * arrow_length, fy * arrow_length)
-                    self.enemy_arrows[i].set_offsets((cx, cy))
+                continue
+
+            enemy.last_position = enemy.state["position"]
+            enemy.last_health = enemy.state["health"]
+            enemy.last_group_size = enemy.state["current_group_size"]
+            if enemy.state["enemy_alive"]:
+                ex, ey = enemy.state["position"]
+                cx, cy = ex * CELL_SIZE + CELL_SIZE/2, ey * CELL_SIZE + CELL_SIZE/2
+                self.enemy_markers[i].set_data([cx], [cy])
+                self.enemy_texts[i].set_position((cx + 15, cy + 15))
+                self.enemy_texts[i].set_text(f"{enemy.state['current_group_size']}/{enemy.state['health']:.0f}")
+                fx, fy = enemy.state["facing"]
+                norm = (fx**2 + fy**2)**0.5
+                if norm > 0:
+                    fx, fy = fx/norm, fy/norm
                 else:
-                    self.enemy_markers[i].set_data([], [])
-                    self.enemy_texts[i].set_text('')
-                    self.enemy_arrows[i].set_UVC(0, 0)
-                    self.enemy_arrows[i].set_offsets((0, 0))
+                    fx, fy = 0, 0
+                arrow_length = CELL_SIZE * 1.2
+                self.enemy_arrows[i].set_UVC(fx * arrow_length, fy * arrow_length)
+                self.enemy_arrows[i].set_offsets((cx, cy))
+            else:
+                self.enemy_markers[i].set_data([], [])
+                self.enemy_texts[i].set_text('')
+                self.enemy_arrows[i].set_UVC(0, 0)
+                self.enemy_arrows[i].set_offsets((0, 0))
 
         # Update friendly units
         for i, unit in enumerate(self.friendly_units):
@@ -1048,30 +1051,9 @@ class Simulation:
 
         # Redraw updated elements
         artists = [self.ax.title]
-        artists.extend([
-            marker for i, (marker, enemy) in enumerate(zip(self.enemy_markers, self.enemy_units))
-            if i < len(self.enemy_markers) and enemy.needs_update()
-        ])
-        artists.extend([
-            arrow for i, (arrow, enemy) in enumerate(zip(self.enemy_arrows, self.enemy_units))
-            if i < len(self.enemy_arrows) and enemy.needs_update()
-        ])
-        artists.extend([
-            text for i, (text, enemy) in enumerate(zip(self.enemy_texts, self.enemy_units))
-            if i < len(self.enemy_texts) and enemy.needs_update()
-        ])
-        artists.extend([
-            marker for i, (marker, unit) in enumerate(zip(self.friendly_markers, self.friendly_units))
-            if i < len(self.friendly_markers) and unit.needs_update()
-        ])
-        artists.extend([
-            arrow for i, (arrow, unit) in enumerate(zip(self.friendly_arrows, self.friendly_units))
-            if i < len(self.friendly_arrows) and unit.needs_update()
-        ])
-        artists.extend([
-            text for i, (text, unit) in enumerate(zip(self.friendly_texts, self.friendly_units))
-            if i < len(self.friendly_texts) and unit.needs_update()
-        ])
+        artists.extend(self.enemy_markers)
+        artists.extend(self.enemy_arrows)
+        artists.extend(self.enemy_texts)
 
         for artist in artists:
             self.ax.draw_artist(artist)
@@ -1124,7 +1106,8 @@ class Simulation:
         for enemy in self.enemy_units:
             enemy.update_plan(self.friendly_units)
         for _ in range(max_steps):
-            if any(u.state.get("outpost_secured", False) for u in self.friendly_units):
+            alive = [u for u in self.friendly_units if u.state["health"] > 0]
+            if alive and all(u.state["position"] == u.state["outpost_position"] for u in alive):
                 if self.visualize:
                     self.update_plot()
                     logger.info("\nMission accomplished: Outpost secured!")
@@ -1165,6 +1148,11 @@ if __name__ == "__main__":
     SCOUT_GROUP_SIZE = 2
     ANTI_TANK_GROUP_SIZE = 2
 
+    ENEMY_TANK_GROUP_SIZE = 4
+    ENEMY_INFANTRY_GROUP_SIZE = 4
+    ENEMY_ANTI_TANK_GROUP_SIZE = 2
+    ENEMY_ARTILLERY_GROUP_SIZE = 1
+
     tank_state_template = {
         "type": "tank",
         "position": (15, 20),
@@ -1183,6 +1171,7 @@ if __name__ == "__main__":
         "damage": 9,
         "suppression": 0.12,
         "penetration": 18,
+        "vision_range": 2000 / CELL_SIZE,
         "friendly_attack_range": 2400 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
@@ -1208,6 +1197,7 @@ if __name__ == "__main__":
         "damage": 0.8,
         "suppression": 0.01,
         "penetration": 1,
+        "vision_range": 2200 / CELL_SIZE,
         "friendly_attack_range": 1200 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
@@ -1233,6 +1223,7 @@ if __name__ == "__main__":
         "damage": 3.5,
         "suppression": 15,
         "penetration": 1,
+        "vision_range": 1800 / CELL_SIZE,
         "friendly_attack_range": 4000 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
@@ -1294,11 +1285,125 @@ if __name__ == "__main__":
         "scout_steps": 0,
         "stealth_modifier": 50
     }
-
-    candidate_domain = secure_outpost_domain
-
-    enemy_state1 = create_enemy_state(index=0)
-    enemy_state2 = create_enemy_state(index=1)
+    enemy_tank_state_template = {
+        "type": "enemy_tank",
+        "position": (GRID_WIDTH - 1, GRID_HEIGHT - 3),
+        "facing": (0, 1),
+        "enemy_alive": True,
+        "health": 20 * ENEMY_TANK_GROUP_SIZE,
+        "max_health": 20 * ENEMY_TANK_GROUP_SIZE,
+        "base_health": 20,
+        "group_size": ENEMY_TANK_GROUP_SIZE,
+        "current_group_size": ENEMY_TANK_GROUP_SIZE,
+        "cumulative_damage": 0.0,
+        "armor_front": 18,
+        "armor_side": 5,
+        "armor_rear": 3,
+        "outpost_position": (GRID_WIDTH - 1, 0),
+        "outpost_secured": False,
+        "attack_range": 2400 / CELL_SIZE,
+        "accuracy": 0.7,
+        "penetration": 18,
+        "damage": 9,
+        "suppression": 0.12,
+        "base_rate_of_fire": 5.5,
+        "suppression_from_enemy": 0.0,
+        "patrol_points": [],
+        "current_patrol_index": 0,
+        "vision_range": 1800 / CELL_SIZE,
+        "retreat_point": (GRID_WIDTH - 1, GRID_HEIGHT - 1),
+        "stealth_modifier": 0
+    }
+    enemy_infantry_state_template = {
+        "type": "infantry",
+        "position": (40, 10),
+        "facing": (0, 1),
+        "enemy_alive": True,
+        "base_health": 1,
+        "health": 1 * ENEMY_INFANTRY_GROUP_SIZE,
+        "max_health": 1 * ENEMY_INFANTRY_GROUP_SIZE,
+        "group_size": ENEMY_INFANTRY_GROUP_SIZE,
+        "current_group_size": ENEMY_INFANTRY_GROUP_SIZE,
+        "cumulative_damage": 0.0,
+        "armor_front": 0,
+        "armor_side": 0,
+        "armor_rear": 0,
+        "outpost_position": (GRID_WIDTH - 1, 0),
+        "outpost_secured": False,
+        "accuracy": 0.50,
+        "base_rate_of_fire": 294,
+        "damage": 0.8,
+        "suppression": 0.01,
+        "penetration": 1,
+        "attack_range": 1200 / CELL_SIZE,
+        "all_enemies_spotted": False,
+        "total_enemies": 2,
+        "suppression_from_enemy": 0.0,
+        "patrol_points": [],
+        "current_patrol_index": 0,
+        "scout_steps": 0,
+        "stealth_modifier": 0
+    }
+    enemy_anti_tank_state_template = {
+        "type": "anti-tank",
+        "position": (40, 12),
+        "facing": (0, 1),
+        "enemy_alive": True,
+        "base_health": 18,
+        "health": 18 * ENEMY_ANTI_TANK_GROUP_SIZE,
+        "max_health": 18 * ENEMY_ANTI_TANK_GROUP_SIZE,
+        "group_size": ENEMY_ANTI_TANK_GROUP_SIZE,
+        "current_group_size": ENEMY_ANTI_TANK_GROUP_SIZE,
+        "cumulative_damage": 0.0,
+        "armor_front": 2,
+        "armor_side": 1,
+        "armor_rear": 1,
+        "outpost_position": (GRID_WIDTH - 1, 0),
+        "outpost_secured": False,
+        "accuracy": 0.90,
+        "base_rate_of_fire": 6.3,
+        "damage": 15,
+        "suppression": 0.1,
+        "penetration": 22,
+        "attack_range": 2800 / CELL_SIZE,
+        "all_enemies_spotted": False,
+        "total_enemies": 2,
+        "suppression_from_enemy": 0.0,
+        "patrol_points": [],
+        "current_patrol_index": 0,
+        "scout_steps": 0,
+        "stealth_modifier": 50
+    }
+    enemy_artillery_state_template = {
+        "type": "artillery",
+        "position": (40, 12),
+        "facing": (0, 1),
+        "enemy_alive": True,
+        "base_health": 13,
+        "health": 13 * ENEMY_ANTI_TANK_GROUP_SIZE,
+        "max_health": 13 * ENEMY_ANTI_TANK_GROUP_SIZE,
+        "group_size": ENEMY_ANTI_TANK_GROUP_SIZE,
+        "current_group_size": ENEMY_ANTI_TANK_GROUP_SIZE,
+        "cumulative_damage": 0.0,
+        "armor_front": 2,
+        "armor_side": 1,
+        "armor_rear": 1,
+        "outpost_position": (GRID_WIDTH - 1, 0),
+        "outpost_secured": False,
+        "accuracy": 0.90,
+        "base_rate_of_fire": 8.6,
+        "damage": 3.5,
+        "suppression": 0.15,
+        "penetration": 0,
+        "attack_range": 4400 / CELL_SIZE,
+        "all_enemies_spotted": False,
+        "total_enemies": 2,
+        "suppression_from_enemy": 0.0,
+        "patrol_points": [],
+        "current_patrol_index": 0,
+        "scout_steps": 0,
+        "stealth_modifier": 0
+    }
 
     enemy_domain = {"DefendAreaMission": [
             (lambda state: any(manhattan(state["position"], u.state["position"]) <= state["attack_range"] and
@@ -1311,9 +1416,37 @@ if __name__ == "__main__":
         ]
     }
 
-    enemy_unit1 = EnemyTank("EnemyTankGroup1", enemy_state1, enemy_domain)
-    enemy_unit2 = EnemyTank("EnemyTankGroup2", enemy_state2, enemy_domain)
-    enemy_units = [enemy_unit1, enemy_unit2]
+    enemy_state1 = enemy_tank_state_template.copy()
+    enemy_state1["name"] = "EnemyTankGroup1"
+    enemy_state1["position"] = (GRID_WIDTH - 1, GRID_HEIGHT - 3)
+    enemy_state1["patrol_points"] = [(GRID_WIDTH - 1, GRID_HEIGHT - 3), (GRID_WIDTH - 1, GRID_HEIGHT - 5)]
+    enemy_tank1 = EnemyTank("EnemyTankGroup1", enemy_state1, enemy_domain)
+
+    enemy_state2 = enemy_tank_state_template.copy()
+    enemy_state2["name"] = "EnemyTankGroup2"
+    enemy_state2["position"] = (GRID_WIDTH - 1, GRID_HEIGHT - 5)
+    enemy_state2["patrol_points"] = [(GRID_WIDTH - 1, GRID_HEIGHT - 5), (GRID_WIDTH - 1, GRID_HEIGHT - 3)]
+    enemy_tank2 = EnemyTank("EnemyTankGroup2", enemy_state2, enemy_domain)
+
+    enemy_state3 = enemy_infantry_state_template.copy()
+    enemy_state3["name"] = "EnemyInfantryGroup1"
+    enemy_state3["position"] = (GRID_WIDTH - 1, GRID_HEIGHT - 4)
+    enemy_state3["patrol_points"] = [(GRID_WIDTH - 1, GRID_HEIGHT - 4), (GRID_WIDTH - 1, GRID_HEIGHT - 6)]
+    enemy_infantry1 = EnemyInfantry("EnemyInfantryGroup1", enemy_state3, enemy_domain)
+
+    enemy_state4 = enemy_anti_tank_state_template.copy()
+    enemy_state4["name"] = "EnemyAntiTankGroup1"
+    enemy_state4["position"] = (GRID_WIDTH - 1, GRID_HEIGHT - 6)
+    enemy_state4["patrol_points"] = [(GRID_WIDTH - 1, GRID_HEIGHT - 6), (GRID_WIDTH - 1, GRID_HEIGHT - 4)]
+    enemy_anti_tank1 = EnemyAntiTank("EnemyAntiTankGroup1", enemy_state4, enemy_domain)
+
+    enemy_state5 = enemy_artillery_state_template.copy()
+    enemy_state5["name"] = "EnemyArtilleryGroup1"
+    enemy_state5["position"] = (GRID_WIDTH - 1, GRID_HEIGHT - 7)
+    enemy_state5["patrol_points"] = [(GRID_WIDTH - 1, GRID_HEIGHT - 7), (GRID_WIDTH - 1, GRID_HEIGHT - 4)]
+    enemy_artillery1 = EnemyArtillery("EnemyArtilleryGroup1", enemy_state5, enemy_domain)
+
+    enemy_units = [enemy_tank1, enemy_tank2, enemy_infantry1, enemy_anti_tank1, enemy_artillery1]
 
     tank_state = tank_state_template.copy()
     infantry_state = infantry_state_template.copy()
@@ -1322,16 +1455,16 @@ if __name__ == "__main__":
     anti_tank_state = anti_tank_state_template.copy()
 
     for state in [tank_state, infantry_state, artillery_state, scout_state, anti_tank_state]:
-        state["enemy"] = enemy_state1
-        state["target_enemy"] = enemy_state1
-        state["outpost_position"] = enemy_state1["outpost_position"]
+        state["enemy"] = enemy_tank_state_template
+        state["target_enemy"] = enemy_tank_state_template
+        state["outpost_position"] = enemy_tank_state_template["outpost_position"]
         state["visible_enemies"] = []
 
-    tank = FriendlyTank("FriendlyTankGroup", tank_state, candidate_domain)
-    infantry = FriendlyInfantry("FriendlyInfantryGroup", infantry_state, candidate_domain)
-    artillery = FriendlyArtillery("FriendlyArtilleryGroup", artillery_state, candidate_domain)
-    scout = FriendlyScout("FriendlyScoutGroup", scout_state, candidate_domain)
-    anti_tank = FriendlyAntiTank("FriendlyAntiTankGroup", anti_tank_state, candidate_domain)
+    tank = FriendlyTank("FriendlyTankGroup", tank_state, secure_outpost_domain)
+    infantry = FriendlyInfantry("FriendlyInfantryGroup", infantry_state, secure_outpost_domain)
+    artillery = FriendlyArtillery("FriendlyArtilleryGroup", artillery_state, secure_outpost_domain)
+    scout = FriendlyScout("FriendlyScoutGroup", scout_state, secure_outpost_domain)
+    anti_tank = FriendlyAntiTank("FriendlyAntiTankGroup", anti_tank_state, secure_outpost_domain)
     friendly_units = [tank, infantry, artillery, scout, anti_tank]
 
     commander = TeamCommander(friendly_units)
