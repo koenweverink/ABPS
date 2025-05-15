@@ -2,10 +2,13 @@ import random
 import heapq
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+from matplotlib.patches import Circle
 import numpy as np
 import math
 import logging
 import time
+
+from plotter import SimulationPlotter
 
 # Write INFO+ messages to simulation.log, DEBUG goes nowhere by default
 logging.basicConfig(
@@ -145,12 +148,22 @@ forest -= set(forest_edge)
 def manhattan(p, q):
     return abs(p[0]-q[0]) + abs(p[1]-q[1])
 
+def get_effective_vision_range(base_vision_range, stealth_modifier, in_cover, has_los):
+    if not in_cover:
+        return base_vision_range
+    return base_vision_range / (1 + stealth_modifier / CELL_SIZE)
+
 def is_in_enemy_vision(pos, enemy_units):
     for enemy in enemy_units:
         if enemy.state["enemy_alive"]:
             distance = manhattan(pos, enemy.state["position"])
             has_los = has_line_of_sight(pos, enemy.state["position"])
-            vision_range = enemy.state.get("vision_range", 20)
+            vision_range = get_effective_vision_range(
+                enemy.state.get("vision_range", 20),
+                enemy.state.get("stealth_modifier", 0),
+                is_in_cover(pos),
+                has_los
+            )
             if distance <= vision_range and has_los:
                 return True
     return False
@@ -174,8 +187,6 @@ def astar(start, goal, enemy_units=None, unit="unknown"):
             else:
                 if is_in_cover(nxt):
                     continue
-            if enemy_units and is_in_enemy_vision(nxt, enemy_units):
-                new_cost += 3
             if nxt not in cost_so_far or new_cost < cost_so_far[nxt]:
                 cost_so_far[nxt] = new_cost
                 priority = new_cost + manhattan(nxt, goal)
@@ -197,38 +208,25 @@ def next_step(start, goal, enemy_units=None, unit="unknown"):
 
 def has_line_of_sight(start, end):
     line = get_line(start, end)
-    blocks_los = all(pos not in river for pos in line[1:-1])
-    if not blocks_los:
-        return False
-    start_in_cover = start in forest or start in forest_edge
-    end_in_cover = end in forest or end in forest_edge
-    start_forest_edge = start in forest_edge
-    end_forest_edge = end in forest_edge
-    los_clear = all(pos not in forest for pos in line[1:-1])
-    if start_forest_edge and not (end in forest or end in forest_edge):
-        if los_clear:
-            return True
-        else:
-            return False
-    if end_forest_edge and not (start in forest or start in forest_edge):
-        if los_clear:
-            return True
-        else:
-            return False
-    if not los_clear:
-        return False
-    if start_in_cover or end_in_cover:
-        if not (start_forest_edge or end_forest_edge):
-            return False
-    return True
+    
+    start_in_forest      = start in forest
+    end_in_forest        = end   in forest
+    start_on_forest_edge = start in forest_edge
+    end_on_forest_edge   = end   in forest_edge
+
+    # 3) If neither is standing in deep forest, LOS is clear
+    if not start_in_forest and not end_in_forest:
+        return True
+
+    # 4) If either is merely on the forest edge, LOS is clear
+    if start_on_forest_edge or end_on_forest_edge:
+        return True
+
+    # 5) Otherwise (both in deep forest) → block LOS
+    return False
 
 def is_in_cover(pos):
     return pos in forest or pos in forest_edge
-
-def get_effective_vision_range(base_vision_range, stealth_modifier, in_cover, has_los):
-    if not in_cover:
-        return base_vision_range
-    return base_vision_range / (1 + stealth_modifier / CELL_SIZE)
 
 ###############################
 # Helper Functions
@@ -282,42 +280,102 @@ def visible_spotted_friendlies(state):
         if name in alive and alive[name].state.get("health", 0) > 0
     ]
 
+def units_spotted_by_vision(unit, candidates):
+    """
+    Return the list of *Unit* objects in `candidates` that `unit` actually sees this tick,
+    accounting for distance, LOS, stealth, and cover.
+    """
+    seen = []
+    for u in candidates:
+        if u.state.get("health",0) <= 0:
+            continue
+        dist  = manhattan(unit.state["position"], u.state["position"])
+        los   = has_line_of_sight(unit.state["position"], u.state["position"])
+        stealth = u.state.get("stealth_modifier",0)
+        in_cover = is_in_cover(u.state["position"])
+        eff_range = get_effective_vision_range(
+            unit.state.get("vision_range",20),
+            stealth, in_cover, los
+        )
+        if dist <= eff_range and los:
+            seen.append(u)
+    return seen
+
+def names_in_drone_memory(sim, side="enemy"):
+    """
+    Return the sorted list of names that the sim's drone(last_known) has for `side`.
+    side="enemy" → sim.friendly_drone.last_known
+    side="friendly" → sim.enemy_drone.last_known
+    """
+    mem = (sim.friendly_drone if side=="enemy" else sim.enemy_drone).last_known
+    return [ name for name, pos in mem.items() ]
+
+
 ###############################
 # HTN Domains and Planners
 ###############################
 
 secure_outpost_domain = {
-    "SecureOutpostMission": [
-    # 1) If outpost already held, done.
+  "SecureOutpostMission": [
+    # 1) done if someone already secured
     (lambda s: any(u.state.get("outpost_secured", False)
                    for u in s["sim"].friendly_units),
      []),
 
-    # 2) If we have **any** spotted enemy, go fight them then secure outpost
-    (lambda s: any(name in s["sim"].friendly_drone.last_known
-                   and s["sim"].enemy_units_dict[name].state["enemy_alive"]
-                   for name in s["sim"].friendly_drone.last_known),
-     ["DefeatEnemies", "SecureOutpost"]),
-
-    # 3) Otherwise—no sightings yet—just hold
-    (lambda s: True, ["Hold"]),
-    ],
-
-    "DefeatEnemies": [
-        (lambda s: bool(visible_spotted_enemies(s)),
-         lambda s: [
-             sub
-             for name in visible_spotted_enemies(s)
-             for sub in [("Move", name), ("AttackEnemy", name)]
+    # 2) if we've spotted ANY enemy (via LOS or drone), fight them then secure
+    (lambda s: bool(s.get("spotted_enemies")),
+     lambda s: [
+         sub
+         for name in sorted(
+             s["spotted_enemies"],
+             key=lambda n: manhattan(
+                 s["unit"].state["position"],
+                 s["sim"].enemy_units_dict[n].state["position"]
+             )
+         )
+         for sub in [
+           # if already in range, shoot; otherwise move to them
+           ("AttackEnemy", name)
+           if manhattan(
+               s["unit"].state["position"],
+               s["sim"].enemy_units_dict[name].state["position"]
+           ) <= s["unit"].state["friendly_attack_range"]
+           else ("Move", name)
          ]
-        ),
-        (lambda s: True, ["Hold"])
-    ],
-   "SecureOutpost": [
-        (lambda state: state["position"] != state["outpost_position"], [("Move", "outpost")]),
-        (lambda state: state["position"] == state["outpost_position"], ["SecureOutpostNoArg"]),
-    ],
+     ] + [("SecureOutpost", None)]
+    ),
+
+    # 3) otherwise hold
+    (lambda s: True, ["Hold"]),
+  ],
+
+"DefeatEnemies": [
+    # 1) As long as there’s at least one spotted contact…
+    (
+        lambda s: bool(s.get("spotted_enemies")),
+        lambda s: [
+            # pick Attack if your custom can_attack says OK, otherwise Move
+            ("AttackEnemy", name)
+            if s["unit"].can_attack(s["sim"].enemy_units_dict[name])
+            else ("Move",        name)
+            for name in s["spotted_enemies"]
+            # only consider still‐alive targets
+            if s["sim"].enemy_units_dict[name].state.get("enemy_alive", False)
+        ]
+    ),
+    # 2) Fallback when nobody’s spotted
+    (
+        lambda s: True,
+        ["Hold"]
+    ),
+],
+
+  "SecureOutpost": [
+    (lambda s: s["position"] != s["outpost_position"], [("Move", "outpost")]),
+    (lambda s: s["position"] == s["outpost_position"], ["SecureOutpostNoArg"]),
+  ],
 }
+
 
 class HTNPlanner:
     def __init__(self, domain):
@@ -358,6 +416,8 @@ class Drone:
         self.side = side
         self.target_side = target_side
         self.current_area = 3 if self.side == "friendly" else 2
+        self.route = [3, 4, 5, 2, 1, 0] if self.side == "friendly" else [2, 1, 0, 3, 4, 5]
+        self.route_idx = 0
 
         # maps unit_name -> (last_x, last_y)
         self.last_known = {}
@@ -373,8 +433,14 @@ class Drone:
         Spots any friendly or enemy in the current area,
         then advances the area counter every stay_rounds.
         """
-        units = sim.friendly_units if self.target_side == "friendly" else sim.enemy_units
+        logger.info(f"Drone({self.side}) update: target_side={self.target_side}")
+        if self.target_side == "friendly":
+            units = sim.friendly_units
+        else:
+            units = sim.enemy_units
+        
         bounds = self.areas[self.current_area]
+
         # try spotting every unit in this area
         in_area = [u for u in units 
                if u.state.get("health",0)>0 
@@ -397,8 +463,9 @@ class Drone:
         # move on after enough rounds
         self.rounds_in_area += 1
         if self.rounds_in_area >= self.stay_rounds:
-            self.current_area = (self.current_area + 1) % len(self.areas)
             self.rounds_in_area = 0
+            self.route_idx = (self.route_idx + 1) % len(self.route)
+            self.current_area = self.route[self.route_idx]
             logger.info(f"{self.side}'s drone moves to area #{self.current_area + 1}")
 
 
@@ -412,39 +479,104 @@ class EnemyUnit:
         self.last_health = state["health"]
         self.last_group_size = state["current_group_size"]
 
-    def update_plan(self, friendly_units):
-        combined_state = self.state.copy()
-        combined_state["sim"] = self.sim
-        combined_state["friendly_units"] = friendly_units
-        visible_units = []
-        for unit in friendly_units:
-            if unit.state.get("health", 0) > 0:
-                distance = manhattan(self.state["position"], unit.state["position"])
-                has_los = has_line_of_sight(self.state["position"], unit.state["position"])
-                stealth_modifier = unit.state.get("stealth_modifier", 0)
-                in_cover = is_in_cover(unit.state["position"])
-                effective_vision_range = get_effective_vision_range(
-                    self.state.get("vision_range", 20), stealth_modifier, in_cover, has_los)
-                if distance <= effective_vision_range and has_los:
-                    visible_units.append(unit)
-        combined_state["friendly_units"] = visible_units
-        if visible_units:
-            target = min(visible_units, key=lambda u: manhattan(self.state["position"], u.state["position"]))
-            combined_state["target_position"] = target.state["position"]
-        else:
-            combined_state["target_position"] = self.state["position"]
+    def update_plan(self, friendly_units, force_replan=False):
         mission = "DefendAreaMission"
-        new_plan = self.planner.plan(mission, combined_state)
-        self.current_plan = new_plan if new_plan else []
-        logger.info(f"{self.state['name']} updated plan: {self.current_plan}")
 
-    def execute_next_task(self, friendly_units):
+        # 1) Build the HTN state skeleton
+        s = self.state.copy()
+        s["sim"]            = self.sim
+        s["spotted_enemies"] = self.state.get("spotted_enemies", [])
+        s["unit"]           = self
+
+        # 2) Gather all valid branches
+        methods     = self.planner.domain[mission]
+        valid       = [(cond, subs) for cond, subs in methods if cond(s)]
+        valid_count = len(valid)
+        old_count   = self.state.get("_last_valid_count", 0)
+        logger.info(f"{self.name} valid methods (count={valid_count}): {valid}")
+
+        # 3) Ensure there's always a _branch_choice
+        if "_branch_choice" not in self.state:
+            # default to 0 (the only branch) if there's one, else pick 0 to start
+            self.state["_branch_choice"]    = 0
+            self.state["_last_valid_count"] = valid_count
+            logger.info(f"{self.name} initializing branch_choice → 0")
+
+        # 4) Decide if we need to (re)choose:
+        #    • forced
+        #    • or no current plan
+        #    • or we just gained a second branch
+        need_choice = (
+            force_replan
+            or not self.current_plan
+            or (old_count < valid_count and valid_count > 1)
+        )
+
+        if need_choice:
+            # pick branch 0 if only one, else uniform random among valid_count
+            idx = 0 if valid_count == 1 else random.randrange(valid_count)
+            self.state["_branch_choice"]    = idx
+            self.state["_last_valid_count"] = valid_count
+            logger.info(f"{self.name} picked branch #{idx}")
+        else:
+            idx = self.state["_branch_choice"]
+            logger.info(f"{self.name} keeps branch #{idx}")
+
+        # 5) Filter to only truly visible friendlies
+        visible = []
+        for u in friendly_units:
+            if u.state.get("health", 0) <= 0:
+                continue
+            dist     = manhattan(self.state["position"], u.state["position"])
+            los      = has_line_of_sight(self.state["position"], u.state["position"])
+            stealth  = u.state.get("stealth_modifier", 0)
+            in_cover = is_in_cover(u.state["position"])
+            eff_rng  = get_effective_vision_range(
+                self.state.get("vision_range", 20),
+                stealth, in_cover, los
+            )
+            if dist <= eff_rng and los:
+                visible.append(u)
+        s["friendly_units"] = visible
+        if visible:
+            tgt = min(visible, key=lambda u: manhattan(self.state["position"], u.state["position"]))
+            s["target_position"] = tgt.state["position"]
+        else:
+            s["target_position"] = self.state["position"]
+
+        # 6) Materialize the chosen branch
+        cond, subtasks = valid[idx]
+        plan = subtasks(s) if callable(subtasks) else list(subtasks)
+
+        # 7) Never leave the plan empty
+        self.current_plan = plan or [("Hold", None)]
+        logger.info(f"{self.name} updated plan: {self.current_plan}")
+
+        # store for next tick
+        self.state["_last_valid_count"] = valid_count
+        self.last_health = self.state["health"]
+
+    def execute_next_task(self):
+        self.state["is_attacking"] = False
+        friendly_units = self.sim.friendly_units
+        for u in friendly_units:
+            if (u.state["health"]>0
+                and manhattan(self.state["position"], u.state["position"]) <= self.state["attack_range"]
+                and has_line_of_sight(self.state["position"], u.state["position"])):
+                # a friendly is now in sight+range → force a new plan
+                self.update_plan(friendly_units, force_replan=True)
+                break
+
         logger.info(f"{self.name} is facing {self.state['facing']}")
         if not self.current_plan or not self.state["enemy_alive"]:
             return
-        task = self.current_plan[0]
+        raw = self.current_plan[0]
+        if isinstance(raw, tuple):
+            task, arg = raw
+        else:
+            task, arg = raw, None
 
-        if task != "BattlePosition" and self.state.get("in_battle_position", False):
+        if task not in ("BattlePosition", "AttackEnemy") and self.state.get("in_battle_position", False):
             self.state["turns_in_battle_position"] = 0
             self.state["hasty_done"]      = False
             self.state["entrenched_done"] = False
@@ -462,7 +594,7 @@ class EnemyUnit:
             dx, dy = new_pos[0] - old_pos[0], new_pos[1] - old_pos[1]
             if dx or dy:
                 self.state["facing"] = (sign(dx), sign(dy))
-        elif task == "ChaseTarget":
+        elif task == "Move":
             self.state["move_credit"] += self.state["speed"]
             steps = int(self.state["move_credit"])
             logger.info(f"{self.name} taking {steps} steps")
@@ -478,6 +610,7 @@ class EnemyUnit:
                 if dx or dy:
                     self.state["facing"] = (sign(dx), sign(dy))
         elif task == "AttackEnemy":
+            self.state["is_attacking"] = True
             target_unit = None
             min_dist = float('inf')
             for u in friendly_units:
@@ -514,6 +647,7 @@ class EnemyUnit:
 
                 for _ in range(num_attacks):
                     if random.random() < effective_accuracy:
+                        target_unit.state["suppression_from_enemy"] += self.state["suppression"]
                         hits += 1
                         target_pos = target_unit.state["position"]
                         dx = target_pos[0] - self.state["position"][0]
@@ -549,7 +683,6 @@ class EnemyUnit:
                             target_unit.state["health"] -= total_damage
                             target_unit.state["cumulative_damage"] += total_damage
                             total_damage_dealt += total_damage
-                            target_unit.state["suppression_from_enemy"] += self.state["suppression"]
 
                             units_lost = int(target_unit.state["cumulative_damage"] // target_unit.state["base_health"])
                             if units_lost > 0:
@@ -616,11 +749,16 @@ class EnemyUnit:
     def get_goal_position(self):
         if not self.current_plan:
             return self.state["position"]
-        t = self.current_plan[0]
+
+        task = self.current_plan[0]
+        if isinstance(task, (list, tuple)):
+            t, _ = task
+        else:
+            t, _ = task, None
         if t == "Patrol":
             idx = self.state["current_patrol_index"]
             return self.state["patrol_points"][idx]
-        elif t in ["ChaseTarget", "AttackEnemy"]:
+        elif t in ["Move", "AttackEnemy"]:
             last_known = self.sim.enemy_drone.last_known  # maps name -> (x,y)
             if last_known:
                 # pick the nearest last‐known coordinate
@@ -638,18 +776,45 @@ class EnemyUnit:
 class EnemyTank(EnemyUnit):
     def __init__(self, name, state, domain):
         super().__init__(name, state, domain)
+    
+    def can_attack(self, target):
+        if target.state.get("enemy_alive", False):
+            distance = manhattan(self.state["position"], target.state["position"])
+            has_los = has_line_of_sight(self.state["position"], target.state["position"])
+            return distance <= self.state["attack_range"] and has_los
+        return False
 
 class EnemyInfantry(EnemyUnit):
     def __init__(self, name, state, domain):
         super().__init__(name, state, domain)
 
+    def can_attack(self, target):
+        if target.state.get("enemy_alive", False):
+            distance = manhattan(self.state["position"], target.state["position"])
+            has_los = has_line_of_sight(self.state["position"], target.state["position"])
+            return distance <= self.state["attack_range"] and has_los
+        return False
+
 class EnemyAntiTank(EnemyUnit):
     def __init__(self, name, state, domain):
         super().__init__(name, state, domain)
+    
+    def can_attack(self, target):
+        if target.state.get("enemy_alive", False):
+            distance = manhattan(self.state["position"], target.state["position"])
+            has_los = has_line_of_sight(self.state["position"], target.state["position"])
+            return distance <= self.state["attack_range"] and has_los
+        return False
 
 class EnemyArtillery(EnemyUnit):
     def __init__(self, name, state, domain):
         super().__init__(name, state, domain)
+
+    def can_attack(self, target):
+        if target.state.get("enemy_alive", False):
+            distance = manhattan(self.state["position"], target.state["position"])
+            return distance <= self.state["attack_range"]
+        return False
 
 ###############################
 # Friendly Unit Classes
@@ -672,7 +837,9 @@ class FriendlyUnit:
         if force_replan or not self.current_plan:
             combined = self.state.copy()
             combined["sim"] = self.sim
-            combined["all_enemies"] = [e.state for e in self.sim.enemy_units]
+            combined["spotted_enemies"] = self.state.get("spotted_enemies", [])
+            combined["unit"] = self
+            combined["enemy_units_dict"]  = self.sim.enemy_units_dict
             new_plan = self.planner.plan(mission, combined)
             if not new_plan:
                 new_plan = [("Hold", None)]
@@ -717,6 +884,7 @@ class FriendlyUnit:
                         if distance <= self.state["friendly_attack_range"] and has_los:
                             logger.info(f"{self.name} within attack range of {task_arg} at distance {distance}; stopping move.")
                             self.current_plan.pop(0)
+                            self.update_plan(force_replan=True)
                             return
                 if self.state["position"] == goal:
                     logger.info(f"{self.name} reached goal {goal}; stopping move.")
@@ -780,6 +948,7 @@ class FriendlyUnit:
             for _ in range(num_attacks):
                 if random.random() < effective_accuracy:
                     hits += 1
+                    target_unit.state["suppression_from_enemy"] += self.state["suppression"]
                     dx = tx - x
                     dy = ty - y
                     norm = math.sqrt(dx**2 + dy**2)
@@ -793,7 +962,7 @@ class FriendlyUnit:
                     dot_product = max(min(dot_product, 1), -1)
                     angle_deg = math.degrees(math.acos(dot_product))
                     direction = "rear" if angle_deg <= 45 else "side" if angle_deg <= 135 else "front"
-                    logger.info(f"{self.name} attacking {target_unit.name} from the {direction}")
+                    logger.info(f"{self.name} attacking {target_unit.name} from the {direction}, suppression: {self.state['suppression']}")
 
                     armor_val = target_unit.state[f"armor_{direction}"]
                     logger.info(f"{self.name} attacking {target_unit.name} with armor {armor_val}")
@@ -805,7 +974,6 @@ class FriendlyUnit:
                         target_unit.state["health"] -= total_damage
                         target_unit.state["cumulative_damage"] += total_damage
                         total_damage_dealt += total_damage
-                        target_unit.state["suppression_from_enemy"] += self.state["suppression"]
 
                         units_lost = int(target_unit.state["cumulative_damage"] // target_unit.state["base_health"])
                         if units_lost > 0:
@@ -878,13 +1046,33 @@ class FriendlyTank(FriendlyUnit):
     def __init__(self, name, state, domain, simulation=None):
         super().__init__(name, state, domain, simulation)
 
+    def can_attack(self, target):
+        if target.state.get("enemy_alive", False):
+            distance = manhattan(self.state["position"], target.state["position"])
+            has_los = has_line_of_sight(self.state["position"], target.state["position"])
+            return distance <= self.state["attack_range"] and has_los
+        return False
+
 class FriendlyInfantry(FriendlyUnit):
     def __init__(self, name, state, domain, simulation=None):
         super().__init__(name, state, domain, simulation)
 
+    def can_attack(self, target):
+        if target.state.get("enemy_alive", False):
+            distance = manhattan(self.state["position"], target.state["position"])
+            has_los = has_line_of_sight(self.state["position"], target.state["position"])
+            return distance <= self.state["attack_range"] and has_los
+        return False
+
 class FriendlyArtillery(FriendlyUnit):
     def __init__(self, name, state, domain, simulation=None):
         super().__init__(name, state, domain, simulation)
+
+    def can_attack(self, target):
+        if target.state.get("enemy_alive", False):
+            distance = manhattan(self.state["position"], target.state["position"])
+            return distance <= self.state["attack_range"]
+        return False
 
 class FriendlyScout(FriendlyUnit):
     def __init__(self, name, state, domain, simulation=None):
@@ -893,6 +1081,13 @@ class FriendlyScout(FriendlyUnit):
 class FriendlyAntiTank(FriendlyUnit):
     def __init__(self, name, state, domain, simulation=None):
         super().__init__(name, state, domain, simulation)
+
+    def can_attack(self, target):
+        if target.state.get("enemy_alive", False):
+            distance = manhattan(self.state["position"], target.state["position"])
+            has_los = has_line_of_sight(self.state["position"], target.state["position"])
+            return distance <= self.state["attack_range"] and has_los
+        return False
 
 ###############################
 # TeamCommander and Simulation Classes
@@ -903,198 +1098,71 @@ class TeamCommander:
         self.friendly_units = friendly_units
 
 class Simulation:
-    def __init__(self, friendly_units, enemy_units, team_commander, visualize=False, plan_name="Unknown Plan"):
+    def __init__(
+        self,
+        friendly_units,
+        enemy_units,
+        team_commander,
+        visualize=False,
+        plan_name="Unknown Plan",
+    ):
+        # ---- core state setup ----
         self.friendly_units = friendly_units
-        self.friendly_units_dict = { u.name: u for u in self.friendly_units }
-        self.enemy_units = enemy_units
-        self.enemy_units_dict = { e.name: e for e in self.enemy_units }
-        self.friendly_drone = Drone(side="friendly", target_side="enemy", n_cols=3, n_rows=2, stay_rounds=10, spot_prob=0.2)
-        self.enemy_drone = Drone(side="enemy", target_side="frienly", n_cols=3, n_rows=2, stay_rounds=10, spot_prob=0.2)
-        self.team_commander = team_commander
-        active_enemy = next((e for e in enemy_units if e.state["enemy_alive"]), None)
-        for u in self.friendly_units:
-            u.state["enemy"] = active_enemy.state if active_enemy else {}
-            u.state["visible_enemies"] = []
-            u.state["all_enemies"] = [e.state for e in self.enemy_units]
-            u.state["total_enemies"] = len(self.enemy_units)
-            u.state["scout_steps"] = 0
-            u.sim = self
-        self.step_count = 0
-        self.visualize = visualize
-        self.plan_name = plan_name
+        self.friendly_units_dict = {u.name: u for u in friendly_units}
 
+        self.enemy_units = enemy_units
+        self.enemy_units_dict  = {e.name: e for e in enemy_units}
+
+        # Recon drones
+        self.friendly_drone = Drone(
+            side="friendly", target_side="enemy",
+            n_cols=3, n_rows=2, stay_rounds=10, spot_prob=0.2
+        )
+        self.enemy_drone = Drone(
+            side="enemy", target_side="friendly",
+            n_cols=3, n_rows=2, stay_rounds=10, spot_prob=0.2
+        )
+
+        self.team_commander = team_commander
+        
+        self.river = river
+        self.forest = forest
+        self.forest_edge = forest_edge
+        self.cliffs = cliffs
+        self.climb_entries = climb_entries
+
+        # Initialize each friendly unit’s view state
+        active_enemy = next((e for e in enemy_units if e.state.get("enemy_alive")), None)
+        for u in self.friendly_units:
+            u.state["enemy"]           = active_enemy.state if active_enemy else {}
+            u.state["visible_enemies"] = []
+            u.state["all_enemies"]     = [e.state for e in self.enemy_units]
+            u.state["total_enemies"]   = len(self.enemy_units)
+            u.state["scout_steps"]     = 0
+            u.sim = self
+
+        for e in self.enemy_units:
+            e.sim = self
+
+        self.step_count = 0
+        self.visualize  = visualize
+        self.plan_name  = plan_name
+
+        # ---- plotting hand-off ----
         if self.visualize:
+            # Hand off _all_ plotting to SimulationPlotter
+            from plotter import SimulationPlotter
             plt.ion()
             plt.show(block=False)
-            self.fig, self.ax = plt.subplots(figsize=(14, 8))
-            self.fig.set_size_inches(14, 8)
-            self.ax.set_aspect("equal", adjustable="box")
-            self.ax.set_xlim(-CELL_SIZE/2, GRID_WIDTH * CELL_SIZE - CELL_SIZE/2)
-            self.ax.set_ylim(-CELL_SIZE/2, GRID_HEIGHT * CELL_SIZE - CELL_SIZE/2)
-            major_step = 500
-            self.ax.set_xticks(np.arange(0, (GRID_WIDTH+1)*CELL_SIZE, major_step))
-            self.ax.set_yticks(np.arange(0, (GRID_HEIGHT+1)*CELL_SIZE, major_step))
-            self.ax.xaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f} m"))
-            self.ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f} m"))
-            self.ax.grid(True)
+            self.plotter = SimulationPlotter(self, visualize=True)
 
-            # Initialize static map using a grid array
-            self.map_grid = np.ones((GRID_HEIGHT, GRID_WIDTH, 3))  # White background
-            for x in range(GRID_WIDTH):
-                for y in range(GRID_HEIGHT):
-                    pos = (x, y)
-                    if pos in river:
-                        self.map_grid[y, x] = [0, 0, 1]  # Blue
-                    elif pos in forest:
-                        self.map_grid[y, x] = [0, 0.5, 0]  # Green
-                    elif pos in forest_edge:
-                        self.map_grid[y, x] = [0.7, 1, 0.7]  # Light green
-                    elif pos in cliffs:
-                        self.map_grid[y, x] = [0.6, 0.3, 0]  # Brown
-                    elif pos in climb_entries:
-                        self.map_grid[y, x] = [0, 0.5, 0]  # Forest green
-
-            self.ax.imshow(
-                self.map_grid,
-                origin='lower',
-                extent=(-CELL_SIZE/2, GRID_WIDTH * CELL_SIZE - CELL_SIZE/2,
-                        -CELL_SIZE/2, GRID_HEIGHT * CELL_SIZE - CELL_SIZE/2)
-            )
-
-            # Draw climb entry arrows
-            self.climb_arrows = []
-            for entry, cliff_cell in climb_entries.items():
-                ex, ey = entry
-                cx, cy = cliff_cell
-                arrow = self.ax.annotate(
-                    '',
-                    xy=(cx*CELL_SIZE + CELL_SIZE/2, cy*CELL_SIZE + CELL_SIZE/2),
-                    xytext=(ex*CELL_SIZE + CELL_SIZE/2, ey*CELL_SIZE + CELL_SIZE/2),
-                    arrowprops=dict(arrowstyle='->', color='black', lw=1),
-                    zorder=2
-                )
-                self.climb_arrows.append(arrow)
-
-            # Draw outpost
-            if self.friendly_units:
-                outpost = self.friendly_units[0].state["outpost_position"]
-                self.outpost_marker, = self.ax.plot(
-                    outpost[0] * CELL_SIZE + CELL_SIZE/2,
-                    outpost[1] * CELL_SIZE + CELL_SIZE/2,
-                    marker='*', markersize=10, color='magenta', label='Outpost', zorder=5
-                )
-
-            # Initialize enemy plots, styling by type
-            style_map = {
-                "tank":      {"marker": "s", "color": "darkgreen",  "label": "Enemy Tanks"},
-                "infantry":  {"marker": "^", "color": "saddlebrown","label": "Enemy Infantry"},
-                "anti-tank": {"marker": "X", "color": "gray",       "label": "Enemy AT"},
-                "artillery": {"marker": "D", "color": "purple",     "label": "Enemy Artillery"},
-            }
-            seen_types = set()
-            self.enemy_markers = []
-            self.enemy_arrows  = []
-            self.enemy_texts   = []
-
-            for enemy in self.enemy_units:
-                enemy.sim = self
-                typ = enemy.state["type"]
-                style = style_map.get(typ,
-                    {"marker": "o", "color": "green", "label": "Enemy"})
-                # only label the first of each type
-                lbl = style["label"] if typ not in seen_types else None
-                seen_types.add(typ)
-
-                ex, ey = enemy.state["position"]
-                cx, cy = ex*CELL_SIZE + CELL_SIZE/2, ey*CELL_SIZE + CELL_SIZE/2
-
-                # Plot the unit marker
-                marker, = self.ax.plot(
-                    cx, cy,
-                    marker     = style["marker"],
-                    markersize = 8,
-                    color      = style["color"],
-                    label      = lbl,
-                    zorder     = 5
-                )
-                self.enemy_markers.append(marker)
-
-                # Plot the facing arrow
-                arrow = self.ax.quiver(
-                    cx, cy, 0, 0,
-                    color       = style["color"],
-                    edgecolor   = "black",
-                    linewidth   = 0.5,
-                    width       = 0.008,
-                    scale       = 1,
-                    scale_units = 'xy',
-                    angles      = 'xy',
-                    zorder      = 4
-                )
-                self.enemy_arrows.append(arrow)
-
-                # Plot the strength text
-                text = self.ax.text(
-                    cx + 15, cy + 15,
-                    f"{enemy.state['current_group_size']}/{enemy.state['health']:.0f}",
-                    fontsize = 6,
-                    color    = "black",
-                    zorder   = 6
-                )
-                self.enemy_texts.append(text)
-
-            self.friendly_markers = []
-            self.friendly_arrows = []
-            self.friendly_texts = []
-            for unit in self.friendly_units:
-                pos = unit.state["position"]
-                color = {
-                    "tank": 'red',
-                    "infantry": 'blue',
-                    "artillery": 'orange',
-                    "scout": 'cyan',
-                    "anti-tank": 'purple'
-                }.get(unit.state.get("type"), 'gray')
-                marker, = self.ax.plot(
-                    pos[0] * CELL_SIZE + CELL_SIZE/2,
-                    pos[1] * CELL_SIZE + CELL_SIZE/2,
-                    marker='o', markersize=8, color=color,
-                    label=unit.state.get("type").capitalize(),
-                    zorder=5
-                )
-                self.friendly_markers.append(marker)
-                arrow = self.ax.quiver(
-                    pos[0] * CELL_SIZE + CELL_SIZE/2,
-                    pos[1] * CELL_SIZE + CELL_SIZE/2,
-                    0, 0,
-                    color=color, edgecolor='black', linewidth=0.5, width=0.008,
-                    scale=1, scale_units='xy', angles='xy', zorder=4
-                )
-                self.friendly_arrows.append(arrow)
-                text = self.ax.text(
-                    pos[0] * CELL_SIZE + CELL_SIZE/2 + 15,
-                    pos[1] * CELL_SIZE + CELL_SIZE/2 + 15,
-                    f"{unit.state['current_group_size']}/{unit.state['health']:.0f}",
-                    fontsize=6, color='black', zorder=6
-                )
-                self.friendly_texts.append(text)
-
-            self.ax.legend(
-                loc='upper left',
-                bbox_to_anchor=(1.02, 1),
-                borderaxespad=0
-            )
-            self.fig.subplots_adjust(right=0.8)
-            self.fig.canvas.draw()
-            self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
-            plt.pause(0.1)  # Allow canvas to stabilize
 
     def update_enemy_behavior(self):
         friendly_units = [u for u in self.friendly_units if u.state.get("health", 0) > 0]
         for enemy in self.enemy_units:
             if enemy.state["enemy_alive"]:
                 enemy.update_plan(friendly_units)
-                enemy.execute_next_task(friendly_units)
+                enemy.execute_next_task()
                 enemy.current_goal = enemy.get_goal_position()
                 if self.visualize:
                     logger.info(f"{enemy.state['name']} position: {enemy.state['position']}")
@@ -1130,7 +1198,8 @@ class Simulation:
                     if self.visualize:
                         logger.info(f"{u.name} state['enemy']: None (no active enemies)")
             if self.visualize:
-                logger.info(f"{u.name} at {u.state['position']}, visible enemies: {[e['name'] for e in u.state.get('visible_enemies', [])]}")
+                visible_enemies = u.state.get("visible_enemies", [])
+                logger.info(f"{u.name} at {u.state['position']} sees enemies: {visible_enemies}")
 
     def evaluate_plan(self):
         total_friendly = sum(u.state["health"] for u in self.friendly_units)
@@ -1150,171 +1219,146 @@ class Simulation:
             "steps_taken": steps
         }
 
-    def update_plot(self):
-        if not self.visualize:
-            return
-
-        start_time = time.time()
-        # Check if update is needed
-        needs_update = any(enemy.needs_update() for enemy in self.enemy_units) or \
-                       any(unit.needs_update() for unit in self.friendly_units)
-        if not needs_update:
-            return
-
-        # Restore background
-        self.fig.canvas.restore_region(self.background)
-
-        # Update title
-        self.ax.set_title(f"Step {self.step_count} - {self.plan_name}")
-
-        # Update enemy units
-        for i, enemy in enumerate(self.enemy_units):
-            if i >= len(self.enemy_markers):  # Safety check
-                continue
-
-            enemy.last_position = enemy.state["position"]
-            enemy.last_health = enemy.state["health"]
-            enemy.last_group_size = enemy.state["current_group_size"]
-            if enemy.state["enemy_alive"]:
-                ex, ey = enemy.state["position"]
-                cx, cy = ex * CELL_SIZE + CELL_SIZE/2, ey * CELL_SIZE + CELL_SIZE/2
-                self.enemy_markers[i].set_data([cx], [cy])
-                self.enemy_texts[i].set_position((cx + 15, cy + 15))
-                self.enemy_texts[i].set_text(f"{enemy.state['current_group_size']}/{enemy.state['health']:.0f}")
-                fx, fy = enemy.state["facing"]
-                norm = (fx**2 + fy**2)**0.5
-                if norm > 0:
-                    fx, fy = fx/norm, fy/norm
-                else:
-                    fx, fy = 0, 0
-                arrow_length = CELL_SIZE * 1.2
-                self.enemy_arrows[i].set_UVC(fx * arrow_length, fy * arrow_length)
-                self.enemy_arrows[i].set_offsets((cx, cy))
-            else:
-                self.enemy_markers[i].set_data([], [])
-                self.enemy_texts[i].set_text('')
-                self.enemy_arrows[i].set_UVC(0, 0)
-                self.enemy_arrows[i].set_offsets((0, 0))
-
-        # Update friendly units
-        for i, unit in enumerate(self.friendly_units):
-            if i >= len(self.friendly_markers):  # Safety check
-                break
-            if unit.needs_update():
-                unit.last_position = unit.state["position"]
-                unit.last_health = unit.state["health"]
-                unit.last_group_size = unit.state["current_group_size"]
-                if unit.state["health"] > 0:
-                    pos = unit.state["position"]
-                    cx, cy = pos[0] * CELL_SIZE + CELL_SIZE/2, pos[1] * CELL_SIZE + CELL_SIZE/2
-                    self.friendly_markers[i].set_data([cx], [cy])
-                    self.friendly_texts[i].set_position((cx + 15, cy + 15))
-                    self.friendly_texts[i].set_text(f"{unit.state['current_group_size']}/{unit.state['health']:.0f}")
-                    fx, fy = unit.state["facing"]
-                    norm = (fx**2 + fy**2)**0.5
-                    if norm > 0:
-                        fx, fy = fx/norm, fy/norm
-                    else:
-                        fx, fy = 0, 0
-                    arrow_length = CELL_SIZE * 1.2
-                    self.friendly_arrows[i].set_UVC(fx * arrow_length, fy * arrow_length)
-                    self.friendly_arrows[i].set_offsets((cx, cy))
-                else:
-                    self.friendly_markers[i].set_data([], [])
-                    self.friendly_texts[i].set_text('')
-                    self.friendly_arrows[i].set_UVC(0, 0)
-                    self.friendly_arrows[i].set_offsets((0, 0))
-
-        # Redraw updated elements
-        artists = [self.ax.title]
-        artists.extend(self.enemy_markers)
-        artists.extend(self.enemy_arrows)
-        artists.extend(self.enemy_texts)
-
-        for artist in artists:
-            self.ax.draw_artist(artist)
-
-        # Blit and flush
-        self.fig.canvas.blit(self.ax.bbox)
-        self.fig.canvas.flush_events()
-        plt.pause(0.01)  # Minimal pause to stabilize rendering
-
-        render_time = time.time() - start_time
-        logger.info(f"Plot update took {render_time:.3f} seconds")
-
     def step(self):
+        # 0) Advance the clock & log header
         self.step_count += 1
         if self.visualize:
             logger.info(f"--- Simulation Step {self.step_count} ---")
-        self.update_friendly_enemy_info()
-        self.update_enemy_behavior()
+
+        # 2) Refresh drones
+        drone_seen_friends = self.friendly_drone.update(self)  # set of enemy names
+        drone_seen_enemies = self.enemy_drone.update(self)     # set of friendly names
+
+        # 3) Build LOS‐based visibility via your helper
+        #    and merge in drone reports for spotted_enemies
         self.friendly_drone.update(self)
         self.enemy_drone.update(self)
-        for unit in self.friendly_units:
-            # Ensure plan is not empty before checking tasks
-            if not unit.current_plan:
-                logger.info(f"{unit.name} has empty plan; replanning.")
-                unit.update_plan(force_replan=True)
-            # Check if the current plan involves attacking a dead enemy
-            if (unit.current_plan and isinstance(unit.current_plan[0], tuple) and
-                unit.current_plan[0][0] == "AttackEnemy" and
-                not any(e.state["name"] == unit.current_plan[0][1] and e.state["enemy_alive"]
-                        for e in self.enemy_units)):
-                logger.info(f"{unit.name} target enemy is dead or invalid; replanning.")
-                unit.update_plan(force_replan=True)
+        # Now read out what they saw
+        drone_seen_by_friendlies = set(self.friendly_drone.last_known.keys())
+        drone_seen_by_enemies    = set(self.enemy_drone.last_known.keys())
+
+        # Build LOS via helper + merge in drone reports
+        for friend in self.friendly_units:
+            los_list = [e.name for e in units_spotted_by_vision(friend, self.enemy_units)]
+            friend.state["visible_enemies"] = los_list
+
+            merged = set(los_list) | drone_seen_by_friendlies
+            friend.state["spotted_enemies"] = [
+                n for n in merged
+                if n in self.enemy_units_dict
+                and self.enemy_units_dict[n].state["current_group_size"] > 0
+            ]
+
+        for enemy in self.enemy_units:
+            los_list = [u.name for u in units_spotted_by_vision(enemy, self.friendly_units)]
+            enemy.state["visible_enemies"] = los_list
+
+            merged = set(los_list) | drone_seen_by_enemies
+            enemy.state["spotted_enemies"] = [
+                n for n in merged
+                if n in self.friendly_units_dict
+                and self.friendly_units_dict[n].state["current_group_size"] > 0
+            ]
+
+        self.update_friendly_enemy_info()
+        # 4) Enemy turn
+        self.update_enemy_behavior()
+
+        # 5) Friendly turn: HTN replan & execution
+        for u in self.friendly_units:
+            last = set(u.state.get("_last_spotted", []))
+            now  = set(u.state["spotted_enemies"])
+            # force‐replan on truly new sightings or dead targets
+            if now - last:
+                logger.info(f"{u.name} spotted new foes {now - last}; forcing replan")
+                u.update_plan(force_replan=True)
+            elif not u.current_plan:
+                logger.info(f"{u.name} has empty plan; replanning")
+                u.update_plan(force_replan=True)
+            elif (
+                isinstance(u.current_plan[0], tuple)
+                and u.current_plan[0][0] == "AttackEnemy"
+            ):
+                tgt = u.current_plan[0][1]
+                if not any(e.name == tgt and e.state.get("enemy_alive", False)
+                        for e in self.enemy_units):
+                    logger.info(f"{u.name}'s target {tgt} died; replanning")
+                    u.update_plan(force_replan=True)
             else:
-                unit.update_plan()
-            logger.info(f"{unit.name} current plan: {unit.current_plan}")
-            if unit.current_plan and isinstance(unit.current_plan[0], tuple) and unit.current_plan[0][1]:
-                logger.info(f"{unit.name} targeting: {unit.current_plan[0][1]}")
-            unit.execute_next_task()
+                u.update_plan()
+
+            u.state["_last_spotted"] = list(now)
+            logger.info(f"{u.name} current plan: {u.current_plan}")
+            if self.visualize and u.current_plan and isinstance(u.current_plan[0], tuple):
+                logger.info(f"{u.name} targeting: {u.current_plan[0][1]}")
+            u.execute_next_task()
             if self.visualize:
-                logger.info(f"{unit.name}'s current goal: {unit.get_goal_position()}")
-            # Re-check plan after execution to handle dead enemies
-            if (unit.current_plan and isinstance(unit.current_plan[0], tuple) and
-                unit.current_plan[0][0] == "AttackEnemy" and
-                not any(e.state["name"] == unit.current_plan[0][1] and e.state["enemy_alive"]
-                        for e in self.enemy_units)):
-                unit.update_plan(force_replan=True)
+                logger.info(f"{u.name}'s current goal: {u.get_goal_position()}")
+
+        # 6) Refresh the plot
+        if self.visualize:
+            self.plotter.update()
+
 
     def run(self, max_steps=500):
+        """
+        Main simulation loop:
+        - Perform initial planning
+        - For up to max_steps:
+            * Check for mission success
+            * step()
+            * Prune dead enemies
+            * Update visualization
+        - Return the evaluation of the executed plan
+        """
+        # 0) Initial planning
         self.step_count = 0
-        for unit in self.friendly_units:
-            unit.update_plan(force_replan=True)
-        for enemy in self.enemy_units:
-            enemy.update_plan(self.friendly_units)
+        for u in self.friendly_units:
+            u.update_plan(force_replan=True)
+        for e in self.enemy_units:
+            e.update_plan(self.friendly_units)
+
+        # 1) Main loop
         for _ in range(max_steps):
-            alive = [u for u in self.friendly_units if u.state["health"] > 0]
-            if alive and all(u.state["position"] == u.state["outpost_position"] for u in alive):
+            # 1a) Success check: all surviving friendlies at outpost
+            alive_friendlies = [
+                u for u in self.friendly_units
+                if u.state.get("health", 0) > 0
+            ]
+            if (alive_friendlies
+                    and all(u.state["position"] == u.state.get("outpost_position")
+                            for u in alive_friendlies)):
                 if self.visualize:
-                    self.update_plot()
+                    self.plotter.update()
                     logger.info("\nMission accomplished: Outpost secured!")
                 return self.evaluate_plan()
+
+            # 1b) Advance one step
             self.step()
+
+            # 1c) Prune any dead enemies so planners never target them
+            alive_enemies = [
+                e for e in self.enemy_units
+                if e.state.get("current_group_size", 0) > 0
+            ]
+            if len(alive_enemies) != len(self.enemy_units):
+                self.enemy_units = alive_enemies
+                self.enemy_units_dict = {e.name: e for e in self.enemy_units}
+
+            # 1d) Visualization update
             if self.visualize:
-                self.update_plot()
-                plt.pause(0.001)  # Allow time for plot to update
-            alive_friendlies = [u for u in self.friendly_units if u.state["health"] > 0]
-            if len(alive_friendlies) < len(self.friendly_units):
-                for dead in set(self.friendly_units) - set(alive_friendlies):
-                    if self.visualize:
-                        logger.info(f"{dead.name} has been destroyed!")
-                # Update plot elements to match alive friendlies
-                if self.visualize:
-                    indices_to_keep = [self.friendly_units.index(u) for u in alive_friendlies if u in self.friendly_units]
-                    self.friendly_markers = [self.friendly_markers[i] for i in indices_to_keep]
-                    self.friendly_arrows = [self.friendly_arrows[i] for i in indices_to_keep]
-                    self.friendly_texts = [self.friendly_texts[i] for i in indices_to_keep]
-                self.friendly_units = alive_friendlies
-                if not self.friendly_units:
-                    if self.visualize:
-                        self.update_plot()
-                        logger.info("\nAll friendly units have been destroyed! Mission failed.")
-                    return self.evaluate_plan()
+                self.plotter.update()
+                plt.pause(0.5)
+
+                while self.plotter.paused:
+                    plt.pause(0.2)
+
+        # 2) If we exhaust max_steps without success
         if self.visualize:
-            self.update_plot()
+            self.plotter.update()
             logger.info("\nMission incomplete after maximum steps.")
         return self.evaluate_plan()
+
 
 ###############################
 # Main Simulation Setup - Mode 1 (Test Specific Plan)
@@ -1481,9 +1525,9 @@ if __name__ == "__main__":
         "speed": (((85 / 3.6) * 6) / CELL_SIZE),
         "move_credit": 0,
         "enemy_alive": True,
-        "health": 20 * ENEMY_TANK_GROUP_SIZE,
-        "max_health": 20 * ENEMY_TANK_GROUP_SIZE,
-        "base_health": 20,
+        "health": 100 * ENEMY_TANK_GROUP_SIZE,
+        "max_health": 100 * ENEMY_TANK_GROUP_SIZE,
+        "base_health": 100,
         "group_size": ENEMY_TANK_GROUP_SIZE,
         "current_group_size": ENEMY_TANK_GROUP_SIZE,
         "cumulative_damage": 0.0,
@@ -1604,18 +1648,38 @@ if __name__ == "__main__":
 
     enemy_domain = {
         "DefendAreaMission": [
-            # --- Attack branch: for each still-alive friendly in sight, move then attack ---
-           (lambda s: bool(visible_spotted_friendlies(s)),
-         lambda s: [
-             sub
-             for name in visible_spotted_friendlies(s)
-             for sub in [("Move", name), ("AttackEnemy", name)]
-         ]),
-            # --- Defend branch: stay dug-in, possibly fire if they wander close ---
-            (lambda state: True,
-            ["BattlePosition", "AttackEnemy"]),
+
+            # 1) As long as there's *any* name in state["spotted_enemies"],
+            #    stay in Attack mode
+            (
+                lambda s: bool(s["spotted_enemies"]),
+                lambda s: [
+                    # For each spotted enemy name, choose Move vs Attack
+                    ("AttackEnemy", name)
+                    if manhattan(
+                        s["unit"].state["position"],
+                        s["sim"].friendly_units_dict[name].state["position"]
+                    ) <= s["unit"].state["attack_range"] 
+                    and has_line_of_sight(
+                        s["unit"].state["position"],
+                        s["sim"].friendly_units_dict[name].state["position"]
+                    )
+                    else ("Move", name)
+                    for name in s["spotted_enemies"]
+                    # filter out any that have since died
+                    if s["sim"].friendly_units_dict[name].state["current_group_size"] > 0
+                ]
+            ),
+
+            # 2) Otherwise—no more spotted contacts—dig in
+            (
+                lambda s: True,
+                ["BattlePosition"]
+            ),
         ]
-    }
+}
+
+
 
     enemy_state1 = enemy_tank_state_template.copy()
     enemy_state1["name"] = "EnemyTankGroup1"
