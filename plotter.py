@@ -193,11 +193,11 @@ class SimulationPlotter:
             #     bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="black", alpha=0.8)
             # )
         
-        self.fig.subplots_adjust(right=0.8)
+        self.fig.subplots_adjust(right=0.7)
 
         self.task_text = self.ax.text(
             1.02,    # x in axes‐fraction coords
-            0.75,     # y in axes‐fraction coords (middle of the spare right margin)
+            1,     # y in axes‐fraction coords (middle of the spare right margin)
             "",      # initially empty
             transform=self.ax.transAxes,
             ha="left",
@@ -209,7 +209,7 @@ class SimulationPlotter:
 
         # box showing what each drone has spotted
         self.spotted_text = self.ax.text(
-            1.02, 0.5, "",  # down at 20% of the axis height
+            1.02, 0.6, "",  # down at 20% of the axis height
             transform=self.ax.transAxes,
             ha="left", va="top",
             fontsize="small", family="monospace",
@@ -219,10 +219,10 @@ class SimulationPlotter:
 
         # box showing which units each side currently sees by LOS
         self.los_text = self.ax.text(
-            1.02, 0.25,  # 5% up from the bottom
+            1.02, 0,  # 5% up from the bottom
             "",
             transform=self.ax.transAxes,
-            ha="left", va="top",
+            ha="left", va="bottom",
             fontsize="small", family="monospace",
             bbox=dict(
                 boxstyle="round,pad=0.3",
@@ -340,25 +340,25 @@ class SimulationPlotter:
         ]
         self.spotted_text.set_text("\n".join(lines))
         
-        # Build the true LOS sets (from u.state["visible_enemies"])
-        los_by_friend = set()
+        # --- per-unit LOS listings ---
+        lines = ["LOS ⟶ Friendly sees per unit:"]
         for u in self.sim.friendly_units:
-            los_by_friend.update(u.state.get("visible_enemies", []))
+            seen = u.state.get("visible_enemies", [])
+            if seen:
+                lines.append(f"  {u.name}: {', '.join(sorted(seen))}")
+            else:
+                lines.append(f"  {u.name}: (none)")
 
-        los_by_enemy = set()
+        lines.append("")  # blank separator
+        lines.append("LOS ⟶ Enemy   sees per unit:")
         for e in self.sim.enemy_units:
-            los_by_enemy.update(e.state.get("visible_enemies", []))
+            seen = e.state.get("visible_enemies", [])
+            if seen:
+                lines.append(f"  {e.name}: {', '.join(sorted(seen))}")
+            else:
+                lines.append(f"  {e.name}: (none)")
 
-        # Format into a little block
-        lines = [
-            "LOS ⟶ Friendly sees:",
-            *([f"  {n}" for n in sorted(los_by_friend)] if los_by_friend else ["  (none)"]),
-            "",
-            "LOS ⟶ Enemy   sees:",
-            *([f"  {n}" for n in sorted(los_by_enemy)]  if los_by_enemy  else ["  (none)"]),
-        ]
         self.los_text.set_text("\n".join(lines))
-
 
         self.fig.canvas.blit(self.ax.bbox)
         self.fig.canvas.flush_events()

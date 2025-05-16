@@ -207,23 +207,24 @@ def next_step(start, goal, enemy_units=None, unit="unknown"):
     return path[1] if len(path) >= 2 else start
 
 def has_line_of_sight(start, end):
-    line = get_line(start, end)
-    
-    start_in_forest      = start in forest
-    end_in_forest        = end   in forest
-    start_on_forest_edge = start in forest_edge
-    end_on_forest_edge   = end   in forest_edge
+    """
+    Returns False if either the observer (start) or the target (end) is in deep forest,
+    or if any intervening cell is deep forest; otherwise True.
+    """
+    # 1) If the observer itself is in deep forest, no sight
+    if start in forest and start not in forest_edge:
+        return False
 
-    # 3) If neither is standing in deep forest, LOS is clear
-    if not start_in_forest and not end_in_forest:
-        return True
+    # 2) If the target is in deep forest, they’re concealed
+    if end in forest and end not in forest_edge:
+        return False
 
-    # 4) If either is merely on the forest edge, LOS is clear
-    if start_on_forest_edge or end_on_forest_edge:
-        return True
+    # 3) Now check the intervening line (you can skip endpoints since we already handled them)
+    for pos in get_line(start, end):
+        if pos in forest and pos not in forest_edge:
+            return False
 
-    # 5) Otherwise (both in deep forest) → block LOS
-    return False
+    return True
 
 def is_in_cover(pos):
     return pos in forest or pos in forest_edge
@@ -334,12 +335,8 @@ secure_outpost_domain = {
              )
          )
          for sub in [
-           # if already in range, shoot; otherwise move to them
-           ("AttackEnemy", name)
-           if manhattan(
-               s["unit"].state["position"],
-               s["sim"].enemy_units_dict[name].state["position"]
-           ) <= s["unit"].state["friendly_attack_range"]
+           # use can_attack() to enforce both range AND LOS
+           ("AttackEnemy", name) if s["unit"].can_attack(s["sim"].enemy_units_dict[name])
            else ("Move", name)
          ]
      ] + [("SecureOutpost", None)]
@@ -354,9 +351,8 @@ secure_outpost_domain = {
     (
         lambda s: bool(s.get("spotted_enemies")),
         lambda s: [
-            # pick Attack if your custom can_attack says OK, otherwise Move
-            ("AttackEnemy", name)
-            if s["unit"].can_attack(s["sim"].enemy_units_dict[name])
+            # identical logic, but only on still‐alive targets
+            ( "AttackEnemy", name) if s["unit"].can_attack(s["sim"].enemy_units_dict[name])
             else ("Move",        name)
             for name in s["spotted_enemies"]
             # only consider still‐alive targets
@@ -495,32 +491,24 @@ class EnemyUnit:
         old_count   = self.state.get("_last_valid_count", 0)
         logger.info(f"{self.name} valid methods (count={valid_count}): {valid}")
 
-        # 3) Ensure there's always a _branch_choice
-        if "_branch_choice" not in self.state:
-            # default to 0 (the only branch) if there's one, else pick 0 to start
-            self.state["_branch_choice"]    = 0
-            self.state["_last_valid_count"] = valid_count
-            logger.info(f"{self.name} initializing branch_choice → 0")
-
-        # 4) Decide if we need to (re)choose:
-        #    • forced
-        #    • or no current plan
-        #    • or we just gained a second branch
-        need_choice = (
-            force_replan
-            or not self.current_plan
-            or (old_count < valid_count and valid_count > 1)
-        )
-
-        if need_choice:
-            # pick branch 0 if only one, else uniform random among valid_count
-            idx = 0 if valid_count == 1 else random.randrange(valid_count)
-            self.state["_branch_choice"]    = idx
-            self.state["_last_valid_count"] = valid_count
+        # 4) Only *lock in* a branch the first time we actually have >1 valid choices
+        if valid_count > 1 and "_branch_choice" not in self.state:
+            # first multi‐branch moment: pick and lock
+            idx = random.randrange(valid_count)
+            self.state["_branch_choice"] = idx
             logger.info(f"{self.name} picked branch #{idx}")
-        else:
+        elif "_branch_choice" in self.state:
+            # we already locked a branch—keep using it
             idx = self.state["_branch_choice"]
+            # clamp if the number of branches has shrunk
+            if idx >= valid_count:
+                idx = valid_count - 1
+                self.state["_branch_choice"] = idx
             logger.info(f"{self.name} keeps branch #{idx}")
+        else:
+            # still only one choice, no lock yet
+            idx = 0
+            logger.info(f"{self.name} only has branch #0")
 
         # 5) Filter to only truly visible friendlies
         visible = []
@@ -880,8 +868,8 @@ class FriendlyUnit:
                     if target_unit and target_unit.state["enemy_alive"]:
                         distance = manhattan(self.state["position"], target_unit.state["position"])
                         has_los = has_line_of_sight(self.state["position"], target_unit.state["position"])
-                        logger.info(f"{self.name} to {task_arg}: distance={distance}, attack_range={self.state['friendly_attack_range']}, has_los={has_los}")
-                        if distance <= self.state["friendly_attack_range"] and has_los:
+                        logger.info(f"{self.name} to {task_arg}: distance={distance}, attack_range={self.state['attack_range']}, has_los={has_los}")
+                        if distance <= self.state["attack_range"] and has_los:
                             logger.info(f"{self.name} within attack range of {task_arg} at distance {distance}; stopping move.")
                             self.current_plan.pop(0)
                             self.update_plan(force_replan=True)
@@ -917,7 +905,7 @@ class FriendlyUnit:
             x, y = self.state["position"]
             distance = manhattan(self.state["position"], target_unit.state["position"])
             has_los = has_line_of_sight(self.state["position"], target_unit.state["position"])
-            if distance > self.state["friendly_attack_range"] or not has_los:
+            if distance > self.state["attack_range"] or not has_los:
                 logger.info(f"{self.name} cannot attack {target_unit.name}; out of range or no LOS.")
                 self.current_plan.pop(0)
                 self.update_plan(force_replan=True)
@@ -1397,7 +1385,7 @@ if __name__ == "__main__":
         "suppression": 0.12,
         "penetration": 18,
         "vision_range": 2000 / CELL_SIZE,
-        "friendly_attack_range": 2400 / CELL_SIZE,
+        "attack_range": 2400 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
         "suppression_from_enemy": 0.0,
@@ -1425,7 +1413,7 @@ if __name__ == "__main__":
         "suppression": 0.01,
         "penetration": 1,
         "vision_range": 2200 / CELL_SIZE,
-        "friendly_attack_range": 1200 / CELL_SIZE,
+        "attack_range": 1200 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
         "suppression_from_enemy": 0.0,
@@ -1453,7 +1441,7 @@ if __name__ == "__main__":
         "suppression": 15,
         "penetration": 1,
         "vision_range": 1800 / CELL_SIZE,
-        "friendly_attack_range": 4000 / CELL_SIZE,
+        "attack_range": 4000 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
         "suppression_from_enemy": 0.0,
@@ -1481,7 +1469,7 @@ if __name__ == "__main__":
         "suppression": 0.05,
         "penetration": 5,
         "vision_range": 2600 / CELL_SIZE,
-        "friendly_attack_range": 1800 / CELL_SIZE,
+        "attack_range": 1800 / CELL_SIZE,
         "all_enemies_spotted": False,
         "candidate_positions": [],
         "current_candidate_index": 0,
@@ -1511,7 +1499,7 @@ if __name__ == "__main__":
         "suppression": 0.10,
         "penetration": 22,
         "vision_range": 2000 / CELL_SIZE,
-        "friendly_attack_range": 2800 / CELL_SIZE,
+        "attack_range": 2800 / CELL_SIZE,
         "all_enemies_spotted": False,
         "total_enemies": 2,
         "suppression_from_enemy": 0.0,
@@ -1700,7 +1688,6 @@ if __name__ == "__main__":
 
     enemy_state3 = enemy_infantry_state_template.copy()
     enemy_state3["name"] = "EnemyInfantryGroup1"
-    enemy_state3["patrol_points"] = [(GRID_WIDTH - 1, GRID_HEIGHT - 4), (GRID_WIDTH - 1, GRID_HEIGHT - 6)]
     enemy_state3["base_armor_front"] = enemy_state3["armor_front"]
     enemy_state3["base_armor_side"]  = enemy_state3["armor_side"]
     enemy_state3["base_armor_rear"]  = enemy_state3["armor_rear"]
