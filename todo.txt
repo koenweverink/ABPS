@@ -1,14 +1,6 @@
-- add correct enemies (branch switching) Why always switch
 - add waypoints
 - run without plot
 
-
-ALPACA_API_KEY = 'PK4W50EER0STT1V95130'
-ALPACA_SECRET_KEY = 'ibaZ1ezJLaab7K5gevXKCAFeHDyRia4s52tfxJ0Y'
-
-
-API_KEY = 'PK4W50EER0STT1V95130'
-API_SECRET = 'ibaZ1ezJLaab7K5gevXKCAFeHDyRia4s52tfxJ0Y'	
 
 
 - wie?
