@@ -1,13 +1,8 @@
-import time
 import matplotlib.pyplot as plt
-from matplotlib.patches import Circle, Rectangle
 import numpy as np
+from matplotlib.patches import Circle, Rectangle
 from matplotlib import ticker
-
-# Cell and grid constants (adjust or import as needed)
-GRID_WIDTH = 75
-GRID_HEIGHT = 50
-CELL_SIZE = 100
+from config import GRID_WIDTH, GRID_HEIGHT, CELL_SIZE
 
 # Style mapping for unit types
 STYLE_MAP_ENEMY = {

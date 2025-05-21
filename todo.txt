@@ -1,9 +1,0 @@
-- add waypoints
-- run without plot
-
-
-
-- wie?
-- waar naartoe? 
-
-Tank -> EnemyTank 
