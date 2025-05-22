@@ -1,4 +1,5 @@
 import copy
+from config import GRID_WIDTH, GRID_HEIGHT
 
 # Enemy unit factory
 def make_enemy(name, cls, base_template, position=None, domain=None):
@@ -22,7 +23,7 @@ def make_friendly(name, cls, base_template, domain, enemy_template):
     state["name"] = name
     state["enemy"] = enemy_template
     state["target_enemy"] = enemy_template
-    state["outpost_position"] = enemy_template["outpost_position"]
+    state["outpost_position"] = enemy_template.get("outpost_position", (GRID_WIDTH - 1, GRID_HEIGHT - 1))
     state["visible_enemies"] = []
 
     return cls(name, state, domain)

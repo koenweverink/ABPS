@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 
 from units.enemy_units import *
@@ -7,13 +6,18 @@ from state_templates import *
 from domains import enemy_domain, secure_outpost_domain
 from simulation import Simulation
 from unit_factory import make_enemy, make_friendly
+from log import logger
 
 
 ###############################
 # Main Simulation Setup
 ###############################
 
-if __name__ == "__main__":
+def main():
+    """
+    Initializes enemy and friendly units, sets up the simulation,
+    and runs the scenario until completion. Logs evaluation metrics.
+    """
     enemy_units = [
         make_enemy("EnemyTankGroup1", EnemyTank, enemy_tank_state_template, position=(63, 15), domain=enemy_domain),
         make_enemy("EnemyTankGroup2", EnemyTank, enemy_tank_state_template, position=(17, 5), domain=enemy_domain),
@@ -29,7 +33,7 @@ if __name__ == "__main__":
         make_friendly("FriendlyAntiTankGroup", FriendlyAntiTank, anti_tank_state_template, secure_outpost_domain, enemy_tank_state_template),
     ]
 
-    sim = Simulation(friendly_units, enemy_units , visualize=True, plan_name="Mode1_Test_Grouped_Dynamic_Partial")
+    sim = Simulation(friendly_units, enemy_units, visualize=True, plan_name="Mode1_Test_Grouped_Dynamic_Partial")
 
     for unit in friendly_units:
         unit.sim = sim
@@ -44,3 +48,7 @@ if __name__ == "__main__":
 
     plt.ioff()
     plt.show()
+
+
+if __name__ == "__main__":
+    main()
