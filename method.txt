@@ -57,3 +57,31 @@ Sort and pick best.
 
 
 
+
+✅ Goal: Hybrid HTN+RL Control
+HTN does:
+
+    “Secure the outpost”, “AttackEnemy”, “Move”
+
+RL does:
+
+    How to move, when to fire, how far to retreat, when to flank
+
+
+1. Let HTN produce high-level plan
+
+In each step, your friendly unit's update_plan() gives something like:
+
+[("AttackEnemy", "EnemyTank")]
+
+This becomes the context or “intent” passed to the RL policy.
+
+
+2. RL policy maps (state + intent) → low-level action
+
+Update your InfantryTankSimEnv.step(action) to:
+
+    Let HTN assign high-level tasks (task_name, task_arg) to each unit
+
+    RL decides how to execute that: approach, retreat, attack, etc.
+
