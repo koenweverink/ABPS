@@ -59,14 +59,7 @@ def astar(start, goal, enemy_units=None, unit="unknown"):
     return path
 
 def next_step(start, goal, enemy_units=None, unit="unknown"):
-    """Return the next grid step along the path to a goal using A*.
-
-    If ``goal`` is ``None`` the unit will stay in place. This guards
-    against incomplete state initialization resulting in ``None`` being
-    passed as the target position.
-    """
-    if start is None or goal is None:
-        return start
+    """Return the next grid step along the path to a goal using A*."""
     path = astar(start, goal, enemy_units, unit)
     return path[1] if len(path) >= 2 else start
 

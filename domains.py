@@ -56,11 +56,9 @@ def expand_attack_or_move(s):
 
 def expand_consolidate_attack(s):
     """Plan to regroup then attack spotted enemies as a team."""
-    sim = s["sim"]
-    if getattr(sim, "staging_position", None) is None:
-        sim.staging_position = compute_staging_position(sim)
-    for u in sim.friendly_units:
-        u.state["staging_position"] = sim.staging_position
+    staging = compute_staging_position(s["sim"])
+    for u in s["sim"].friendly_units:
+        u.state["staging_position"] = staging
     return [
         ("MoveToStaging", None),
         "WaitForGroup",

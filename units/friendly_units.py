@@ -30,17 +30,12 @@ class FriendlyUnit:
         """Regenerate or preserve the current plan depending on context or threats."""
         mission = "SecureOutpostMission"
         if not force_replan and self.current_plan:
-            first = self.current_plan[0]
-            first_task = first[0] if isinstance(first, tuple) else first
-            if first_task not in ("MoveToStaging", "WaitForGroup"):
-                for enemy_name, enemy in self.sim.enemy_units_dict.items():
-                    if self.can_attack(enemy):
-                        if self.current_plan[0][:2] != ("AttackEnemy", enemy_name):
-                            force_replan = True
-                            logger.info(
-                                f"{self.name} forcing replan due to attackable enemy {enemy_name}"
-                            )
-                            break
+            for enemy_name, enemy in self.sim.enemy_units_dict.items():
+                if self.can_attack(enemy):
+                    if self.current_plan[0][:2] != ("AttackEnemy", enemy_name):
+                        force_replan = True
+                        logger.info(f"{self.name} forcing replan due to attackable enemy {enemy_name}")
+                        break
 
         if force_replan or not self.current_plan:
             combined = copy.deepcopy(self.state)
@@ -157,13 +152,8 @@ class FriendlyUnit:
         logger.info(f"{self.name} moving to staging area with {steps} steps")
 
         if "staging_position" not in self.state:
-            if self.sim.staging_position is None:
-                self.sim.staging_position = compute_staging_position(self.sim)
-            self.state["staging_position"] = self.sim.staging_position
-        else:
-            if self.sim.staging_position is None:
-                self.sim.staging_position = self.state["staging_position"]
-        staging = self.sim.staging_position
+            self.state["staging_position"] = compute_staging_position(self.sim)
+        staging = self.state["staging_position"]
         for _ in range(steps):
             old_pos = self.state["position"]
             if self.state["position"] == staging:
@@ -179,15 +169,12 @@ class FriendlyUnit:
     def _execute_wait_for_group(self):
         """Hold until all friendly units reach the staging area."""
         if "staging_position" not in self.state:
-            if self.sim.staging_position is None:
-                self.sim.staging_position = compute_staging_position(self.sim)
-            self.state["staging_position"] = self.sim.staging_position
-        staging = self.sim.staging_position
+            self.state["staging_position"] = compute_staging_position(self.sim)
+        staging = self.state["staging_position"]
         all_ready = all_units_at_position(self.sim.friendly_units, staging)
         if all_ready:
             logger.info(f"{self.name} group assembled, proceeding")
             self.current_plan.pop(0)
-            self.sim.staging_position = None
         else:
             logger.info(f"{self.name} waiting at staging for group")
 
@@ -210,10 +197,9 @@ class FriendlyUnit:
         if task_name == "Move" and task_arg == "outpost":
             return self.state["outpost_position"]
         if task_name == "MoveToStaging":
-            if self.sim.staging_position is None:
-                self.sim.staging_position = compute_staging_position(self.sim)
-            self.state["staging_position"] = self.sim.staging_position
-            return self.sim.staging_position
+            if "staging_position" not in self.state:
+                self.state["staging_position"] = compute_staging_position(self.sim)
+            return self.state["staging_position"]
         if task_name in ("Move", "AttackEnemy") and task_arg:
             return self.sim.friendly_drone.last_known.get(task_arg, self.state["position"])
         return self.state["position"]
