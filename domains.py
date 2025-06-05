@@ -81,32 +81,32 @@ secure_outpost_domain = {
         (condition_default, ["Hold"]),
     ],
 
-#     "DefeatEnemies": [
-#         (
-#             lambda s: isinstance(s, dict) and bool(s.get("spotted_enemies", [])),
-#             lambda s: [
-#                 ("AttackEnemy", name) if s["unit"].can_attack(s["sim"].enemy_units_dict.get(name)) else ("Move", name)
-#                 for name in s.get("spotted_enemies", [])
-#                 if name in s["sim"].enemy_units_dict and s["sim"].enemy_units_dict[name].state.get("enemy_alive", False)
-#             ]
-#         ),
-#         (condition_default, ["Hold"]),
-#     ],
+    "DefeatEnemies": [
+        (
+            lambda s: isinstance(s, dict) and bool(s.get("spotted_enemies", [])),
+            lambda s: [
+                ("AttackEnemy", name) if s["unit"].can_attack(s["sim"].enemy_units_dict.get(name)) else ("Move", name)
+                for name in s.get("spotted_enemies", [])
+                if name in s["sim"].enemy_units_dict and s["sim"].enemy_units_dict[name].state.get("enemy_alive", False)
+            ]
+        ),
+        (condition_default, ["Hold"]),
+    ],
 
     "ConsolidateAttack": [
         (condition_default, expand_consolidate_attack),
     ],
 
-#     "SecureOutpost": [
-#         (
-#             lambda s: isinstance(s, dict) and s.get("position") != s.get("outpost_position"),
-#             [("Move", "outpost")]
-#         ),
-#         (
-#             lambda s: isinstance(s, dict) and s.get("position") == s.get("outpost_position"),
-#             ["SecureOutpostNoArg"]
-#         ),
-#     ],
+    "SecureOutpost": [
+        (
+            lambda s: isinstance(s, dict) and s.get("position") != s.get("outpost_position"),
+            [("Move", "outpost")]
+        ),
+        (
+            lambda s: isinstance(s, dict) and s.get("position") == s.get("outpost_position"),
+            ["SecureOutpostNoArg"]
+        ),
+    ],
 }
 
 
