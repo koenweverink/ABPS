@@ -5,7 +5,8 @@ import random
 from htn_planner import HTNPlanner
 from utils import (
     manhattan, has_line_of_sight, under_friendly_drone_cover, next_step,
-    get_num_attacks, get_penetration_probability, perform_attack
+    get_num_attacks, get_penetration_probability, perform_attack,
+    all_units_at_position, compute_staging_position
 )
 from terrain_utils import sign
 from log import logger
@@ -69,6 +70,10 @@ class FriendlyUnit:
             self._execute_attack(task_arg)
         elif task_name == "SecureOutpostNoArg":
             self._execute_secure_outpost()
+        elif task_name == "MoveToStaging":
+            self._execute_move_to_staging()
+        elif task_name == "WaitForGroup":
+            self._execute_wait_for_group()
         elif task_name == "Hold":
             logger.info(f"{self.name} holds position at {self.state['position']}")
             self.current_plan.pop(0)
@@ -139,6 +144,40 @@ class FriendlyUnit:
         self.current_plan.pop(0)
         self.current_plan.append(("Hold", None))
 
+    def _execute_move_to_staging(self):
+        """Move toward the designated staging position."""
+        self.state["move_credit"] += self.state["speed"]
+        steps = int(self.state["move_credit"])
+        self.state["move_credit"] -= steps
+        logger.info(f"{self.name} moving to staging area with {steps} steps")
+
+        if "staging_position" not in self.state:
+            self.state["staging_position"] = compute_staging_position(self.sim)
+        staging = self.state["staging_position"]
+        for _ in range(steps):
+            old_pos = self.state["position"]
+            if self.state["position"] == staging:
+                logger.info(f"{self.name} reached staging area {staging}")
+                self.current_plan.pop(0)
+                break
+            self.state["position"] = next_step(self.state["position"], staging, self.sim.enemy_units, unit=self.state["type"])
+            dx, dy = self.state["position"][0] - old_pos[0], self.state["position"][1] - old_pos[1]
+            if dx or dy:
+                self.state["facing"] = (sign(dx), sign(dy))
+            logger.info(f"{self.name} moved to {self.state['position']}")
+
+    def _execute_wait_for_group(self):
+        """Hold until all friendly units reach the staging area."""
+        if "staging_position" not in self.state:
+            self.state["staging_position"] = compute_staging_position(self.sim)
+        staging = self.state["staging_position"]
+        all_ready = all_units_at_position(self.sim.friendly_units, staging)
+        if all_ready:
+            logger.info(f"{self.name} group assembled, proceeding")
+            self.current_plan.pop(0)
+        else:
+            logger.info(f"{self.name} waiting at staging for group")
+
     def _get_enemy_by_name(self, name):
         """Return enemy unit by name from the simulation context."""
         return next((e for e in self.sim.enemy_units if e.name == name), None)
@@ -157,6 +196,10 @@ class FriendlyUnit:
         task_name, task_arg = task if isinstance(task, tuple) else (task, None)
         if task_name == "Move" and task_arg == "outpost":
             return self.state["outpost_position"]
+        if task_name == "MoveToStaging":
+            if "staging_position" not in self.state:
+                self.state["staging_position"] = compute_staging_position(self.sim)
+            return self.state["staging_position"]
         if task_name in ("Move", "AttackEnemy") and task_arg:
             return self.sim.friendly_drone.last_known.get(task_arg, self.state["position"])
         return self.state["position"]

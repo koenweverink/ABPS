@@ -1,4 +1,4 @@
-from utils import manhattan, has_line_of_sight
+from utils import manhattan, has_line_of_sight, compute_staging_position
 
 
 def condition_outpost_secured(s):
@@ -26,6 +26,16 @@ def condition_spotted_enemies_exist(s):
     )
 
 
+def condition_can_consolidate_attack(s):
+    """Return True if multiple friendlies are alive and enemies are spotted."""
+    if not isinstance(s, dict):
+        return False
+    sim = s.get("sim")
+    if not sim:
+        return False
+    alive_friendlies = [u for u in sim.friendly_units if u.state.get("current_group_size", 0) > 0]
+    return len(alive_friendlies) >= 2 and condition_spotted_enemies_exist(s)
+
 def expand_attack_or_move(s):
     """Generate a plan to either attack or move toward each spotted enemy."""
     return [
@@ -44,6 +54,18 @@ def expand_attack_or_move(s):
     ]
 
 
+def expand_consolidate_attack(s):
+    """Plan to regroup then attack spotted enemies as a team."""
+    staging = compute_staging_position(s["sim"])
+    for u in s["sim"].friendly_units:
+        u.state["staging_position"] = staging
+    return [
+        ("MoveToStaging", None),
+        "WaitForGroup",
+        *expand_attack_or_move(s),
+    ]
+
+
 def condition_default(s):
     """Catch-all condition to match any state dictionary."""
     return isinstance(s, dict)
@@ -54,6 +76,7 @@ secure_outpost_domain = {
     "SecureOutpostMission": [
         (condition_outpost_secured, []),
         (condition_all_enemies_defeated, [("SecureOutpost", None)]),
+        (condition_can_consolidate_attack, [("ConsolidateAttack", None)]),
         (condition_spotted_enemies_exist, expand_attack_or_move),
         (condition_default, ["Hold"]),
     ],
@@ -68,6 +91,10 @@ secure_outpost_domain = {
             ]
         ),
         (condition_default, ["Hold"]),
+    ],
+
+    "ConsolidateAttack": [
+        (condition_default, expand_consolidate_attack),
     ],
 
     "SecureOutpost": [

@@ -139,6 +139,85 @@ def under_friendly_drone_cover(sim, target_unit):
     bounds = drone.areas[drone.current_area]
     return drone._in_area(target_unit.state["position"], bounds)
 
+
+def all_units_at_position(units, position):
+    """Return True if all given units are exactly at the specified position."""
+    return all(u.state.get("position") == position for u in units if u.state.get("current_group_size", 0) > 0)
+
+
+def compute_staging_position(sim, max_distance=20):
+    """Return a rally point as close as possible to a spotted enemy while
+    remaining unseen.
+
+    The search begins at the average friendly position and walks the path
+    toward the nearest enemy spotted by the drone.  The function selects the
+    last tile on that path that is either outside the enemy's vision range or
+    hidden from line of sight.  This means a tile *inside* the vision radius is
+    acceptable so long as we can approach it without ever entering the enemy's
+    line of sight.  Preference is given to tiles within friendly attack range.
+    Line of sight to the outpost is **not** required.
+    """
+
+    friendlies = [u for u in sim.friendly_units if u.state.get("current_group_size", 0) > 0]
+    if not friendlies:
+        return (0, 0)
+
+    avg_x = sum(u.state["position"][0] for u in friendlies) // len(friendlies)
+    avg_y = sum(u.state["position"][1] for u in friendlies) // len(friendlies)
+    start = (avg_x, avg_y)
+
+    drone_mem = sim.friendly_drone.last_known
+    if drone_mem:
+        closest_name = min(drone_mem, key=lambda n: manhattan(start, drone_mem[n]))
+        enemy_pos = drone_mem[closest_name]
+        enemy_unit = sim.enemy_units_dict.get(closest_name)
+        enemy_range = enemy_unit.state.get("vision_range", 0) if enemy_unit else 0
+        max_range = max(u.state.get("attack_range", 0) for u in friendlies)
+
+        path = astar(start, enemy_pos, sim.enemy_units, unit=friendlies[0].state.get("type", "unknown"))
+        best = None  # closest outside vision and within attack range
+        fallback = None  # closest outside vision regardless of range
+        travelled = 0
+        prev = start
+        for pos in path:
+            travelled += manhattan(prev, pos)
+            if travelled > max_distance:
+                break
+            if pos == enemy_pos:
+                break
+            dist_enemy = manhattan(pos, enemy_pos)
+            enemy_los = has_line_of_sight(pos, enemy_pos)
+            outside_enemy = dist_enemy > enemy_range or not enemy_los
+            if outside_enemy:
+                fallback = pos
+                if dist_enemy <= max_range:
+                    best = pos
+            else:
+                break
+            prev = pos
+
+        if best:
+            return best
+        if fallback:
+            return fallback
+
+    # Fallback: search around start for any tile outside enemy vision
+    from collections import deque
+    visited = {start}
+    queue = deque([(start, 0)])
+    while queue:
+        pos, dist = queue.popleft()
+        if dist > max_distance:
+            break
+        if not is_in_enemy_vision(pos, sim.enemy_units):
+            return pos
+        for n in neighbors(pos, in_bounds, river=sim.river, cliffs=sim.cliffs, climb_entries=sim.climb_entries):
+            if n not in visited:
+                visited.add(n)
+                queue.append((n, dist + 1))
+
+    return start
+
 def perform_attack(attacker, target):
     """Resolve an attack from one unit to another, applying damage if successful."""
     import math
