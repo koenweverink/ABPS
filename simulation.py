@@ -30,6 +30,9 @@ class Simulation:
         self.friendly_drone = Drone("friendly", "enemy")
         self.enemy_drone = Drone("enemy", "friendly")
 
+        # Shared rally point for consolidate maneuvers
+        self.staging_position = None
+
         self.river = river
         self.forest = forest
         self.forest_edge = forest_edge
