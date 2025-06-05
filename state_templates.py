@@ -213,6 +213,7 @@ enemy_infantry_state_template = {
     "suppression_from_enemy": 0.0,
     "patrol_points": [],
     "current_patrol_index": 0,
+    "vision_range": 2000 / CELL_SIZE,
     "scout_steps": 0,
     "stealth_modifier": 0
 }
@@ -245,6 +246,7 @@ enemy_anti_tank_state_template = {
     "suppression_from_enemy": 0.0,
     "patrol_points": [],
     "current_patrol_index": 0,
+    "vision_range": 2000 / CELL_SIZE,
     "scout_steps": 0,
     "stealth_modifier": 50
 }
@@ -277,6 +279,7 @@ enemy_artillery_state_template = {
     "suppression_from_enemy": 0.0,
     "patrol_points": [],
     "current_patrol_index": 0,
+    "vision_range": 1800 / CELL_SIZE,
     "scout_steps": 0,
     "stealth_modifier": 0
 }
