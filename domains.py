@@ -56,27 +56,49 @@ def expand_attack_or_move(s):
 
 
 def expand_consolidate_attack(s):
-    """
-    For each spotted, alive enemy (in order of proximity), 
-    insert: MoveToStaging → WaitForGroup → AttackEnemy(enemy_name)
-    """
-    # 1) Gather and sort all spotted, alive enemies
-    enemies = [
-        name for name in s["spotted_enemies"]
-        if name in s["sim"].enemy_units_dict
-        and s["sim"].enemy_units_dict[name].state.get("enemy_alive", False)
-    ]
-    enemies.sort(key=lambda n: manhattan(
-        s["unit"].state["position"],
-        s["sim"].enemy_units_dict[n].state["position"]
-    ))
+    """Return a staging/attack plan for the given friendly unit."""
+
+    # 1) Determine the attack sequence.  If the Simulation provides a
+    #    precomputed 'attack_sequence' (a list of ``(enemy_name,
+    #    [friendly_names])`` tuples) we use that.  Otherwise fall back to the
+    #    original behaviour where every unit attacks each spotted enemy in
+    #    order of proximity.
+    seq = getattr(s.get("sim"), "attack_sequence", None)
 
     plan = []
-    for name in enemies:
-        # each time we’re about to switch to a new enemy…
-        plan.append(("MoveToStaging", None))
-        plan.append("WaitForGroup")
-        plan.append(("AttackEnemy", name))
+
+    if seq:
+        # Filter to enemies that are still alive and in the provided sequence
+        for enemy_name, assigned in seq:
+            enemy_unit = s["sim"].enemy_units_dict.get(enemy_name)
+            if not enemy_unit or not enemy_unit.state.get("enemy_alive", False):
+                continue
+            if s["unit"].name not in assigned:
+                # This friendly is not part of the group assigned to that enemy
+                continue
+
+            plan.append(("MoveToStaging", None))
+            plan.append("WaitForGroup")
+            plan.append(("AttackEnemy", enemy_name))
+    else:
+        # Default behaviour: all friendlies attack all spotted enemies
+        enemies = [
+            name
+            for name in s.get("spotted_enemies", [])
+            if name in s["sim"].enemy_units_dict
+            and s["sim"].enemy_units_dict[name].state.get("enemy_alive", False)
+        ]
+        enemies.sort(
+            key=lambda n: manhattan(
+                s["unit"].state["position"],
+                s["sim"].enemy_units_dict[n].state["position"],
+            )
+        )
+
+        for name in enemies:
+            plan.append(("MoveToStaging", None))
+            plan.append("WaitForGroup")
+            plan.append(("AttackEnemy", name))
 
     return plan
 
