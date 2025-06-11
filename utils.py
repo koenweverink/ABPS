@@ -145,19 +145,9 @@ def all_units_at_position(units, position):
     return all(u.state.get("position") == position for u in units if u.state.get("current_group_size", 0) > 0)
 
 
-def compute_staging_position(sim, max_distance=20):
-    """Return a rally point as close as possible to a spotted enemy while
-    remaining unseen.
-
-    The search begins at the average friendly position and walks the path
-    toward the nearest enemy spotted by the drone.  The function selects the
-    last tile on that path that is either outside the enemy's vision range or
-    hidden from line of sight.  This means a tile *inside* the vision radius is
-    acceptable so long as we can approach it without ever entering the enemy's
-    line of sight.  Preference is given to tiles within friendly attack range.
-    Line of sight to the outpost is **not** required.
-    """
-
+def compute_staging_position(sim, max_distance=500):
+    # 1) Compute centroid of all friendly units (with group_size > 0). 
+    #    If none, return (0, 0).
     friendlies = [u for u in sim.friendly_units if u.state.get("current_group_size", 0) > 0]
     if not friendlies:
         return (0, 0)
@@ -166,57 +156,58 @@ def compute_staging_position(sim, max_distance=20):
     avg_y = sum(u.state["position"][1] for u in friendlies) // len(friendlies)
     start = (avg_x, avg_y)
 
-    drone_mem = sim.friendly_drone.last_known
-    if drone_mem:
-        closest_name = min(drone_mem, key=lambda n: manhattan(start, drone_mem[n]))
-        enemy_pos = drone_mem[closest_name]
-        enemy_unit = sim.enemy_units_dict.get(closest_name)
-        enemy_range = enemy_unit.state.get("vision_range", 0) if enemy_unit else 0
-        max_range = max(u.state.get("attack_range", 0) for u in friendlies)
+    # 2) Gather “last known” positions of alive enemies, as seen by our drone:
+    drone_mem = {
+        name: pos
+        for name, pos in sim.friendly_drone.last_known.items()
+        if name in sim.enemy_units_dict
+        and sim.enemy_units_dict[name].state.get("enemy_alive", False)
+    }
+    if not drone_mem:
+        # No intel on any alive enemy → stay at the centroid.
+        return start
 
-        path = astar(start, enemy_pos, sim.enemy_units, unit=friendlies[0].state.get("type", "unknown"))
-        best = None  # closest outside vision and within attack range
-        fallback = None  # closest outside vision regardless of range
-        travelled = 0
-        prev = start
-        for pos in path:
-            travelled += manhattan(prev, pos)
-            if travelled > max_distance:
-                break
-            if pos == enemy_pos:
-                break
-            dist_enemy = manhattan(pos, enemy_pos)
-            enemy_los = has_line_of_sight(pos, enemy_pos)
-            outside_enemy = dist_enemy > enemy_range or not enemy_los
-            if outside_enemy:
-                fallback = pos
-                if dist_enemy <= max_range:
-                    best = pos
-            else:
-                break
-            prev = pos
+    # 3) Pick the one enemy whose last-known tile is nearest to our centroid:
+    closest_name = min(drone_mem, key=lambda n: manhattan(start, drone_mem[n]))
+    enemy_pos   = drone_mem[closest_name]
+    enemy_unit  = sim.enemy_units_dict[closest_name]
+    enemy_range = enemy_unit.state.get("vision_range", 0) if enemy_unit else 0
 
-        if best:
-            return best
-        if fallback:
-            return fallback
+    # 4) Run A* from “start” toward “enemy_pos” to get the exact tile-by-tile path:
+    path = astar(
+        start,
+        enemy_pos,
+        sim.enemy_units,
+        unit=friendlies[0].state.get("type", "unknown")
+    )
+    #    path is a list of coordinates: [ start, …, enemy_pos ]
 
-    # Fallback: search around start for any tile outside enemy vision
-    from collections import deque
-    visited = {start}
-    queue = deque([(start, 0)])
-    while queue:
-        pos, dist = queue.popleft()
-        if dist > max_distance:
-            break
-        if not is_in_enemy_vision(pos, sim.enemy_units):
+    # 5) Precompute cumulative distance from start for each index i along the path:
+    travelled = [0] * len(path)
+    for i in range(1, len(path)):
+        travelled[i] = travelled[i-1] + manhattan(path[i-1], path[i])
+
+    # 6) Now scan **in reverse** (from index = len(path)-1 down to 0):
+    #    As soon as we find a tile that is still within max_distance AND
+    #    satisfies “(dist > enemy_range)  or  (not LOS)”, we return it.
+    for i in range(len(path)-1, -1, -1):
+        if travelled[i] > max_distance:
+            # Too far from our own start → skip this tile
+            continue
+
+        pos = path[i]
+        dist_enemy = manhattan(pos, enemy_pos)
+        enemy_los  = has_line_of_sight(pos, enemy_pos)
+
+        # **Only one of these must hold true**:
+        outside_enemy = (dist_enemy > enemy_range) or (not enemy_los)
+        if outside_enemy:
             return pos
-        for n in neighbors(pos, in_bounds, river=sim.river, cliffs=sim.cliffs, climb_entries=sim.climb_entries):
-            if n not in visited:
-                visited.add(n)
-                queue.append((n, dist + 1))
 
+    # 7) If we never found a tile meeting those criteria within max_distance,
+    #    fall back to the centroid.
     return start
+
 
 def perform_attack(attacker, target):
     """Resolve an attack from one unit to another, applying damage if successful."""

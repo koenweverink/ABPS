@@ -9,7 +9,7 @@ class Drone:
     spotting units based on proximity and probability.
     """
 
-    def __init__(self, side, target_side, n_cols=3, n_rows=2, stay_rounds=10, spot_prob=0.2):
+    def __init__(self, side, target_side, n_cols=3, n_rows=2, stay_rounds=10, spot_prob=1):
         """
         Initialize a Drone instance.
 
@@ -45,7 +45,8 @@ class Drone:
 
     def _define_route(self):
         """Return the area scan order based on side logic."""
-        return [3, 4, 5, 2, 1, 0] if self.side == "friendly" else [2, 1, 0, 3, 4, 5]
+        # return [3, 4, 5, 2, 1, 0] if self.side == "friendly" else [2, 1, 0, 3, 4, 5]
+        return [3, 0, 1, 2, 5, 4] if self.side == "friendly" else [2, 5, 4, 3, 0, 1]
 
     def _in_area(self, pos, bounds):
         """Check if a given position is inside a rectangular area."""

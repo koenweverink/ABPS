@@ -36,34 +36,49 @@ def condition_can_consolidate_attack(s):
     alive_friendlies = [u for u in sim.friendly_units if u.state.get("current_group_size", 0) > 0]
     return len(alive_friendlies) >= 2 and condition_spotted_enemies_exist(s)
 
+
 def expand_attack_or_move(s):
-    """Generate a plan to either attack or move toward each spotted enemy."""
-    return [
-        ("AttackEnemy", name) if s.get("unit", {}).can_attack(s["sim"].enemy_units_dict[name])
-        else ("Move", name)
-        for name in sorted(
-            [
-                name for name in s.get("spotted_enemies", [])
-                if name in s["sim"].enemy_units_dict and s["sim"].enemy_units_dict[name].state.get("enemy_alive", False)
-            ],
-            key=lambda n: manhattan(
-                s.get("unit", {}).state.get("position", (0, 0)),
-                s["sim"].enemy_units_dict[n].state.get("position", (0, 0))
-            )
-        )
+    """
+    Always schedule an AttackEnemy step for each spotted, alive enemy.
+    Runtime will swap to Move if needed.
+    """
+    enemies = [
+        name for name in s.get("spotted_enemies", [])
+        if name in s["sim"].enemy_units_dict
+        and s["sim"].enemy_units_dict[name].state.get("enemy_alive", False)
     ]
+    # sort by current distance for a deterministic order
+    enemies.sort(key=lambda n: manhattan(
+        s["unit"].state["position"],
+        s["sim"].enemy_units_dict[n].state["position"]
+    ))
+    return [("AttackEnemy", name) for name in enemies]
 
 
 def expand_consolidate_attack(s):
-    """Plan to regroup then attack spotted enemies as a team."""
-    staging = compute_staging_position(s["sim"])
-    for u in s["sim"].friendly_units:
-        u.state["staging_position"] = staging
-    return [
-        ("MoveToStaging", None),
-        "WaitForGroup",
-        *expand_attack_or_move(s),
+    """
+    For each spotted, alive enemy (in order of proximity), 
+    insert: MoveToStaging → WaitForGroup → AttackEnemy(enemy_name)
+    """
+    # 1) Gather and sort all spotted, alive enemies
+    enemies = [
+        name for name in s["spotted_enemies"]
+        if name in s["sim"].enemy_units_dict
+        and s["sim"].enemy_units_dict[name].state.get("enemy_alive", False)
     ]
+    enemies.sort(key=lambda n: manhattan(
+        s["unit"].state["position"],
+        s["sim"].enemy_units_dict[n].state["position"]
+    ))
+
+    plan = []
+    for name in enemies:
+        # each time we’re about to switch to a new enemy…
+        plan.append(("MoveToStaging", None))
+        plan.append("WaitForGroup")
+        plan.append(("AttackEnemy", name))
+
+    return plan
 
 
 def condition_default(s):
@@ -74,40 +89,57 @@ def condition_default(s):
 # Friendly HTN domain
 secure_outpost_domain = {
     "SecureOutpostMission": [
+        # 1) If the outpost is already secured, do nothing
         (condition_outpost_secured, []),
+
+        # 2) If all enemies are defeated, transition to the SecureOutpost task
         (condition_all_enemies_defeated, [("SecureOutpost", None)]),
+
+        # 3) Otherwise, if we can consolidate (stage) for an attack, do that
         (condition_can_consolidate_attack, [("ConsolidateAttack", None)]),
+
+        # 4) If we have any spotted enemies, attack or move toward them
         (condition_spotted_enemies_exist, expand_attack_or_move),
+
+        # 5) Default: hold position
         (condition_default, ["Hold"]),
     ],
 
     "DefeatEnemies": [
         (
+            # If there are spotted enemies, for each do AttackEnemy if in range, else Move
             lambda s: isinstance(s, dict) and bool(s.get("spotted_enemies", [])),
             lambda s: [
-                ("AttackEnemy", name) if s["unit"].can_attack(s["sim"].enemy_units_dict.get(name)) else ("Move", name)
-                for name in s.get("spotted_enemies", [])
-                if name in s["sim"].enemy_units_dict and s["sim"].enemy_units_dict[name].state.get("enemy_alive", False)
+                ("AttackEnemy", name)
+                if s["unit"].can_attack(s["sim"].enemy_units_dict[name])
+                else ("Move", name)
+                for name in s["spotted_enemies"]
+                if name in s["sim"].enemy_units_dict
+                   and s["sim"].enemy_units_dict[name].state.get("enemy_alive", False)
             ]
         ),
         (condition_default, ["Hold"]),
     ],
 
     "ConsolidateAttack": [
+        # ConsolidateAttack is handled by your expand_consolidate_attack (staging + per-target loops)
         (condition_default, expand_consolidate_attack),
     ],
 
     "SecureOutpost": [
         (
+            # If not yet at the outpost, move there
             lambda s: isinstance(s, dict) and s.get("position") != s.get("outpost_position"),
             [("Move", "outpost")]
         ),
         (
+            # Once at the outpost, execute SecureOutpostNoArg (e.g. ‘dig in’)
             lambda s: isinstance(s, dict) and s.get("position") == s.get("outpost_position"),
             ["SecureOutpostNoArg"]
         ),
     ],
 }
+
 
 
 # Enemy HTN domain logic

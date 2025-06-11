@@ -48,6 +48,7 @@ class SimulationPlotter:
         self.friendly_name_texts = {}
         self.friendly_attack_indicators = {}
 
+        self.staging_markers = {}  # New: staging position markers
 
         # Build the static background (terrain, grid, arrows, outpost, etc.)
         self._init_plot()
@@ -323,7 +324,22 @@ class SimulationPlotter:
                     ring.set_visible(True)
                 else:
                     ring.set_visible(False)
-
+                
+                # update staging markers
+                staging = u.state.get("staging_position")
+                marker = self.staging_markers.get(name)
+                if staging and alive:
+                    sx, sy = staging
+                    scx = sx * CELL_SIZE + CELL_SIZE / 2
+                    scy = sy * CELL_SIZE + CELL_SIZE / 2
+                    if marker:
+                        marker.set_offsets((scx, scy))
+                        marker.set_visible(True)
+                    else:
+                        m = self.ax.scatter(scx, scy, marker="X", color="black", s=80, zorder=3)
+                        self.staging_markers[name] = m
+                elif marker:
+                    marker.set_visible(False)
 
         # update enemies
         _update_group(self.sim.enemy_units,
