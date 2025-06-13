@@ -49,6 +49,7 @@ class SimulationPlotter:
         self.friendly_attack_indicators = {}
 
         self.staging_markers = {}  # New: staging position markers
+        self.defend_markers = {}   # Defensive position markers
 
         # Build the static background (terrain, grid, arrows, outpost, etc.)
         self._init_plot()
@@ -341,6 +342,22 @@ class SimulationPlotter:
                 elif marker:
                     marker.set_visible(False)
 
+                # update defend markers
+                defend = u.state.get("defend_position")
+                marker = self.defend_markers.get(name)
+                if defend and alive:
+                    dx, dy = defend
+                    dcx = dx * CELL_SIZE + CELL_SIZE / 2
+                    dcy = dy * CELL_SIZE + CELL_SIZE / 2
+                    if marker:
+                        marker.set_offsets((dcx, dcy))
+                        marker.set_visible(True)
+                    else:
+                        m = self.ax.scatter(dcx, dcy, marker="P", color="gray", s=70, zorder=3)
+                        self.defend_markers[name] = m
+                elif marker:
+                    marker.set_visible(False)
+
         # update enemies
         _update_group(self.sim.enemy_units,
                     self.enemy_markers, self.enemy_arrows,
@@ -446,7 +463,8 @@ class SimulationPlotter:
         name_text_dict   = self.enemy_name_texts   if group == 'enemy' else self.friendly_name_texts
         ring_dict        = self.enemy_attack_indicators if group == 'enemy' else self.friendly_attack_indicators
 
-        for d in [marker_dict, arrow_dict, text_dict, name_text_dict, ring_dict]:
+        for d in [marker_dict, arrow_dict, text_dict, name_text_dict, ring_dict,
+                 self.staging_markers, self.defend_markers]:
             art = d.pop(name, None)
             if art:
                 art.remove()

@@ -166,19 +166,36 @@ secure_outpost_domain = {
 
 # Enemy HTN domain logic
 
+def face_and_attack(s):
+    """Return tasks to face the nearest enemy and attack if possible."""
+    if not s.get("friendly_units"):
+        return ["Hold"]
+    target = min(
+        s["friendly_units"],
+        key=lambda u: manhattan(s["unit"].state["position"], u.state["position"]),
+    )
+    tasks = [("FaceEnemy", target.name)]
+    if s["unit"].can_attack(target):
+        tasks.append(("AttackEnemy", target.name))
+    return tasks
+
+
+def condition_needs_retreat(s):
+    unit = s["unit"]
+    low = unit.state.get("health", 0) <= 0.25 * unit.state.get("max_health", 1)
+    return low and not unit.state.get("has_retreated", False)
+
+
 defend_area_conditions = [
-    # (
-    #     lambda s: bool(s["spotted_enemies"]),
-    #     lambda s: [
-    #         ("AttackEnemy", name) if (
-    #             manhattan(s["unit"].state["position"], s["sim"].friendly_units_dict[name].state["position"]) <= s["unit"].state["attack_range"]
-    #             and has_line_of_sight(s["unit"].state["position"], s["sim"].friendly_units_dict[name].state["position"])
-    #         ) else ("Move", name)
-    #         for name in s["spotted_enemies"]
-    #         if s["sim"].friendly_units_dict[name].state["current_group_size"] > 0
-    #     ]
-    # ),
-    (lambda s: True, ["BattlePosition"]),
+    (condition_needs_retreat, [("Retreat", None)]),
+    (lambda s: not s["unit"].state.get("picked_position", False), ["PickPosition"]),
+    (
+        lambda s: s["unit"].state.get("position") != s["unit"].state.get("defend_position", s["unit"].state.get("position")),
+        ["MoveToPosition"],
+    ),
+    (lambda s: not s["unit"].state.get("in_battle_position", False), ["BattlePosition"]),
+    (lambda s: bool(s.get("friendly_units")), face_and_attack),
+    (lambda s: True, ["Hold"]),
 ]
 
 # Enemy domain
