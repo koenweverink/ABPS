@@ -6,96 +6,76 @@ from state_templates import *
 from domains import enemy_domain, secure_outpost_domain
 from simulation import Simulation
 from unit_factory import make_enemy, make_friendly
-
-import itertools
 from log import logger
 
+# Import GA entry‐point and run helper
+from ga_optimizer import genetic_optimize, build_friendly_units, _build_enemy_units, COST_MAP
 
-def generate_attack_sequences(friendly_names, enemy_names, group_size=2):
-    """Yield all possible attack sequences.
-
-    Each sequence is a list of ``(enemy_name, [friendly_names])`` tuples. The
-    order of enemies in the list represents the order in which they will be
-    attacked.  For every enemy, a combination of ``group_size`` friendlies is
-    chosen.  Friendlies may be reused across different enemies.
-    """
-    pairs = list(itertools.combinations(friendly_names, group_size))
-    for enemy_order in itertools.permutations(enemy_names):
-        for combo in itertools.product(pairs, repeat=len(enemy_names)):
-            yield [
-                (enemy, list(pairs_assigned))
-                for enemy, pairs_assigned in zip(enemy_order, combo)
-            ]
-
-
-
-
-###############################
-# Main Simulation Setup
-###############################
-
-def _build_units():
-    """Create fresh friendly and enemy unit lists."""
-    enemy_units = [
-        make_enemy("EnemyTankGroup1", EnemyTank, enemy_tank_state_template, position=(63, 15), domain=enemy_domain),
-        make_enemy("EnemyTankGroup2", EnemyTank, enemy_tank_state_template, position=(17, 5), domain=enemy_domain),
-        make_enemy("EnemyInfantryGroup1", EnemyInfantry, enemy_infantry_state_template, domain=enemy_domain),
-        make_enemy("EnemyAntiTankGroup1", EnemyAntiTank, enemy_anti_tank_state_template, domain=enemy_domain),
-        make_enemy("EnemyArtilleryGroup1", EnemyArtillery, enemy_artillery_state_template, domain=enemy_domain),
-    ]
-
-    friendly_units = [
-        make_friendly("FriendlyTankGroup", FriendlyTank, tank_state_template, secure_outpost_domain, enemy_tank_state_template),
-        make_friendly("FriendlyInfantryGroup", FriendlyInfantry, infantry_state_template, secure_outpost_domain, enemy_tank_state_template),
-        make_friendly("FriendlyArtilleryGroup", FriendlyArtillery, artillery_state_template, secure_outpost_domain, enemy_tank_state_template),
-        make_friendly("FriendlyAntiTankGroup", FriendlyAntiTank, anti_tank_state_template, secure_outpost_domain, enemy_tank_state_template),
-    ]
-
+def _build_units(config):
+    enemy_units = _build_enemy_units()
+    friendly_units = build_friendly_units(config)
     return friendly_units, enemy_units
 
-
-def run_with_sequence(sequence, visualize=False):
-    """Run a single simulation using the provided attack sequence."""
-    friendly_units, enemy_units = _build_units()
+def run_with_sequence(config, sequence, visualize=False):
+    """Run a sim with a pre-built set of friendly & enemy units, according to sequence."""
+    friendly_units, enemy_units = _build_units(config)
     sim = Simulation(friendly_units, enemy_units, visualize=visualize, plan_name="HTN_V3_Sim")
     sim.attack_sequence = sequence
-
-    for unit in friendly_units:
-        unit.sim = sim
-
+    for u in friendly_units:
+        u.sim = sim
+    print(f"Running final simulation with attack sequence: {sequence}")
     return sim.run(max_steps=300)
 
-
 def main():
-    friendly_units, enemy_units = _build_units()
-
-    friendly_names = [u.name for u in friendly_units]
+    # 1) Define your enemy list
+    enemy_units = _build_enemy_units()
     enemy_names = [e.name for e in enemy_units]
 
-    best = None
-    best_seq = None
+    # 2) Define min/max counts for each friendly type
+    min_counts = {
+        "FriendlyTankGroup":      0,
+        "FriendlyInfantryGroup":  0,
+        "FriendlyArtilleryGroup": 0,
+        "FriendlyAntiTankGroup":  0,
+    }
+    max_counts = {
+        "FriendlyTankGroup":      3,
+        "FriendlyInfantryGroup":  3,
+        "FriendlyArtilleryGroup": 3,
+        "FriendlyAntiTankGroup":  3,
+    }
 
-    # Limit combinations to keep runtime manageable; adjust as needed
-    MAX_COMBOS = 10
-    for i, seq in enumerate(generate_attack_sequences(friendly_names, enemy_names)):
-        if i >= MAX_COMBOS:
-            break
-        result = run_with_sequence(seq, visualize=False)
-        score = result['score']
-        if best is None or score > best['score']:
-            best = result
-            best_seq = seq
+    # 3) Run the GA optimizer
+    best_score, (best_config, best_seq) = genetic_optimize(
+        enemy_names,
+        pop_size=10,
+        generations=2,
+        min_size=2,
+        min_counts=min_counts,
+        max_counts=max_counts,
+        cost_weight=1.0,
+        retain_frac=0.3,
+        random_frac=0.1,
+        mutate_p=0.2,
+        tournament_size=5
+    )
 
-    # Run the best sequence again with visualization so the user can observe it
-    final_result = run_with_sequence(best_seq, visualize=True)
-
-    logger.info("\n=== Best Sequence Evaluation ===")
+    # 4) Log out your optimal force mix & plan
+    total_cost = sum(best_config[n] * COST_MAP[n] for n in best_config)
+    logger.info("=== GA Optimization Results ===")
+    logger.info(f"Best (score - cost): {best_score:.1f}")
+    logger.info(f"Total deployment cost: {total_cost}")
+    logger.info(f"Friendly config: {best_config}")
     logger.info(f"Attack sequence: {best_seq}")
-    logger.info(f"Score: {final_result['score']:.1f}")
-    logger.info(f"Total Friendly Health Remaining: {final_result['health']}")
-    logger.info(f"Enemy Health Remaining: {final_result['enemy_health']}")
-    logger.info(f"Outpost Secured: {final_result['outpost_secured']}")
-    logger.info(f"Steps Taken: {final_result['steps_taken']}")
+
+    # 5) Visualize the best‐found sequence
+    final = run_with_sequence(best_config, best_seq, visualize=True)
+    logger.info("=== Final Simulation Metrics ===")
+    logger.info(f"Score: {final['score']:.1f}")
+    logger.info(f"Friendly health remaining: {final['health']}")
+    logger.info(f"Enemy health remaining: {final['enemy_health']}")
+    logger.info(f"Outpost secured: {final['outpost_secured']}")
+    logger.info(f"Steps taken: {final['steps_taken']}")
 
     plt.ioff()
     plt.show()

@@ -105,6 +105,7 @@ class Simulation:
         friendly_ratio = total_friendly / max_friendly if max_friendly > 0 else 0
         enemy_ratio = health / max_enemy if max_enemy > 0 else 0
         score = (friendly_ratio * 20) - (enemy_ratio * 20) + (10 if outpost_secured else -10) - 0.1 * steps
+        print(f"\n\n\nScore: {score:.1f} \n Health: {total_friendly} \n Enemy Health: {health} \n Outpost Secured: {outpost_secured} \n Steps Taken: {steps}")
         return {
             "score": score,
             "health": total_friendly,
