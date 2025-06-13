@@ -209,6 +209,98 @@ def compute_staging_position(sim, max_distance=500):
     return start
 
 
+def compute_retreat_point(sim, max_distance=500):
+    """Determine a fallback position away from friendly forces."""
+    from config import GRID_WIDTH, GRID_HEIGHT
+
+    enemies = [u for u in sim.enemy_units if u.state.get("enemy_alive", False)]
+    if not enemies:
+        return (0, 0)
+
+    avg_x = sum(u.state["position"][0] for u in enemies) // len(enemies)
+    avg_y = sum(u.state["position"][1] for u in enemies) // len(enemies)
+    start = (avg_x, avg_y)
+
+    friendlies = [u for u in sim.friendly_units if u.state.get("health", 0) > 0]
+    if not friendlies:
+        return start
+
+    fx = sum(u.state["position"][0] for u in friendlies) // len(friendlies)
+    fy = sum(u.state["position"][1] for u in friendlies) // len(friendlies)
+    friendly_centroid = (fx, fy)
+
+    corners = [
+        (0, 0),
+        (0, GRID_HEIGHT - 1),
+        (GRID_WIDTH - 1, 0),
+        (GRID_WIDTH - 1, GRID_HEIGHT - 1),
+    ]
+    goal = max(corners, key=lambda c: manhattan(c, friendly_centroid))
+
+    path = astar(start, goal, sim.enemy_units, unit=enemies[0].state.get("type", "unknown"))
+    if not path:
+        return goal
+
+    travelled = [0] * len(path)
+    for i in range(1, len(path)):
+        travelled[i] = travelled[i - 1] + manhattan(path[i - 1], path[i])
+
+    for i, pos in enumerate(path):
+        if travelled[i] > max_distance:
+            break
+        nearest = min(friendlies, key=lambda u: manhattan(pos, u.state["position"]))
+        dist = manhattan(pos, nearest.state["position"])
+        los = has_line_of_sight(pos, nearest.state["position"])
+        if dist > nearest.state.get("vision_range", 0) or not los:
+            return pos
+
+    return path[min(len(path) - 1, i)]
+
+
+def compute_defend_position(sim, max_distance=500):
+    """Choose a defensive position relative to last known friendly units."""
+    enemies = [u for u in sim.enemy_units if u.state.get("enemy_alive", False)]
+    if not enemies:
+        return (0, 0)
+
+    avg_x = sum(u.state["position"][0] for u in enemies) // len(enemies)
+    avg_y = sum(u.state["position"][1] for u in enemies) // len(enemies)
+    start = (avg_x, avg_y)
+
+    drone_mem = {
+        name: pos
+        for name, pos in sim.enemy_drone.last_known.items()
+        if name in sim.friendly_units_dict
+        and sim.friendly_units_dict[name].state.get("health", 0) > 0
+    }
+    if not drone_mem:
+        return start
+
+    closest = min(drone_mem, key=lambda n: manhattan(start, drone_mem[n]))
+    friendly_pos = drone_mem[closest]
+    friendly_unit = sim.friendly_units_dict[closest]
+    friendly_range = friendly_unit.state.get("vision_range", 0)
+
+    path = astar(start, friendly_pos, sim.enemy_units, unit=enemies[0].state.get("type", "unknown"))
+    if not path:
+        return friendly_pos
+
+    travelled = [0] * len(path)
+    for i in range(1, len(path)):
+        travelled[i] = travelled[i - 1] + manhattan(path[i - 1], path[i])
+
+    for i in range(len(path) - 1, -1, -1):
+        if travelled[i] > max_distance:
+            continue
+        pos = path[i]
+        dist = manhattan(pos, friendly_pos)
+        los = has_line_of_sight(pos, friendly_pos)
+        if dist > friendly_range or not los:
+            return pos
+
+    return start
+
+
 def perform_attack(attacker, target):
     """Resolve an attack from one unit to another, applying damage if successful."""
     import math

@@ -4,7 +4,7 @@ from htn_planner import HTNPlanner
 from log import logger
 from utils import (
     manhattan, has_line_of_sight, is_in_cover, get_effective_vision_range,
-    next_step, perform_attack
+    next_step, perform_attack, compute_retreat_point, compute_defend_position
 )
 from terrain_utils import sign
 
@@ -90,17 +90,25 @@ class EnemyUnit:
 
         task, arg = self.current_plan[0] if isinstance(self.current_plan[0], tuple) else (self.current_plan[0], None)
 
-        if task not in ("BattlePosition", "AttackEnemy") and self.state.get("in_battle_position", False):
-            self.state.update({"turns_in_battle_position": 0, "hasty_done": False, "entrenched_done": False, "in_battle_position": False})
+        old_pos = self.state["position"]
 
         if task == "Move":
             self._execute_move()
+        elif task == "MoveToPosition":
+            self._execute_move_to_position()
+        elif task == "PickPosition":
+            self._execute_pick_position()
+        elif task == "FaceEnemy":
+            self._execute_face_enemy(arg)
         elif task == "AttackEnemy":
             self._execute_attack()
         elif task == "Retreat":
             self._execute_retreat()
         elif task == "BattlePosition":
             self._execute_battle_position()
+
+        if self.state["position"] != old_pos and self.state.get("in_battle_position", False):
+            self.state.update({"turns_in_battle_position": 0, "hasty_done": False, "entrenched_done": False, "in_battle_position": False})
 
     def _execute_move(self):
         """Perform movement toward the nearest friendly unit."""
@@ -140,10 +148,37 @@ class EnemyUnit:
 
     def _execute_retreat(self):
         """Move toward a designated fallback point."""
-        retreat = self.state.get("retreat_point", (9, 9))
-        self.state["position"] = next_step(self.state["position"], retreat)
-        if self.state["position"] == retreat:
-            self.current_plan.pop(0)
+        if "retreat_point" not in self.state:
+            self.state["retreat_point"] = compute_retreat_point(self.sim)
+        target = self.state["retreat_point"]
+
+        self.state["move_credit"] += self.state["speed"]
+        steps = int(self.state["move_credit"])
+        self.state["move_credit"] -= steps
+        for _ in range(steps):
+            old_pos = self.state["position"]
+            if old_pos == target:
+                break
+            self.state["position"] = next_step(old_pos, target, self.sim.enemy_units, unit=self.state["type"])
+            dx = self.state["position"][0] - old_pos[0]
+            dy = self.state["position"][1] - old_pos[1]
+            if dx or dy:
+                self.state["facing"] = (sign(dx), sign(dy))
+        if self.state["position"] == target:
+            self.state["has_retreated"] = True
+            self.state["defend_position"] = target
+            self.state["picked_position"] = True
+            if self.current_plan:
+                self.current_plan.pop(0)
+            # Immediately adopt battle position and face nearest enemy
+            self._execute_battle_position()
+            visible = self._filter_visible_friendlies(self.sim.friendly_units)
+            if visible:
+                nearest = min(visible, key=lambda u: manhattan(self.state["position"], u.state["position"]))
+                dx = nearest.state["position"][0] - self.state["position"][0]
+                dy = nearest.state["position"][1] - self.state["position"][1]
+                if dx or dy:
+                    self.state["facing"] = (sign(dx), sign(dy))
 
     def _execute_battle_position(self):
         """Switch to a defensive posture and apply armor bonuses over time."""
@@ -167,6 +202,50 @@ class EnemyUnit:
         self.state["armor_front"] = self.state["base_armor_front"] + front
         self.state["armor_side"] = self.state["base_armor_side"] + flank
         self.state["armor_rear"] = self.state["base_armor_rear"] + flank
+
+    def _execute_pick_position(self):
+        """Select a defensive position if not already chosen."""
+        if "defend_position" not in self.state:
+            self.state["defend_position"] = compute_defend_position(self.sim)
+        self.state["picked_position"] = True
+        if self.current_plan:
+            self.current_plan.pop(0)
+
+    def _execute_move_to_position(self):
+        """Move toward the preset defend_position."""
+        target = self.state.get("defend_position", self.state["position"])
+        self.state["move_credit"] += self.state["speed"]
+        steps = int(self.state["move_credit"])
+        self.state["move_credit"] -= steps
+        for _ in range(steps):
+            old_pos = self.state["position"]
+            if old_pos == target:
+                if self.current_plan:
+                    self.current_plan.pop(0)
+                break
+            self.state["position"] = next_step(old_pos, target, self.sim.enemy_units, unit=self.state["type"])
+            dx = self.state["position"][0] - old_pos[0]
+            dy = self.state["position"][1] - old_pos[1]
+            if dx or dy:
+                self.state["facing"] = (sign(dx), sign(dy))
+        else:
+            if self.state["position"] == target and self.current_plan:
+                self.current_plan.pop(0)
+
+    def _execute_face_enemy(self, name):
+        """Orient the unit toward a specific enemy without moving."""
+        if name is None:
+            visible = self._filter_visible_friendlies(self.sim.friendly_units)
+            enemy = min(visible, key=lambda u: manhattan(self.state["position"], u.state["position"])) if visible else None
+        else:
+            enemy = next((u for u in self.sim.friendly_units if u.name == name), None)
+        if enemy:
+            dx = enemy.state["position"][0] - self.state["position"][0]
+            dy = enemy.state["position"][1] - self.state["position"][1]
+            if dx or dy:
+                self.state["facing"] = (sign(dx), sign(dy))
+        if self.current_plan:
+            self.current_plan.pop(0)
 
     def get_goal_position(self):
         """Determine current target location based on top-level plan."""
