@@ -1,0 +1,5 @@
+E1	EnemyAntiTankGroup1
+E12	EnemyArtilleryGroup1
+E13	EnemyInfantryGroup1
+E14	EnemyTankGroup1
+O	outpost

@@ -1,0 +1,4 @@
+1	EnemyInfantryGroup1
+2	EnemyInfantryGroup2
+3	EnemyInfantryGroup3
+4	outpost

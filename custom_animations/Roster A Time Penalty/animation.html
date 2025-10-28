@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation Animation - Roster A Time Penalty</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .controls {
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-bottom: 1px solid #bdc3c7;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .control-group label {
+            font-weight: bold;
+            min-width: 100px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .play-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+        .play-btn:hover {
+            background-color: #229954;
+        }
+        .play-btn.playing {
+            background-color: #e74c3c;
+        }
+        .play-btn.playing:hover {
+            background-color: #c0392b;
+        }
+        .step-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        .step-btn:hover {
+            background-color: #2980b9;
+        }
+        .step-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        input[type="range"] {
+            flex: 1;
+            min-width: 200px;
+        }
+        .info-panel {
+            display: flex;
+            gap: 20px;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .info-item {
+            flex: 1;
+        }
+        .info-item h4 {
+            margin: 0 0 5px 0;
+            color: #495057;
+            font-size: 14px;
+        }
+        .info-item .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .animation-container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+        }
+        .animation-image {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .step-info {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Simulation Animation</h1>
+            <p>Roster A Time Penalty - 279 steps</p>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Playback:</label>
+                <button id="playBtn" class="play-btn">Play</button>
+                <button id="prevBtn" class="step-btn">Previous</button>
+                <button id="nextBtn" class="step-btn">Next</button>
+                <button id="firstBtn" class="step-btn">First</button>
+                <button id="lastBtn" class="step-btn">Last</button>
+            </div>
+            
+            <div class="control-group">
+                <label>Step:</label>
+                <input type="range" id="stepSlider" min="0" max="447" value="0">
+                <span id="stepDisplay">0 / 447</span>
+            </div>
+            
+            <div class="control-group">
+                <label>Speed:</label>
+                <input type="range" id="speedSlider" min="1" max="10" value="2">
+                <span id="speedDisplay">2 fps</span>
+            </div>
+            
+            <div class="control-group">
+                <label>Loop:</label>
+                <input type="checkbox" id="loopCheckbox" checked>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <div class="info-item">
+                <h4>Friendly Health</h4>
+                <div class="value" id="friendlyHealth">-</div>
+            </div>
+            <div class="info-item">
+                <h4>Enemy Health</h4>
+                <div class="value" id="enemyHealth">-</div>
+            </div>
+            <div class="info-item">
+                <h4>Alive Friendlies</h4>
+                <div class="value" id="aliveFriendlies">-</div>
+            </div>
+            <div class="info-item">
+                <h4>Alive Enemies</h4>
+                <div class="value" id="aliveEnemies">-</div>
+            </div>
+            <div class="info-item">
+                <h4>Outpost Secured</h4>
+                <div class="value" id="outpostSecured">-</div>
+            </div>
+            <div class="info-item">
+                <h4>Gantt Chart</h4>
+                <div class="value"><a href="gantt_chart.png" target="_blank" style="color: #3498db; text-decoration: none;">View Chart</a></div>
+            </div>
+        </div>
+        
+        <div class="animation-container">
+            <div id="loading" class="loading">Loading animation...</div>
+            <img id="animationImage" class="animation-image" style="display: none;">
+            <div id="stepInfo" class="step-info" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Animation data
+        const totalSteps = 448;
+        const stepData = [{"step": 1, "filename": "step_0001.png", "timestamp": "2025-09-15T16:49:17.359856", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 2, "filename": "step_0002.png", "timestamp": "2025-09-15T16:49:21.868937", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 3, "filename": "step_0003.png", "timestamp": "2025-09-15T16:49:26.611190", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 4, "filename": "step_0004.png", "timestamp": "2025-09-15T16:49:32.028266", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 5, "filename": "step_0005.png", "timestamp": "2025-09-15T16:49:37.444092", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 6, "filename": "step_0006.png", "timestamp": "2025-09-15T16:49:42.470194", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 7, "filename": "step_0007.png", "timestamp": "2025-09-15T16:49:47.506210", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 8, "filename": "step_0008.png", "timestamp": "2025-09-15T16:49:52.525643", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 9, "filename": "step_0009.png", "timestamp": "2025-09-15T16:49:57.451711", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 10, "filename": "step_0010.png", "timestamp": "2025-09-15T16:50:02.648631", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 11, "filename": "step_0011.png", "timestamp": "2025-09-15T16:50:07.284619", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 12, "filename": "step_0012.png", "timestamp": "2025-09-15T16:50:12.032968", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 13, "filename": "step_0013.png", "timestamp": "2025-09-15T16:50:16.959328", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 14, "filename": "step_0014.png", "timestamp": "2025-09-15T16:50:22.150707", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 15, "filename": "step_0015.png", "timestamp": "2025-09-15T16:50:27.018026", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 16, "filename": "step_0016.png", "timestamp": "2025-09-15T16:50:32.054295", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 17, "filename": "step_0017.png", "timestamp": "2025-09-15T16:50:37.103596", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 18, "filename": "step_0018.png", "timestamp": "2025-09-15T16:50:42.026186", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 19, "filename": "step_0019.png", "timestamp": "2025-09-15T16:50:46.987992", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 20, "filename": "step_0020.png", "timestamp": "2025-09-15T16:51:20.163715", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 21, "filename": "step_0021.png", "timestamp": "2025-09-15T16:51:25.906302", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 22, "filename": "step_0022.png", "timestamp": "2025-09-15T16:51:31.034492", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 23, "filename": "step_0023.png", "timestamp": "2025-09-15T16:51:36.177567", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 24, "filename": "step_0024.png", "timestamp": "2025-09-15T16:51:41.102170", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 25, "filename": "step_0025.png", "timestamp": "2025-09-15T16:51:45.882015", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 26, "filename": "step_0026.png", "timestamp": "2025-09-15T16:51:50.802679", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 27, "filename": "step_0027.png", "timestamp": "2025-09-15T16:51:55.778903", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 28, "filename": "step_0028.png", "timestamp": "2025-09-15T16:52:00.811283", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 29, "filename": "step_0029.png", "timestamp": "2025-09-15T16:52:05.873550", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 30, "filename": "step_0030.png", "timestamp": "2025-09-15T16:52:10.964901", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 31, "filename": "step_0031.png", "timestamp": "2025-09-15T16:52:16.096782", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 32, "filename": "step_0032.png", "timestamp": "2025-09-15T16:52:21.776587", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 33, "filename": "step_0033.png", "timestamp": "2025-09-15T16:52:27.160867", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 34, "filename": "step_0034.png", "timestamp": "2025-09-15T16:52:50.414032", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 35, "filename": "step_0035.png", "timestamp": "2025-09-15T16:52:55.138878", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 36, "filename": "step_0036.png", "timestamp": "2025-09-15T16:53:00.024163", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 37, "filename": "step_0037.png", "timestamp": "2025-09-15T16:53:04.726243", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 38, "filename": "step_0038.png", "timestamp": "2025-09-15T16:53:09.476176", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 39, "filename": "step_0039.png", "timestamp": "2025-09-15T16:53:14.094065", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 40, "filename": "step_0040.png", "timestamp": "2025-09-15T16:53:18.855884", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 41, "filename": "step_0041.png", "timestamp": "2025-09-15T16:53:23.495275", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 42, "filename": "step_0042.png", "timestamp": "2025-09-15T16:53:28.256043", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 43, "filename": "step_0043.png", "timestamp": "2025-09-15T16:53:32.914294", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 44, "filename": "step_0044.png", "timestamp": "2025-09-15T16:53:37.604831", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 45, "filename": "step_0045.png", "timestamp": "2025-09-15T16:53:42.268538", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 46, "filename": "step_0046.png", "timestamp": "2025-09-15T16:53:46.925613", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 47, "filename": "step_0047.png", "timestamp": "2025-09-15T16:54:02.423945", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 48, "filename": "step_0048.png", "timestamp": "2025-09-15T16:54:26.672207", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 49, "filename": "step_0049.png", "timestamp": "2025-09-15T16:54:31.429759", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 50, "filename": "step_0050.png", "timestamp": "2025-09-15T16:54:36.187896", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 51, "filename": "step_0051.png", "timestamp": "2025-09-15T16:54:40.934249", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 52, "filename": "step_0052.png", "timestamp": "2025-09-15T16:54:45.694544", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 53, "filename": "step_0053.png", "timestamp": "2025-09-15T16:54:56.397289", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 54, "filename": "step_0054.png", "timestamp": "2025-09-15T16:55:01.303765", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 55, "filename": "step_0055.png", "timestamp": "2025-09-15T16:55:06.064162", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 56, "filename": "step_0056.png", "timestamp": "2025-09-15T16:55:27.938141", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 57, "filename": "step_0057.png", "timestamp": "2025-09-15T16:55:32.661611", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 58, "filename": "step_0058.png", "timestamp": "2025-09-15T16:55:37.695813", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 59, "filename": "step_0059.png", "timestamp": "2025-09-15T16:55:42.597979", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 60, "filename": "step_0060.png", "timestamp": "2025-09-15T16:55:47.854129", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 61, "filename": "step_0061.png", "timestamp": "2025-09-15T16:55:52.855469", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 62, "filename": "step_0062.png", "timestamp": "2025-09-15T16:56:09.758510", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 63, "filename": "step_0063.png", "timestamp": "2025-09-15T16:56:15.706125", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 64, "filename": "step_0064.png", "timestamp": "2025-09-15T16:56:20.786724", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 65, "filename": "step_0065.png", "timestamp": "2025-09-15T16:56:26.364070", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 66, "filename": "step_0066.png", "timestamp": "2025-09-15T16:56:31.528334", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 67, "filename": "step_0067.png", "timestamp": "2025-09-15T16:56:37.071618", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 68, "filename": "step_0068.png", "timestamp": "2025-09-15T16:56:42.214646", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 69, "filename": "step_0069.png", "timestamp": "2025-09-15T16:56:52.007949", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 70, "filename": "step_0070.png", "timestamp": "2025-09-15T16:57:00.346198", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 71, "filename": "step_0071.png", "timestamp": "2025-09-15T16:57:05.509265", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 72, "filename": "step_0072.png", "timestamp": "2025-09-15T16:57:10.391592", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 73, "filename": "step_0073.png", "timestamp": "2025-09-15T16:57:15.188597", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 74, "filename": "step_0074.png", "timestamp": "2025-09-15T16:57:20.003277", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 75, "filename": "step_0075.png", "timestamp": "2025-09-15T16:57:24.800479", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 76, "filename": "step_0076.png", "timestamp": "2025-09-15T16:57:29.606144", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 77, "filename": "step_0077.png", "timestamp": "2025-09-15T16:57:34.291272", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 78, "filename": "step_0078.png", "timestamp": "2025-09-15T16:57:39.467313", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 79, "filename": "step_0079.png", "timestamp": "2025-09-15T16:57:44.602217", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 80, "filename": "step_0080.png", "timestamp": "2025-09-15T16:57:49.398568", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 81, "filename": "step_0081.png", "timestamp": "2025-09-15T16:57:54.256384", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 82, "filename": "step_0082.png", "timestamp": "2025-09-15T16:57:59.536626", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 83, "filename": "step_0083.png", "timestamp": "2025-09-15T16:58:04.422805", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 84, "filename": "step_0084.png", "timestamp": "2025-09-15T16:58:09.779581", "simulation_data": {"friendly_health": 114, "enemy_health": 240, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 85, "filename": "step_0085.png", "timestamp": "2025-09-15T16:58:15.073974", "simulation_data": {"friendly_health": 114, "enemy_health": 210, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 86, "filename": "step_0086.png", "timestamp": "2025-09-15T16:58:24.488144", "simulation_data": {"friendly_health": 114, "enemy_health": 210, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 87, "filename": "step_0087.png", "timestamp": "2025-09-15T16:58:29.633054", "simulation_data": {"friendly_health": 114, "enemy_health": 210, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 88, "filename": "step_0088.png", "timestamp": "2025-09-15T16:58:34.743177", "simulation_data": {"friendly_health": 114, "enemy_health": 150, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 89, "filename": "step_0089.png", "timestamp": "2025-09-15T16:58:40.126110", "simulation_data": {"friendly_health": 114, "enemy_health": 150, "alive_friendlies": 4, "alive_enemies": 4, "outpost_secured": false}}, {"step": 90, "filename": "step_0090.png", "timestamp": "2025-09-15T16:59:07.585178", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 91, "filename": "step_0091.png", "timestamp": "2025-09-15T16:59:25.574583", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 92, "filename": "step_0092.png", "timestamp": "2025-09-15T16:59:31.182854", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 93, "filename": "step_0093.png", "timestamp": "2025-09-15T16:59:35.722395", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 94, "filename": "step_0094.png", "timestamp": "2025-09-15T16:59:40.338706", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 95, "filename": "step_0095.png", "timestamp": "2025-09-15T16:59:44.859912", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 96, "filename": "step_0096.png", "timestamp": "2025-09-15T16:59:49.300002", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 97, "filename": "step_0097.png", "timestamp": "2025-09-15T17:00:05.081897", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 98, "filename": "step_0098.png", "timestamp": "2025-09-15T17:00:09.709512", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 99, "filename": "step_0099.png", "timestamp": "2025-09-15T17:00:14.244348", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 100, "filename": "step_0100.png", "timestamp": "2025-09-15T17:00:18.486082", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 101, "filename": "step_0101.png", "timestamp": "2025-09-15T17:00:22.869622", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 102, "filename": "step_0102.png", "timestamp": "2025-09-15T17:00:27.364592", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 103, "filename": "step_0103.png", "timestamp": "2025-09-15T17:00:31.594869", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 104, "filename": "step_0104.png", "timestamp": "2025-09-15T17:00:35.780869", "simulation_data": {"friendly_health": 114, "enemy_health": 140, "alive_friendlies": 4, "alive_enemies": 3, "outpost_secured": false}}, {"step": 105, "filename": "step_0105.png", "timestamp": "2025-09-15T17:00:55.883824", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 106, "filename": "step_0106.png", "timestamp": "2025-09-15T17:01:09.960770", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 107, "filename": "step_0107.png", "timestamp": "2025-09-15T17:01:23.491995", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 108, "filename": "step_0108.png", "timestamp": "2025-09-15T17:01:27.442519", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 109, "filename": "step_0109.png", "timestamp": "2025-09-15T17:01:31.280519", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 110, "filename": "step_0110.png", "timestamp": "2025-09-15T17:01:35.321256", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 111, "filename": "step_0111.png", "timestamp": "2025-09-15T17:01:39.179529", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 112, "filename": "step_0112.png", "timestamp": "2025-09-15T17:01:43.055389", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 113, "filename": "step_0113.png", "timestamp": "2025-09-15T17:01:46.881569", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 114, "filename": "step_0114.png", "timestamp": "2025-09-15T17:01:50.773852", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 115, "filename": "step_0115.png", "timestamp": "2025-09-15T17:02:01.745481", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 116, "filename": "step_0116.png", "timestamp": "2025-09-15T17:02:05.628785", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 117, "filename": "step_0117.png", "timestamp": "2025-09-15T17:02:09.491383", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 118, "filename": "step_0118.png", "timestamp": "2025-09-15T17:02:13.323144", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 119, "filename": "step_0119.png", "timestamp": "2025-09-15T17:02:34.351437", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 120, "filename": "step_0120.png", "timestamp": "2025-09-15T17:02:47.624331", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 121, "filename": "step_0121.png", "timestamp": "2025-09-15T17:02:51.500833", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 122, "filename": "step_0122.png", "timestamp": "2025-09-15T17:02:55.346162", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 123, "filename": "step_0123.png", "timestamp": "2025-09-15T17:02:59.364497", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 124, "filename": "step_0124.png", "timestamp": "2025-09-15T17:03:03.357854", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 125, "filename": "step_0125.png", "timestamp": "2025-09-15T17:03:07.261071", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 126, "filename": "step_0126.png", "timestamp": "2025-09-15T17:03:11.106636", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 127, "filename": "step_0127.png", "timestamp": "2025-09-15T17:03:14.965162", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 128, "filename": "step_0128.png", "timestamp": "2025-09-15T17:03:18.830055", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 129, "filename": "step_0129.png", "timestamp": "2025-09-15T17:03:29.856996", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 130, "filename": "step_0130.png", "timestamp": "2025-09-15T17:03:33.729550", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 131, "filename": "step_0131.png", "timestamp": "2025-09-15T17:03:37.607602", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 132, "filename": "step_0132.png", "timestamp": "2025-09-15T17:03:41.470669", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 133, "filename": "step_0133.png", "timestamp": "2025-09-15T17:04:02.824351", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 134, "filename": "step_0134.png", "timestamp": "2025-09-15T17:04:15.968494", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 135, "filename": "step_0135.png", "timestamp": "2025-09-15T17:04:19.872437", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 136, "filename": "step_0136.png", "timestamp": "2025-09-15T17:04:23.637870", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 137, "filename": "step_0137.png", "timestamp": "2025-09-15T17:04:27.399041", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 138, "filename": "step_0138.png", "timestamp": "2025-09-15T17:04:31.361061", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 139, "filename": "step_0139.png", "timestamp": "2025-09-15T17:04:35.435004", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 140, "filename": "step_0140.png", "timestamp": "2025-09-15T17:04:39.747337", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 141, "filename": "step_0141.png", "timestamp": "2025-09-15T17:04:45.358194", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 142, "filename": "step_0142.png", "timestamp": "2025-09-15T17:04:56.349863", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 143, "filename": "step_0143.png", "timestamp": "2025-09-15T17:05:00.321050", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 144, "filename": "step_0144.png", "timestamp": "2025-09-15T17:05:04.116340", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 145, "filename": "step_0145.png", "timestamp": "2025-09-15T17:05:07.867224", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 146, "filename": "step_0146.png", "timestamp": "2025-09-15T17:05:11.626769", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 147, "filename": "step_0147.png", "timestamp": "2025-09-15T17:05:24.001064", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 148, "filename": "step_0148.png", "timestamp": "2025-09-15T17:05:36.954603", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 149, "filename": "step_0149.png", "timestamp": "2025-09-15T17:05:40.716637", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 150, "filename": "step_0150.png", "timestamp": "2025-09-15T17:05:44.426420", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 151, "filename": "step_0151.png", "timestamp": "2025-09-15T17:05:48.148502", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 152, "filename": "step_0152.png", "timestamp": "2025-09-15T17:05:51.860573", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 153, "filename": "step_0153.png", "timestamp": "2025-09-15T17:05:55.577274", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 154, "filename": "step_0154.png", "timestamp": "2025-09-15T17:05:59.374622", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 155, "filename": "step_0155.png", "timestamp": "2025-09-15T17:06:03.086345", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 156, "filename": "step_0156.png", "timestamp": "2025-09-15T17:06:06.730219", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 157, "filename": "step_0157.png", "timestamp": "2025-09-15T17:06:10.407468", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 158, "filename": "step_0158.png", "timestamp": "2025-09-15T17:06:14.084290", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 159, "filename": "step_0159.png", "timestamp": "2025-09-15T17:06:17.756442", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 160, "filename": "step_0160.png", "timestamp": "2025-09-15T17:06:21.469981", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 161, "filename": "step_0161.png", "timestamp": "2025-09-15T17:06:25.186898", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 162, "filename": "step_0162.png", "timestamp": "2025-09-15T17:06:29.012767", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 163, "filename": "step_0163.png", "timestamp": "2025-09-15T17:06:32.680861", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 164, "filename": "step_0164.png", "timestamp": "2025-09-15T17:06:36.354635", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 165, "filename": "step_0165.png", "timestamp": "2025-09-15T17:06:40.074332", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 166, "filename": "step_0166.png", "timestamp": "2025-09-15T17:06:43.755077", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 167, "filename": "step_0167.png", "timestamp": "2025-09-15T17:06:47.441372", "simulation_data": {"friendly_health": 114, "enemy_health": 136, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 168, "filename": "step_0168.png", "timestamp": "2025-09-15T17:06:51.072475", "simulation_data": {"friendly_health": 114, "enemy_health": 106, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 169, "filename": "step_0169.png", "timestamp": "2025-09-15T17:06:54.716889", "simulation_data": {"friendly_health": 114, "enemy_health": 106, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 170, "filename": "step_0170.png", "timestamp": "2025-09-15T17:06:58.369236", "simulation_data": {"friendly_health": 114, "enemy_health": 106, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 171, "filename": "step_0171.png", "timestamp": "2025-09-15T17:07:02.235012", "simulation_data": {"friendly_health": 114, "enemy_health": 106, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 172, "filename": "step_0172.png", "timestamp": "2025-09-15T17:07:05.930165", "simulation_data": {"friendly_health": 114, "enemy_health": 106, "alive_friendlies": 4, "alive_enemies": 2, "outpost_secured": false}}, {"step": 173, "filename": "step_0173.png", "timestamp": "2025-09-15T17:07:16.586631", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 174, "filename": "step_0174.png", "timestamp": "2025-09-15T17:07:19.144488", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 175, "filename": "step_0175.png", "timestamp": "2025-09-15T17:07:21.721343", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 176, "filename": "step_0176.png", "timestamp": "2025-09-15T17:07:24.250723", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 177, "filename": "step_0177.png", "timestamp": "2025-09-15T17:07:26.769456", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 178, "filename": "step_0178.png", "timestamp": "2025-09-15T17:07:29.376724", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 179, "filename": "step_0179.png", "timestamp": "2025-09-15T17:07:31.924881", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 180, "filename": "step_0180.png", "timestamp": "2025-09-15T17:07:34.477033", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 181, "filename": "step_0181.png", "timestamp": "2025-09-15T17:07:37.003966", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 182, "filename": "step_0182.png", "timestamp": "2025-09-15T17:07:39.570673", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 183, "filename": "step_0183.png", "timestamp": "2025-09-15T17:07:42.071543", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 184, "filename": "step_0184.png", "timestamp": "2025-09-15T17:07:44.584014", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 185, "filename": "step_0185.png", "timestamp": "2025-09-15T17:07:47.122642", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 186, "filename": "step_0186.png", "timestamp": "2025-09-15T17:07:57.768463", "simulation_data": {"friendly_health": 114, "enemy_health": 100, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 187, "filename": "step_0187.png", "timestamp": "2025-09-15T17:08:00.336686", "simulation_data": {"friendly_health": 114, "enemy_health": 70, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 188, "filename": "step_0188.png", "timestamp": "2025-09-15T17:08:02.896901", "simulation_data": {"friendly_health": 114, "enemy_health": 70, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 189, "filename": "step_0189.png", "timestamp": "2025-09-15T17:08:05.433116", "simulation_data": {"friendly_health": 114, "enemy_health": 70, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 190, "filename": "step_0190.png", "timestamp": "2025-09-15T17:08:07.930300", "simulation_data": {"friendly_health": 114, "enemy_health": 70, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 191, "filename": "step_0191.png", "timestamp": "2025-09-15T17:08:10.469878", "simulation_data": {"friendly_health": 114, "enemy_health": 70, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 192, "filename": "step_0192.png", "timestamp": "2025-09-15T17:08:12.989371", "simulation_data": {"friendly_health": 114, "enemy_health": 70, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 193, "filename": "step_0193.png", "timestamp": "2025-09-15T17:08:15.438890", "simulation_data": {"friendly_health": 114, "enemy_health": 40, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 194, "filename": "step_0194.png", "timestamp": "2025-09-15T17:08:17.953874", "simulation_data": {"friendly_health": 114, "enemy_health": 40, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 195, "filename": "step_0195.png", "timestamp": "2025-09-15T17:08:20.503994", "simulation_data": {"friendly_health": 114, "enemy_health": 10, "alive_friendlies": 4, "alive_enemies": 1, "outpost_secured": false}}, {"step": 196, "filename": "step_0196.png", "timestamp": "2025-09-15T17:08:22.393407", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 197, "filename": "step_0197.png", "timestamp": "2025-09-15T17:08:24.043864", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 198, "filename": "step_0198.png", "timestamp": "2025-09-15T17:08:25.747772", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 199, "filename": "step_0199.png", "timestamp": "2025-09-15T17:08:27.388945", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 200, "filename": "step_0200.png", "timestamp": "2025-09-15T17:08:29.078103", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 201, "filename": "step_0201.png", "timestamp": "2025-09-15T17:08:30.721541", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 202, "filename": "step_0202.png", "timestamp": "2025-09-15T17:08:32.371812", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 203, "filename": "step_0203.png", "timestamp": "2025-09-15T17:08:34.043995", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 204, "filename": "step_0204.png", "timestamp": "2025-09-15T17:08:35.703309", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 205, "filename": "step_0205.png", "timestamp": "2025-09-15T17:08:37.338829", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 206, "filename": "step_0206.png", "timestamp": "2025-09-15T17:08:38.982272", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 207, "filename": "step_0207.png", "timestamp": "2025-09-15T17:08:40.664748", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 208, "filename": "step_0208.png", "timestamp": "2025-09-15T17:08:42.370729", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 209, "filename": "step_0209.png", "timestamp": "2025-09-15T17:08:44.030146", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 210, "filename": "step_0210.png", "timestamp": "2025-09-15T17:08:45.821977", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 211, "filename": "step_0211.png", "timestamp": "2025-09-15T17:08:47.465069", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 212, "filename": "step_0212.png", "timestamp": "2025-09-15T17:08:49.107735", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 213, "filename": "step_0213.png", "timestamp": "2025-09-15T17:08:50.780600", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 214, "filename": "step_0214.png", "timestamp": "2025-09-15T17:08:52.410789", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 215, "filename": "step_0215.png", "timestamp": "2025-09-15T17:08:54.032460", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 216, "filename": "step_0216.png", "timestamp": "2025-09-15T17:08:55.691360", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 217, "filename": "step_0217.png", "timestamp": "2025-09-15T17:08:57.561113", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 218, "filename": "step_0218.png", "timestamp": "2025-09-15T17:08:59.416671", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 219, "filename": "step_0219.png", "timestamp": "2025-09-15T17:09:01.056121", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 220, "filename": "step_0220.png", "timestamp": "2025-09-15T17:09:02.743656", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 221, "filename": "step_0221.png", "timestamp": "2025-09-15T17:09:04.393916", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 222, "filename": "step_0222.png", "timestamp": "2025-09-15T17:09:06.054795", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 223, "filename": "step_0223.png", "timestamp": "2025-09-15T17:09:07.674793", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 224, "filename": "step_0224.png", "timestamp": "2025-09-15T17:09:09.308630", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 225, "filename": "step_0225.png", "timestamp": "2025-09-15T17:09:10.941237", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 226, "filename": "step_0226.png", "timestamp": "2025-09-15T17:09:12.632879", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 227, "filename": "step_0227.png", "timestamp": "2025-09-15T17:09:14.252946", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 228, "filename": "step_0228.png", "timestamp": "2025-09-15T17:09:15.888562", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 229, "filename": "step_0229.png", "timestamp": "2025-09-15T17:09:17.532455", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 230, "filename": "step_0230.png", "timestamp": "2025-09-15T17:09:19.176286", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 231, "filename": "step_0231.png", "timestamp": "2025-09-15T17:09:20.833461", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 232, "filename": "step_0232.png", "timestamp": "2025-09-15T17:09:22.454957", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 233, "filename": "step_0233.png", "timestamp": "2025-09-15T17:09:24.083403", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 234, "filename": "step_0234.png", "timestamp": "2025-09-15T17:09:25.728220", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 235, "filename": "step_0235.png", "timestamp": "2025-09-15T17:09:27.349372", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 236, "filename": "step_0236.png", "timestamp": "2025-09-15T17:09:29.267644", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 237, "filename": "step_0237.png", "timestamp": "2025-09-15T17:09:31.051500", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 238, "filename": "step_0238.png", "timestamp": "2025-09-15T17:09:32.800528", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 239, "filename": "step_0239.png", "timestamp": "2025-09-15T17:09:34.572452", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 240, "filename": "step_0240.png", "timestamp": "2025-09-15T17:09:36.325071", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 241, "filename": "step_0241.png", "timestamp": "2025-09-15T17:09:37.978825", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 242, "filename": "step_0242.png", "timestamp": "2025-09-15T17:09:39.626079", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 243, "filename": "step_0243.png", "timestamp": "2025-09-15T17:09:41.254614", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 244, "filename": "step_0244.png", "timestamp": "2025-09-15T17:09:42.906579", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 245, "filename": "step_0245.png", "timestamp": "2025-09-15T17:09:44.654704", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 246, "filename": "step_0246.png", "timestamp": "2025-09-15T17:09:46.294213", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 247, "filename": "step_0247.png", "timestamp": "2025-09-15T17:09:47.954952", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 248, "filename": "step_0248.png", "timestamp": "2025-09-15T17:09:49.635143", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 249, "filename": "step_0249.png", "timestamp": "2025-09-15T17:09:51.261697", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 250, "filename": "step_0250.png", "timestamp": "2025-09-15T17:09:52.887858", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 251, "filename": "step_0251.png", "timestamp": "2025-09-15T17:09:54.523181", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 252, "filename": "step_0252.png", "timestamp": "2025-09-15T17:09:56.174729", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 253, "filename": "step_0253.png", "timestamp": "2025-09-15T17:09:57.802429", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 254, "filename": "step_0254.png", "timestamp": "2025-09-15T17:09:59.603627", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 255, "filename": "step_0255.png", "timestamp": "2025-09-15T17:10:01.342294", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 256, "filename": "step_0256.png", "timestamp": "2025-09-15T17:10:03.016605", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 257, "filename": "step_0257.png", "timestamp": "2025-09-15T17:10:04.734951", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 258, "filename": "step_0258.png", "timestamp": "2025-09-15T17:10:06.498719", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 259, "filename": "step_0259.png", "timestamp": "2025-09-15T17:10:08.132412", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 260, "filename": "step_0260.png", "timestamp": "2025-09-15T17:10:09.785571", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 261, "filename": "step_0261.png", "timestamp": "2025-09-15T17:10:11.418853", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 262, "filename": "step_0262.png", "timestamp": "2025-09-15T17:10:13.029943", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 263, "filename": "step_0263.png", "timestamp": "2025-09-15T17:10:14.667738", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 264, "filename": "step_0264.png", "timestamp": "2025-09-15T17:10:16.318270", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 265, "filename": "step_0265.png", "timestamp": "2025-09-15T17:10:17.946594", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 266, "filename": "step_0266.png", "timestamp": "2025-09-15T17:10:19.621939", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 267, "filename": "step_0267.png", "timestamp": "2025-09-15T17:10:21.248950", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 268, "filename": "step_0268.png", "timestamp": "2025-09-15T17:10:22.889103", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 269, "filename": "step_0269.png", "timestamp": "2025-09-15T17:10:24.594136", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 270, "filename": "step_0270.png", "timestamp": "2025-09-15T17:10:26.329111", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 271, "filename": "step_0271.png", "timestamp": "2025-09-15T17:10:27.966743", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 272, "filename": "step_0272.png", "timestamp": "2025-09-15T17:10:29.698381", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 273, "filename": "step_0273.png", "timestamp": "2025-09-15T17:10:31.293637", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 274, "filename": "step_0274.png", "timestamp": "2025-09-15T17:10:32.886769", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 275, "filename": "step_0275.png", "timestamp": "2025-09-15T17:10:34.472996", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 276, "filename": "step_0276.png", "timestamp": "2025-09-15T17:10:36.067261", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 277, "filename": "step_0277.png", "timestamp": "2025-09-15T17:10:37.674621", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": false}}, {"step": 278, "filename": "step_0278.png", "timestamp": "2025-09-15T17:10:39.299786", "simulation_data": {"friendly_health": 114, "enemy_health": 0, "alive_friendlies": 4, "alive_enemies": 0, "outpost_secured": true}}];
+        let currentStep = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        let currentSpeed = 2;
+        
+        // DOM elements
+        const playBtn = document.getElementById('playBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const firstBtn = document.getElementById('firstBtn');
+        const lastBtn = document.getElementById('lastBtn');
+        const stepSlider = document.getElementById('stepSlider');
+        const stepDisplay = document.getElementById('stepDisplay');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedDisplay = document.getElementById('speedDisplay');
+        const loopCheckbox = document.getElementById('loopCheckbox');
+        const animationImage = document.getElementById('animationImage');
+        const loading = document.getElementById('loading');
+        const stepInfo = document.getElementById('stepInfo');
+        
+        // Info display elements
+        const friendlyHealth = document.getElementById('friendlyHealth');
+        const enemyHealth = document.getElementById('enemyHealth');
+        const aliveFriendlies = document.getElementById('aliveFriendlies');
+        const aliveEnemies = document.getElementById('aliveEnemies');
+        const outpostSecured = document.getElementById('outpostSecured');
+        
+        // Initialize
+        function init() {
+            loading.style.display = 'none';
+            animationImage.style.display = 'block';
+            stepInfo.style.display = 'block';
+            updateDisplay();
+            updateButtons();
+        }
+        
+        // Update display
+        function updateDisplay() {
+            if (currentStep >= 0 && currentStep < totalSteps) {
+                const filename = `step_${String(currentStep).padStart(4, '0')}.png`;
+                animationImage.src = `images/${filename}`;
+                
+                stepDisplay.textContent = `${currentStep} / ${totalSteps - 1}`;
+                stepSlider.value = currentStep;
+                
+                // Update step info
+                if (stepData[currentStep]) {
+                    const data = stepData[currentStep].simulation_data;
+                    friendlyHealth.textContent = Math.round(data.friendly_health);
+                    enemyHealth.textContent = Math.round(data.enemy_health);
+                    aliveFriendlies.textContent = data.alive_friendlies;
+                    aliveEnemies.textContent = data.alive_enemies;
+                    outpostSecured.textContent = data.outpost_secured ? 'Yes' : 'No';
+                    
+                    stepInfo.innerHTML = `
+                        <strong>Step ${currentStep}</strong><br>
+                        Friendly Health: ${Math.round(data.friendly_health)}<br>
+                        Enemy Health: ${Math.round(data.enemy_health)}<br>
+                        Alive Friendlies: ${data.alive_friendlies}<br>
+                        Alive Enemies: ${data.alive_enemies}<br>
+                        Outpost Secured: ${data.outpost_secured ? 'Yes' : 'No'}
+                    `;
+                }
+            }
+        }
+        
+        // Update button states
+        function updateButtons() {
+            prevBtn.disabled = currentStep <= 0;
+            nextBtn.disabled = currentStep >= totalSteps - 1;
+            firstBtn.disabled = currentStep <= 0;
+            lastBtn.disabled = currentStep >= totalSteps - 1;
+        }
+        
+        // Play/pause animation
+        function togglePlay() {
+            if (isPlaying) {
+                pause();
+            } else {
+                play();
+            }
+        }
+        
+        function play() {
+            isPlaying = true;
+            playBtn.textContent = 'Pause';
+            playBtn.classList.add('playing');
+            
+            playInterval = setInterval(() => {
+                if (currentStep < totalSteps - 1) {
+                    currentStep++;
+                    updateDisplay();
+                    updateButtons();
+                } else if (loopCheckbox.checked) {
+                    currentStep = 0;
+                    updateDisplay();
+                    updateButtons();
+                } else {
+                    pause();
+                }
+            }, 1000 / currentSpeed);
+        }
+        
+        function pause() {
+            isPlaying = false;
+            playBtn.textContent = 'Play';
+            playBtn.classList.remove('playing');
+            
+            if (playInterval) {
+                clearInterval(playInterval);
+                playInterval = null;
+            }
+        }
+        
+        // Navigation functions
+        function goToStep(step) {
+            if (step >= 0 && step < totalSteps) {
+                currentStep = step;
+                updateDisplay();
+                updateButtons();
+            }
+        }
+        
+        function previousStep() {
+            if (currentStep > 0) {
+                goToStep(currentStep - 1);
+            }
+        }
+        
+        function nextStep() {
+            if (currentStep < totalSteps - 1) {
+                goToStep(currentStep + 1);
+            }
+        }
+        
+        function firstStep() {
+            goToStep(0);
+        }
+        
+        function lastStep() {
+            goToStep(totalSteps - 1);
+        }
+        
+        // Event listeners
+        playBtn.addEventListener('click', togglePlay);
+        prevBtn.addEventListener('click', previousStep);
+        nextBtn.addEventListener('click', nextStep);
+        firstBtn.addEventListener('click', firstStep);
+        lastBtn.addEventListener('click', lastStep);
+        
+        stepSlider.addEventListener('input', (e) => {
+            goToStep(parseInt(e.target.value));
+        });
+        
+        speedSlider.addEventListener('input', (e) => {
+            currentSpeed = parseInt(e.target.value);
+            speedDisplay.textContent = `${currentSpeed} fps`;
+            
+            if (isPlaying) {
+                pause();
+                play();
+            }
+        });
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case ' ':
+                    e.preventDefault();
+                    togglePlay();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    previousStep();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    nextStep();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    firstStep();
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    lastStep();
+                    break;
+            }
+        });
+        
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
+        

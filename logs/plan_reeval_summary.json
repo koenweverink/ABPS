@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-09-12T01:34:37",
+  "n_evals": 30,
+  "mean_score": 1.3576296296296297,
+  "std_score": 26.02257549489075,
+  "success_rate": 0.6,
+  "mean_steps": 322.76666666666665,
+  "friendly_health_mean": 60.166666666666664,
+  "enemy_health_mean": 12.133333333333333,
+  "plan_source": "C:\\Users\\koenw\\Desktop\\Master - Computational Science\\Year 2\\Thesis\\ABPS\\best_artifact_extracted_2.json"
+}

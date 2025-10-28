@@ -1,0 +1,289 @@
+{
+  "args": {
+    "mode": "nsga2",
+    "low_trials": 2,
+    "confirm": 1,
+    "low_generations": 5,
+    "low_pop": 10,
+    "high_generations": 10,
+    "high_pop": 20,
+    "high_seeds": 3,
+    "workers": 4,
+    "max_steps": 300,
+    "min_team_size": 2,
+    "max_count": 2,
+    "worker_log": "eval_runs.log",
+    "mutate_p_start_min": 0.3,
+    "mutate_p_start_max": 0.7,
+    "mutate_p_end_min": 0.02,
+    "mutate_p_end_max": 0.25,
+    "block_shift_min": 0.2,
+    "block_shift_max": 0.8,
+    "elites_min": 2,
+    "elites_max": 2,
+    "random_frac_min": 0.0,
+    "random_frac_max": 0.3,
+    "robust_lambda_min": 0.0,
+    "robust_lambda_max": 2.0,
+    "cost_weight_min": 0.0,
+    "cost_weight_max": 3.0,
+    "seed": 123,
+    "ckpt_every": 2,
+    "ckpt_dir": "hpo_ckpts",
+    "save_best": true,
+    "resume_trials": true
+  },
+  "low_trials": [
+    {
+      "stage": "low",
+      "trial": 0,
+      "metric": 7.0,
+      "duration_sec": 0.03852343559265137,
+      "params": {
+        "mutate_p_start": 0.32094543954037774,
+        "mutate_p_end": 0.04005293583020543,
+        "block_shift_mut_prob": 0.444345058202239,
+        "elites_per_gen": 2,
+        "random_frac": 0.2515510549423073,
+        "robust_lambda": 1.7496514922105322,
+        "cost_weight": 1.1373729974672653
+      },
+      "cfg_used": {
+        "enemy_names": [
+          "EnemyInfantryGroup1",
+          "EnemyTankGroup1",
+          "EnemyAntiTankGroup1",
+          "EnemyArtilleryGroup1"
+        ],
+        "pop_size": 10,
+        "generations": 5,
+        "min_size": 2,
+        "min_counts": {
+          "FriendlyTankGroup": 0,
+          "FriendlyInfantryGroup": 0,
+          "FriendlyArtilleryGroup": 0,
+          "FriendlyAntiTankGroup": 0
+        },
+        "max_counts": {
+          "FriendlyTankGroup": 2,
+          "FriendlyInfantryGroup": 2,
+          "FriendlyArtilleryGroup": 2,
+          "FriendlyAntiTankGroup": 2
+        },
+        "mode": "nsga2",
+        "cost_weight": 1.1373729974672653,
+        "elites_per_gen": 2,
+        "random_frac": 0.2515510549423073,
+        "block_shift_mut_prob": 0.444345058202239,
+        "mutate_p_start": 0.32094543954037774,
+        "mutate_p_end": 0.04005293583020543,
+        "num_eval_seeds": 1,
+        "robust_lambda": 1.7496514922105322,
+        "workers": 4,
+        "max_steps": 300,
+        "bias_team": true,
+        "quiet_workers": true,
+        "worker_log_file": "eval_runs.log",
+        "op_log_sample_rate": 50,
+        "cache_capacity": 2000,
+        "checkpoint_every": 2,
+        "resume_from": "hpo_ckpts\\ckpt_low_t0_seed10123.pkl",
+        "best_path": "hpo_ckpts\\best_low_t0_seed10123.pkl",
+        "checkpoint_path": "hpo_ckpts\\ckpt_low_t0_seed10123.pkl",
+        "reeval_best": false,
+        "seed": 10123
+      }
+    },
+    {
+      "stage": "low",
+      "trial": 1,
+      "metric": 14.0,
+      "duration_sec": 0.013233184814453125,
+      "params": {
+        "mutate_p_start": 0.5249274859791925,
+        "mutate_p_end": 0.09838359241172615,
+        "block_shift_mut_prob": 0.23114099275914907,
+        "elites_per_gen": 2,
+        "random_frac": 0.10116499713278265,
+        "robust_lambda": 0.6675927892579105,
+        "cost_weight": 0.7354900575528334
+      },
+      "cfg_used": {
+        "enemy_names": [
+          "EnemyInfantryGroup1",
+          "EnemyTankGroup1",
+          "EnemyAntiTankGroup1",
+          "EnemyArtilleryGroup1"
+        ],
+        "pop_size": 10,
+        "generations": 5,
+        "min_size": 2,
+        "min_counts": {
+          "FriendlyTankGroup": 0,
+          "FriendlyInfantryGroup": 0,
+          "FriendlyArtilleryGroup": 0,
+          "FriendlyAntiTankGroup": 0
+        },
+        "max_counts": {
+          "FriendlyTankGroup": 2,
+          "FriendlyInfantryGroup": 2,
+          "FriendlyArtilleryGroup": 2,
+          "FriendlyAntiTankGroup": 2
+        },
+        "mode": "nsga2",
+        "cost_weight": 0.7354900575528334,
+        "elites_per_gen": 2,
+        "random_frac": 0.10116499713278265,
+        "block_shift_mut_prob": 0.23114099275914907,
+        "mutate_p_start": 0.5249274859791925,
+        "mutate_p_end": 0.09838359241172615,
+        "num_eval_seeds": 1,
+        "robust_lambda": 0.6675927892579105,
+        "workers": 4,
+        "max_steps": 300,
+        "bias_team": true,
+        "quiet_workers": true,
+        "worker_log_file": "eval_runs.log",
+        "op_log_sample_rate": 50,
+        "cache_capacity": 2000,
+        "checkpoint_every": 2,
+        "resume_from": "hpo_ckpts\\ckpt_low_t1_seed20123.pkl",
+        "best_path": "hpo_ckpts\\best_low_t1_seed20123.pkl",
+        "checkpoint_path": "hpo_ckpts\\ckpt_low_t1_seed20123.pkl",
+        "reeval_best": false,
+        "seed": 20123
+      }
+    }
+  ],
+  "confirms": [
+    {
+      "stage": "high",
+      "candidate_from": 1,
+      "metric": 15.0,
+      "duration_sec": 0.011886119842529297,
+      "params": {
+        "mutate_p_start": 0.5249274859791925,
+        "mutate_p_end": 0.09838359241172615,
+        "block_shift_mut_prob": 0.23114099275914907,
+        "elites_per_gen": 2,
+        "random_frac": 0.10116499713278265,
+        "robust_lambda": 0.6675927892579105,
+        "cost_weight": 0.7354900575528334
+      },
+      "cfg_used": {
+        "enemy_names": [
+          "EnemyInfantryGroup1",
+          "EnemyTankGroup1",
+          "EnemyAntiTankGroup1",
+          "EnemyArtilleryGroup1"
+        ],
+        "pop_size": 20,
+        "generations": 10,
+        "min_size": 2,
+        "min_counts": {
+          "FriendlyTankGroup": 0,
+          "FriendlyInfantryGroup": 0,
+          "FriendlyArtilleryGroup": 0,
+          "FriendlyAntiTankGroup": 0
+        },
+        "max_counts": {
+          "FriendlyTankGroup": 2,
+          "FriendlyInfantryGroup": 2,
+          "FriendlyArtilleryGroup": 2,
+          "FriendlyAntiTankGroup": 2
+        },
+        "mode": "nsga2",
+        "cost_weight": 0.7354900575528334,
+        "elites_per_gen": 2,
+        "random_frac": 0.10116499713278265,
+        "block_shift_mut_prob": 0.23114099275914907,
+        "mutate_p_start": 0.5249274859791925,
+        "mutate_p_end": 0.09838359241172615,
+        "num_eval_seeds": 3,
+        "robust_lambda": 0.6675927892579105,
+        "workers": 4,
+        "max_steps": 300,
+        "bias_team": true,
+        "quiet_workers": true,
+        "worker_log_file": "eval_runs.log",
+        "op_log_sample_rate": 50,
+        "cache_capacity": 2000,
+        "checkpoint_every": 2,
+        "resume_from": "hpo_ckpts\\ckpt_high_from1_seed100096.pkl",
+        "best_path": "hpo_ckpts\\best_high_from1_seed100096.pkl",
+        "checkpoint_path": "hpo_ckpts\\ckpt_high_from1_seed100096.pkl",
+        "reeval_best": false,
+        "seed": 100096
+      },
+      "result_head": {
+        "has_pareto": true,
+        "best_final_gen_fitness": 6.53761645128928
+      }
+    }
+  ],
+  "final_pick": {
+    "stage": "high",
+    "candidate_from": 1,
+    "metric": 15.0,
+    "duration_sec": 0.011886119842529297,
+    "params": {
+      "mutate_p_start": 0.5249274859791925,
+      "mutate_p_end": 0.09838359241172615,
+      "block_shift_mut_prob": 0.23114099275914907,
+      "elites_per_gen": 2,
+      "random_frac": 0.10116499713278265,
+      "robust_lambda": 0.6675927892579105,
+      "cost_weight": 0.7354900575528334
+    },
+    "cfg_used": {
+      "enemy_names": [
+        "EnemyInfantryGroup1",
+        "EnemyTankGroup1",
+        "EnemyAntiTankGroup1",
+        "EnemyArtilleryGroup1"
+      ],
+      "pop_size": 20,
+      "generations": 10,
+      "min_size": 2,
+      "min_counts": {
+        "FriendlyTankGroup": 0,
+        "FriendlyInfantryGroup": 0,
+        "FriendlyArtilleryGroup": 0,
+        "FriendlyAntiTankGroup": 0
+      },
+      "max_counts": {
+        "FriendlyTankGroup": 2,
+        "FriendlyInfantryGroup": 2,
+        "FriendlyArtilleryGroup": 2,
+        "FriendlyAntiTankGroup": 2
+      },
+      "mode": "nsga2",
+      "cost_weight": 0.7354900575528334,
+      "elites_per_gen": 2,
+      "random_frac": 0.10116499713278265,
+      "block_shift_mut_prob": 0.23114099275914907,
+      "mutate_p_start": 0.5249274859791925,
+      "mutate_p_end": 0.09838359241172615,
+      "num_eval_seeds": 3,
+      "robust_lambda": 0.6675927892579105,
+      "workers": 4,
+      "max_steps": 300,
+      "bias_team": true,
+      "quiet_workers": true,
+      "worker_log_file": "eval_runs.log",
+      "op_log_sample_rate": 50,
+      "cache_capacity": 2000,
+      "checkpoint_every": 2,
+      "resume_from": "hpo_ckpts\\ckpt_high_from1_seed100096.pkl",
+      "best_path": "hpo_ckpts\\best_high_from1_seed100096.pkl",
+      "checkpoint_path": "hpo_ckpts\\ckpt_high_from1_seed100096.pkl",
+      "reeval_best": false,
+      "seed": 100096
+    },
+    "result_head": {
+      "has_pareto": true,
+      "best_final_gen_fitness": 6.53761645128928
+    }
+  },
+  "timestamp": "2025-08-29 10:53:16"
+}

@@ -1,0 +1,4029 @@
+{
+  "cfg_used": {
+    "enemy_names": [
+      "EnemyInfantryGroup1",
+      "EnemyTankGroup1",
+      "EnemyAntiTankGroup1",
+      "EnemyTankGroup2"
+    ],
+    "min_size": 2,
+    "min_counts": {
+      "FriendlyTankGroup": 0,
+      "FriendlyInfantryGroup": 0,
+      "FriendlyArtilleryGroup": 0,
+      "FriendlyAntiTankGroup": 0
+    },
+    "max_counts": {
+      "FriendlyTankGroup": 3,
+      "FriendlyInfantryGroup": 3,
+      "FriendlyArtilleryGroup": 3,
+      "FriendlyAntiTankGroup": 3
+    },
+    "mode": "nsga2",
+    "pop_size": 20,
+    "generations": 10,
+    "elites_per_gen": 2,
+    "random_frac": 0.20146904444639552,
+    "block_shift_mut_prob": 0.20449488203515231,
+    "mutate_p_start": 0.6865814142768555,
+    "mutate_p_end": 0.12136849781033113,
+    "robust_lambda": 0.16787645367416792,
+    "time_weight": 0.5,
+    "num_eval_seeds": 1,
+    "workers": 7,
+    "max_steps": 300,
+    "bias_team": true,
+    "quiet_workers": true,
+    "op_log_sample_rate": 50,
+    "cache_capacity": 2000,
+    "checkpoint_every": 1,
+    "resume_from": null,
+    "best_path": "robustness_B.pkl",
+    "checkpoint_path": "robustness_B",
+    "reeval_best": false,
+    "rng": "<random.Random object at 0x000002021D57D740>"
+  },
+  "result": {
+    "best_overall": {
+      "generation": 4,
+      "fitness": 37.888888888888886,
+      "eval": {
+        "mean_raw": 1.0,
+        "std_raw": 0.0,
+        "adjusted_raw": 0.5133333333333333,
+        "cost": 11.0,
+        "seed_base": 3946691,
+        "seeds": [
+          3946691
+        ],
+        "final_score": 37.888888888888886
+      },
+      "chromosome": {
+        "config": {
+          "FriendlyTankGroup": 0,
+          "FriendlyInfantryGroup": 2,
+          "FriendlyArtilleryGroup": 1,
+          "FriendlyAntiTankGroup": 1
+        },
+        "sequence": [
+          [
+            "EnemyTankGroup2",
+            "FlankAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyInfantryGroup_1",
+              "FriendlyArtilleryGroup_0"
+            ]
+          ],
+          [
+            "EnemyInfantryGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyInfantryGroup_0",
+              "FriendlyAntiTankGroup_0",
+              "FriendlyArtilleryGroup_0",
+              "FriendlyInfantryGroup_1"
+            ]
+          ],
+          [
+            "EnemyAntiTankGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyInfantryGroup_0"
+            ]
+          ],
+          [
+            "EnemyTankGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyInfantryGroup_1",
+              "FriendlyAntiTankGroup_0",
+              "FriendlyInfantryGroup_0"
+            ]
+          ]
+        ]
+      },
+      "key": [
+        [
+          [
+            "FriendlyTankGroup",
+            0
+          ],
+          [
+            "FriendlyInfantryGroup",
+            2
+          ],
+          [
+            "FriendlyArtilleryGroup",
+            1
+          ],
+          [
+            "FriendlyAntiTankGroup",
+            1
+          ]
+        ],
+        [
+          [
+            "EnemyTankGroup2",
+            "FlankAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyArtilleryGroup_0",
+              "FriendlyInfantryGroup_1"
+            ]
+          ],
+          [
+            "EnemyInfantryGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyArtilleryGroup_0",
+              "FriendlyInfantryGroup_0",
+              "FriendlyInfantryGroup_1"
+            ]
+          ],
+          [
+            "EnemyAntiTankGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyInfantryGroup_0"
+            ]
+          ],
+          [
+            "EnemyTankGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyInfantryGroup_0",
+              "FriendlyInfantryGroup_1"
+            ]
+          ]
+        ]
+      ]
+    },
+    "best_final_gen": {
+      "fitness": 37.888888888888886,
+      "eval": {
+        "mean_raw": 1.0,
+        "std_raw": 0.0,
+        "adjusted_raw": 0.5133333333333333,
+        "cost": 11.0,
+        "seed_base": 3946691,
+        "seeds": [
+          3946691
+        ],
+        "final_score": 37.888888888888886
+      },
+      "chromosome": {
+        "config": {
+          "FriendlyTankGroup": 0,
+          "FriendlyInfantryGroup": 2,
+          "FriendlyArtilleryGroup": 1,
+          "FriendlyAntiTankGroup": 1
+        },
+        "sequence": [
+          [
+            "EnemyTankGroup2",
+            "FlankAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyInfantryGroup_1",
+              "FriendlyArtilleryGroup_0"
+            ]
+          ],
+          [
+            "EnemyInfantryGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyInfantryGroup_0",
+              "FriendlyAntiTankGroup_0",
+              "FriendlyArtilleryGroup_0",
+              "FriendlyInfantryGroup_1"
+            ]
+          ],
+          [
+            "EnemyAntiTankGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyInfantryGroup_0"
+            ]
+          ],
+          [
+            "EnemyTankGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyInfantryGroup_1",
+              "FriendlyAntiTankGroup_0",
+              "FriendlyInfantryGroup_0"
+            ]
+          ]
+        ]
+      },
+      "key": [
+        [
+          [
+            "FriendlyTankGroup",
+            0
+          ],
+          [
+            "FriendlyInfantryGroup",
+            2
+          ],
+          [
+            "FriendlyArtilleryGroup",
+            1
+          ],
+          [
+            "FriendlyAntiTankGroup",
+            1
+          ]
+        ],
+        [
+          [
+            "EnemyTankGroup2",
+            "FlankAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyArtilleryGroup_0",
+              "FriendlyInfantryGroup_1"
+            ]
+          ],
+          [
+            "EnemyInfantryGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyArtilleryGroup_0",
+              "FriendlyInfantryGroup_0",
+              "FriendlyInfantryGroup_1"
+            ]
+          ],
+          [
+            "EnemyAntiTankGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyInfantryGroup_0"
+            ]
+          ],
+          [
+            "EnemyTankGroup1",
+            "ConsolidateAttack",
+            [
+              "FriendlyAntiTankGroup_0",
+              "FriendlyInfantryGroup_0",
+              "FriendlyInfantryGroup_1"
+            ]
+          ]
+        ]
+      ]
+    },
+    "pareto_front": [
+      {
+        "fitness": 32.40079365079365,
+        "eval": {
+          "mean_raw": 1.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.5916666666666667,
+          "cost": 19.0,
+          "seed_base": 2829240,
+          "seeds": [
+            2829240
+          ],
+          "final_score": 32.40079365079365
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 1,
+            "FriendlyInfantryGroup": 1,
+            "FriendlyArtilleryGroup": 3,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyArtilleryGroup_2"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              1
+            ],
+            [
+              "FriendlyInfantryGroup",
+              1
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              3
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_2",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 155809,
+          "seeds": [
+            155809
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 37.05555555555555,
+        "eval": {
+          "mean_raw": 1.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.5366666666666666,
+          "cost": 13.0,
+          "seed_base": 7085252,
+          "seeds": [
+            7085252
+          ],
+          "final_score": 37.05555555555555
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 1,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 1,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              1
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              1
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 37.888888888888886,
+        "eval": {
+          "mean_raw": 1.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.5133333333333333,
+          "cost": 11.0,
+          "seed_base": 3946691,
+          "seeds": [
+            3946691
+          ],
+          "final_score": 37.888888888888886
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 1,
+            "FriendlyAntiTankGroup": 1
+          },
+          "sequence": [
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              1
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              1
+            ]
+          ],
+          [
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 1998738,
+          "seeds": [
+            1998738
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 16.805555555555554,
+        "eval": {
+          "mean_raw": 0.425,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.20166666666666666,
+          "cost": 7.0,
+          "seed_base": 7225630,
+          "seeds": [
+            7225630
+          ],
+          "final_score": 16.805555555555554
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 1,
+            "FriendlyInfantryGroup": 1,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              1
+            ],
+            [
+              "FriendlyInfantryGroup",
+              1
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 9290952,
+          "seeds": [
+            9290952
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 8105487,
+          "seeds": [
+            8105487
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 4441781,
+          "seeds": [
+            4441781
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 2668469,
+          "seeds": [
+            2668469
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 466714,
+          "seeds": [
+            466714
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 34.66386554621849,
+        "eval": {
+          "mean_raw": 0.9411764705882353,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.4411764705882353,
+          "cost": 9.0,
+          "seed_base": 8982810,
+          "seeds": [
+            8982810
+          ],
+          "final_score": 34.66386554621849
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 1,
+            "FriendlyArtilleryGroup": 1,
+            "FriendlyAntiTankGroup": 1
+          },
+          "sequence": [
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              1
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              1
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              1
+            ]
+          ],
+          [
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        ]
+      }
+    ],
+    "history": [
+      {
+        "gen": 0,
+        "mutate_p": 0.6865814142768555,
+        "front0_size": 5,
+        "best_scalar_fitness": 36.904761904761905,
+        "avg_adjusted_raw": 0.26769824050720276,
+        "avg_cost": 17.55
+      },
+      {
+        "gen": 1,
+        "mutate_p": 0.6237799791139084,
+        "front0_size": 5,
+        "best_scalar_fitness": 37.05555555555555,
+        "avg_adjusted_raw": 0.3007926398718652,
+        "avg_cost": 15.3
+      },
+      {
+        "gen": 2,
+        "mutate_p": 0.5609785439509611,
+        "front0_size": 5,
+        "best_scalar_fitness": 37.05555555555555,
+        "avg_adjusted_raw": 0.2677557442557442,
+        "avg_cost": 13.15
+      },
+      {
+        "gen": 3,
+        "mutate_p": 0.498177108788014,
+        "front0_size": 5,
+        "best_scalar_fitness": 37.05555555555555,
+        "avg_adjusted_raw": 0.2824592074592075,
+        "avg_cost": 13.15
+      },
+      {
+        "gen": 4,
+        "mutate_p": 0.4353756736250669,
+        "front0_size": 5,
+        "best_scalar_fitness": 37.888888888888886,
+        "avg_adjusted_raw": 0.2808181818181818,
+        "avg_cost": 12.6
+      },
+      {
+        "gen": 5,
+        "mutate_p": 0.3725742384621197,
+        "front0_size": 8,
+        "best_scalar_fitness": 37.888888888888886,
+        "avg_adjusted_raw": 0.3040424901185771,
+        "avg_cost": 12.3
+      },
+      {
+        "gen": 6,
+        "mutate_p": 0.30977280329917256,
+        "front0_size": 8,
+        "best_scalar_fitness": 37.888888888888886,
+        "avg_adjusted_raw": 0.2886439393939394,
+        "avg_cost": 12.05
+      },
+      {
+        "gen": 7,
+        "mutate_p": 0.2469713681362254,
+        "front0_size": 8,
+        "best_scalar_fitness": 37.888888888888886,
+        "avg_adjusted_raw": 0.2636439393939394,
+        "avg_cost": 11.75
+      },
+      {
+        "gen": 8,
+        "mutate_p": 0.18416993297327833,
+        "front0_size": 10,
+        "best_scalar_fitness": 37.888888888888886,
+        "avg_adjusted_raw": 0.22985472370766485,
+        "avg_cost": 10.1
+      },
+      {
+        "gen": 9,
+        "mutate_p": 0.1213684978103311,
+        "front0_size": 12,
+        "best_scalar_fitness": 37.888888888888886,
+        "avg_adjusted_raw": 0.2617587853323148,
+        "avg_cost": 10.75
+      }
+    ],
+    "population_final": [
+      {
+        "fitness": 32.40079365079365,
+        "eval": {
+          "mean_raw": 1.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.5916666666666667,
+          "cost": 19.0,
+          "seed_base": 2829240,
+          "seeds": [
+            2829240
+          ],
+          "final_score": 32.40079365079365
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 1,
+            "FriendlyInfantryGroup": 1,
+            "FriendlyArtilleryGroup": 3,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyArtilleryGroup_2"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              1
+            ],
+            [
+              "FriendlyInfantryGroup",
+              1
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              3
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_2",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 155809,
+          "seeds": [
+            155809
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 37.05555555555555,
+        "eval": {
+          "mean_raw": 1.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.5366666666666666,
+          "cost": 13.0,
+          "seed_base": 7085252,
+          "seeds": [
+            7085252
+          ],
+          "final_score": 37.05555555555555
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 1,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 1,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              1
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              1
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 37.888888888888886,
+        "eval": {
+          "mean_raw": 1.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.5133333333333333,
+          "cost": 11.0,
+          "seed_base": 3946691,
+          "seeds": [
+            3946691
+          ],
+          "final_score": 37.888888888888886
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 1,
+            "FriendlyAntiTankGroup": 1
+          },
+          "sequence": [
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              1
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              1
+            ]
+          ],
+          [
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 1998738,
+          "seeds": [
+            1998738
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 16.805555555555554,
+        "eval": {
+          "mean_raw": 0.425,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.20166666666666666,
+          "cost": 7.0,
+          "seed_base": 7225630,
+          "seeds": [
+            7225630
+          ],
+          "final_score": 16.805555555555554
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 1,
+            "FriendlyInfantryGroup": 1,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              1
+            ],
+            [
+              "FriendlyInfantryGroup",
+              1
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 9290952,
+          "seeds": [
+            9290952
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 8105487,
+          "seeds": [
+            8105487
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 4441781,
+          "seeds": [
+            4441781
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 2668469,
+          "seeds": [
+            2668469
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 4.0,
+          "seed_base": 466714,
+          "seeds": [
+            466714
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 34.66386554621849,
+        "eval": {
+          "mean_raw": 0.9411764705882353,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.4411764705882353,
+          "cost": 9.0,
+          "seed_base": 8982810,
+          "seeds": [
+            8982810
+          ],
+          "final_score": 34.66386554621849
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 1,
+            "FriendlyArtilleryGroup": 1,
+            "FriendlyAntiTankGroup": 1
+          },
+          "sequence": [
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              1
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              1
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              1
+            ]
+          ],
+          [
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 24.956349206349206,
+        "eval": {
+          "mean_raw": 1.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.5516666666666667,
+          "cost": 23.0,
+          "seed_base": 4565653,
+          "seeds": [
+            4565653
+          ],
+          "final_score": 24.956349206349206
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 1,
+            "FriendlyInfantryGroup": 3,
+            "FriendlyArtilleryGroup": 3,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              1
+            ],
+            [
+              "FriendlyInfantryGroup",
+              3
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              3
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 13.373015873015875,
+        "eval": {
+          "mean_raw": 1.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.5616666666666666,
+          "cost": 32.0,
+          "seed_base": 9543806,
+          "seeds": [
+            9543806
+          ],
+          "final_score": 13.373015873015875
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 2,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 3,
+            "FriendlyAntiTankGroup": 2
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_1",
+                "FriendlyAntiTankGroup_1",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_2"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyAntiTankGroup_1",
+                "FriendlyTankGroup_0",
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_1",
+                "FriendlyInfantryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyTankGroup_1",
+                "FriendlyAntiTankGroup_1",
+                "FriendlyArtilleryGroup_2"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyTankGroup_0",
+                "FriendlyAntiTankGroup_1",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              2
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              3
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              2
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_1",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyAntiTankGroup_1",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0",
+                "FriendlyTankGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyTankGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyAntiTankGroup_1",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 33.22222222222222,
+        "eval": {
+          "mean_raw": 1.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.5366666666666666,
+          "cost": 16.0,
+          "seed_base": 9613930,
+          "seeds": [
+            9613930
+          ],
+          "final_score": 33.22222222222222
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 1,
+            "FriendlyInfantryGroup": 0,
+            "FriendlyArtilleryGroup": 2,
+            "FriendlyAntiTankGroup": 1
+          },
+          "sequence": [
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_1",
+                "FriendlyAntiTankGroup_0",
+                "FriendlyTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_1",
+                "FriendlyAntiTankGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              1
+            ],
+            [
+              "FriendlyInfantryGroup",
+              0
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              2
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              1
+            ]
+          ],
+          [
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 36.904761904761905,
+        "eval": {
+          "mean_raw": 1.0,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.5,
+          "cost": 11.0,
+          "seed_base": 5294016,
+          "seeds": [
+            5294016
+          ],
+          "final_score": 36.904761904761905
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 0,
+            "FriendlyArtilleryGroup": 2,
+            "FriendlyAntiTankGroup": 1
+          },
+          "sequence": [
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_1"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyAntiTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyAntiTankGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              0
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              2
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              1
+            ]
+          ],
+          [
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_1"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.6746031746031722,
+        "eval": {
+          "mean_raw": 0.5083333333333333,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.008333333333333304,
+          "cost": 8.0,
+          "seed_base": 2236718,
+          "seeds": [
+            2236718
+          ],
+          "final_score": 0.6746031746031722
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 1,
+            "FriendlyAntiTankGroup": 0
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              1
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              0
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 0.0,
+        "eval": {
+          "mean_raw": 0.13333333333333336,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.0,
+          "cost": 5.0,
+          "seed_base": 8460029,
+          "seeds": [
+            8460029
+          ],
+          "final_score": 0.0
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 1,
+            "FriendlyArtilleryGroup": 0,
+            "FriendlyAntiTankGroup": 1
+          },
+          "sequence": [
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              1
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              0
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              1
+            ]
+          ],
+          [
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 29.271708683473392,
+        "eval": {
+          "mean_raw": 0.8725490196078431,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.37254901960784315,
+          "cost": 9.0,
+          "seed_base": 5927248,
+          "seeds": [
+            5927248
+          ],
+          "final_score": 29.271708683473392
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 0,
+            "FriendlyInfantryGroup": 1,
+            "FriendlyArtilleryGroup": 1,
+            "FriendlyAntiTankGroup": 1
+          },
+          "sequence": [
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              0
+            ],
+            [
+              "FriendlyInfantryGroup",
+              1
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              1
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              1
+            ]
+          ],
+          [
+            [
+              "EnemyTankGroup2",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyInfantryGroup1",
+              "FlankAttack",
+              [
+                "FriendlyArtilleryGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0"
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "fitness": 17.990723562152137,
+        "eval": {
+          "mean_raw": 0.8831168831168832,
+          "std_raw": 0.0,
+          "adjusted_raw": 0.41978354978354987,
+          "cost": 24.0,
+          "seed_base": 2190232,
+          "seeds": [
+            2190232
+          ],
+          "final_score": 17.990723562152137
+        },
+        "chromosome": {
+          "config": {
+            "FriendlyTankGroup": 1,
+            "FriendlyInfantryGroup": 2,
+            "FriendlyArtilleryGroup": 3,
+            "FriendlyAntiTankGroup": 1
+          },
+          "sequence": [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_1",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyTankGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyAntiTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0",
+                "FriendlyAntiTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyTankGroup_0",
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_1"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1"
+              ]
+            ]
+          ]
+        },
+        "key": [
+          [
+            [
+              "FriendlyTankGroup",
+              1
+            ],
+            [
+              "FriendlyInfantryGroup",
+              2
+            ],
+            [
+              "FriendlyArtilleryGroup",
+              3
+            ],
+            [
+              "FriendlyAntiTankGroup",
+              1
+            ]
+          ],
+          [
+            [
+              "EnemyInfantryGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyInfantryGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup2",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_0",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyTankGroup1",
+              "ConsolidateAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyInfantryGroup_1",
+                "FriendlyTankGroup_0"
+              ]
+            ],
+            [
+              "EnemyAntiTankGroup1",
+              "FlankAttack",
+              [
+                "FriendlyAntiTankGroup_0",
+                "FriendlyArtilleryGroup_0",
+                "FriendlyArtilleryGroup_1",
+                "FriendlyArtilleryGroup_2",
+                "FriendlyTankGroup_0"
+              ]
+            ]
+          ]
+        ]
+      }
+    ]
+  }
+}

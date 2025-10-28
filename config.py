@@ -1,0 +1,10 @@
+# config.py
+import random
+
+GRID_WIDTH = 100
+GRID_HEIGHT = 75
+CELL_SIZE = 100
+
+RANDOM_SEED = 42
+random.seed(RANDOM_SEED)
+SUPPRESSION_RECOVERY_RATE = 0.05

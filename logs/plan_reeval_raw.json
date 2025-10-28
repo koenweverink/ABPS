@@ -1,0 +1,242 @@
+[
+  {
+    "seed": 10001,
+    "score": 23.759999999999998,
+    "health": 72,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 312
+  },
+  {
+    "seed": 10002,
+    "score": 22.72888888888889,
+    "health": 119.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 308
+  },
+  {
+    "seed": 10003,
+    "score": -36.04,
+    "health": 0,
+    "enemy_health": 66,
+    "outpost_secured": false,
+    "steps_taken": 302
+  },
+  {
+    "seed": 10004,
+    "score": -34.18,
+    "health": 0,
+    "enemy_health": 30,
+    "outpost_secured": false,
+    "steps_taken": 209
+  },
+  {
+    "seed": 10005,
+    "score": 20.49111111111111,
+    "health": 58.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 281
+  },
+  {
+    "seed": 10006,
+    "score": -35.1,
+    "health": 0,
+    "enemy_health": 26,
+    "outpost_secured": false,
+    "steps_taken": 255
+  },
+  {
+    "seed": 10007,
+    "score": -34.06,
+    "health": 0,
+    "enemy_health": 30,
+    "outpost_secured": false,
+    "steps_taken": 203
+  },
+  {
+    "seed": 10008,
+    "score": 23.7,
+    "health": 90,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 315
+  },
+  {
+    "seed": 10009,
+    "score": 23.42,
+    "health": 72,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 329
+  },
+  {
+    "seed": 10010,
+    "score": -22.59259259259259,
+    "health": 47.0,
+    "enemy_health": 26,
+    "outpost_secured": false,
+    "steps_taken": 500
+  },
+  {
+    "seed": 10011,
+    "score": 23.40888888888889,
+    "health": 119.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 274
+  },
+  {
+    "seed": 10012,
+    "score": -36.68,
+    "health": 0,
+    "enemy_health": 26,
+    "outpost_secured": false,
+    "steps_taken": 334
+  },
+  {
+    "seed": 10013,
+    "score": 22.275555555555556,
+    "health": 65.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 289
+  },
+  {
+    "seed": 10014,
+    "score": -25.185185185185187,
+    "health": 40.0,
+    "enemy_health": 26,
+    "outpost_secured": false,
+    "steps_taken": 500
+  },
+  {
+    "seed": 10015,
+    "score": 24.26,
+    "health": 90,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 287
+  },
+  {
+    "seed": 10016,
+    "score": 22.50888888888889,
+    "health": 119.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 319
+  },
+  {
+    "seed": 10017,
+    "score": -34.84,
+    "health": 0,
+    "enemy_health": 30,
+    "outpost_secured": false,
+    "steps_taken": 242
+  },
+  {
+    "seed": 10018,
+    "score": -20.0,
+    "health": 54,
+    "enemy_health": 26,
+    "outpost_secured": false,
+    "steps_taken": 500
+  },
+  {
+    "seed": 10019,
+    "score": -22.59259259259259,
+    "health": 47.0,
+    "enemy_health": 26,
+    "outpost_secured": false,
+    "steps_taken": 500
+  },
+  {
+    "seed": 10020,
+    "score": 16.58222222222222,
+    "health": 22.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 282
+  },
+  {
+    "seed": 10021,
+    "score": -25.185185185185187,
+    "health": 40.0,
+    "enemy_health": 26,
+    "outpost_secured": false,
+    "steps_taken": 500
+  },
+  {
+    "seed": 10022,
+    "score": 22.484444444444446,
+    "health": 83.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 298
+  },
+  {
+    "seed": 10023,
+    "score": 23.32888888888889,
+    "health": 119.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 278
+  },
+  {
+    "seed": 10024,
+    "score": 21.34444444444445,
+    "health": 83.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 355
+  },
+  {
+    "seed": 10025,
+    "score": 23.78,
+    "health": 72,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 311
+  },
+  {
+    "seed": 10026,
+    "score": 24.22,
+    "health": 72,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 289
+  },
+  {
+    "seed": 10027,
+    "score": 22.177777777777777,
+    "health": 112.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 280
+  },
+  {
+    "seed": 10028,
+    "score": -34.9,
+    "health": 0,
+    "enemy_health": 26,
+    "outpost_secured": false,
+    "steps_taken": 245
+  },
+  {
+    "seed": 10029,
+    "score": 22.19777777777778,
+    "health": 112.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 279
+  },
+  {
+    "seed": 10030,
+    "score": 19.415555555555557,
+    "health": 98.0,
+    "enemy_health": 0,
+    "outpost_secured": true,
+    "steps_taken": 307
+  }
+]

@@ -1,0 +1,44 @@
+{
+    "config": {
+      "FriendlyTankGroup": 0,
+      "FriendlyInfantryGroup": 0,
+      "FriendlyArtilleryGroup": 1,
+      "FriendlyAntiTankGroup": 2
+    },
+    "sequence": [
+      [
+        "EnemyTankGroup1",
+        "ConsolidateAttack",
+        [
+          "FriendlyAntiTankGroup_1",
+          "FriendlyAntiTankGroup_0"
+        ]
+      ],
+      [
+        "EnemyAntiTankGroup1",
+        "ConsolidateAttack",
+        [
+          "FriendlyAntiTankGroup_0",
+          "FriendlyAntiTankGroup_1",
+          "FriendlyArtilleryGroup_0"
+        ]
+      ],
+      [
+        "EnemyInfantryGroup1",
+        "ConsolidateAttack",
+        [
+          "FriendlyAntiTankGroup_1",
+          "FriendlyArtilleryGroup_0",
+          "FriendlyAntiTankGroup_0"
+        ]
+      ],
+      [
+        "EnemyArtilleryGroup1",
+        "ConsolidateAttack",
+        [
+          "FriendlyAntiTankGroup_0",
+          "FriendlyAntiTankGroup_1"
+        ]
+      ]
+    ]
+  }

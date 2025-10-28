@@ -1,0 +1,3990 @@
+
+==== Worker eval start 2025-09-10T15:46:09 ====
+seed_base=9444596, num_eval_seeds=3, max_steps=300
+
+==== Worker eval start 2025-09-10T15:46:09 ====
+seed_base=2568100, num_eval_seeds=3, max_steps=300
+
+==== Worker eval start 2025-09-10T15:46:09 ====
+seed_base=2612620, num_eval_seeds=3, max_steps=300
+
+==== Worker eval start 2025-09-10T15:46:09 ====
+seed_base=1980626, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 120 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 108 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -21.2 
+ Health: 113.0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.474, std=0.021, cost=10.0 ----
+==== Worker eval end 2025-09-10T15:57:28 ====
+
+
+==== Worker eval start 2025-09-10T15:57:28 ====
+seed_base=7571418, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 210 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 978 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 498 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 186 
+ Enemy Health: 62 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 312 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 978 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 702 
+ Enemy Health: 136 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -18.2 
+ Health: 252 
+ Enemy Health: 151 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 210 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.328, mean=0.840, std=0.077, cost=19.0 ----
+==== Worker eval end 2025-09-10T16:20:31 ====
+
+
+==== Worker eval start 2025-09-10T16:20:31 ====
+seed_base=9864804, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 978 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.500, std=0.000, cost=37.0 ----
+==== Worker eval end 2025-09-10T16:29:39 ====
+
+
+==== Worker eval start 2025-09-10T16:29:39 ====
+seed_base=48492, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 312 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.060, mean=0.598, std=0.225, cost=20.0 ----
+==== Worker eval end 2025-09-10T16:30:15 ====
+
+
+==== Worker eval start 2025-09-10T16:30:15 ====
+seed_base=8942655, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 738 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.087, mean=0.602, std=0.092, cost=32.0 ----
+==== Worker eval end 2025-09-10T16:30:43 ====
+
+
+==== Worker eval start 2025-09-10T16:30:43 ====
+seed_base=3433537, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 240 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 294 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 240 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 294 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 888 
+ Enemy Health: 4 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -7.5 
+ Health: 150 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.485, std=0.171, cost=12.0 ----
+==== Worker eval end 2025-09-10T16:46:36 ====
+
+
+==== Worker eval start 2025-09-10T16:46:36 ====
+seed_base=26410, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 642 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -18.1 
+ Health: 294 
+ Enemy Health: 147 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.373, std=0.025, cost=19.0 ----
+==== Worker eval end 2025-09-10T16:55:25 ====
+
+
+==== Worker eval start 2025-09-10T16:55:25 ====
+seed_base=1079927, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 162 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -1.1 
+ Health: 357.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 162 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 888 
+ Enemy Health: 104 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 162 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.126, std=0.000, cost=22.0 ----
+==== Worker eval end 2025-09-10T17:13:53 ====
+
+
+==== Worker eval start 2025-09-10T17:13:53 ====
+seed_base=1248306, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 378 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 18.4 
+ Health: 564 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 264
+
+
+
+Score: -38.1 
+ Health: 0 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 242
+
+
+
+Score: 0.0 
+ Health: 390 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.464, mean=0.966, std=0.017, cost=21.0 ----
+==== Worker eval end 2025-09-10T17:37:05 ====
+
+
+==== Worker eval start 2025-09-10T17:37:05 ====
+seed_base=585915, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -10.3 
+ Health: 35.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 942 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.347, mean=0.872, std=0.152, cost=34.0 ----
+==== Worker eval end 2025-09-10T17:41:31 ====
+
+
+==== Worker eval start 2025-09-10T17:41:31 ====
+seed_base=6064975, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -33.3 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 98
+
+
+
+Score: -35.5 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 164
+
+
+
+Score: -33.4 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 102
+
+
+
+Score: -20.0 
+ Health: 24 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.398, std=0.226, cost=12.0 ----
+==== Worker eval end 2025-09-10T17:48:26 ====
+
+
+==== Worker eval start 2025-09-10T17:48:26 ====
+seed_base=2330582, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 14.9 
+ Health: 471 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 285
+---- Eval summary: adjusted_raw=0.335, mean=0.813, std=0.039, cost=30.0 ----
+==== Worker eval end 2025-09-10T17:48:44 ====
+
+
+==== Worker eval start 2025-09-10T17:48:44 ====
+seed_base=4952328, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -33.9 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 117
+---- Eval summary: adjusted_raw=0.000, mean=0.000, std=0.000, cost=6.0 ----
+==== Worker eval end 2025-09-10T17:50:45 ====
+
+
+==== Worker eval start 2025-09-10T17:50:45 ====
+seed_base=1508567, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 36 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -28.0 
+ Health: 54.0 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 36 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 258 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -34.4 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 131
+---- Eval summary: adjusted_raw=0.036, mean=0.476, std=0.337, cost=8.0 ----
+==== Worker eval end 2025-09-10T18:03:13 ====
+
+
+==== Worker eval start 2025-09-10T18:03:13 ====
+seed_base=9830775, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -24.2 
+ Health: 218.0 
+ Enemy Health: 100 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.210, std=0.189, cost=19.0 ----
+==== Worker eval end 2025-09-10T18:06:26 ====
+
+
+==== Worker eval start 2025-09-10T18:06:26 ====
+seed_base=4944510, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 20.6 
+ Health: 90 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 283
+
+
+
+Score: -22.2 
+ Health: 230.0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 294 
+ Enemy Health: 126 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -21.9 
+ Health: 478.0 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 258 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.482, std=0.026, cost=22.0 ----
+==== Worker eval end 2025-09-10T18:19:25 ====
+
+
+==== Worker eval start 2025-09-10T18:19:25 ====
+seed_base=4568652, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 174 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 174 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 54 
+ Enemy Health: 136 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -28.2 
+ Health: 174 
+ Enemy Health: 126 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 174 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.500, std=0.000, cost=14.0 ----
+==== Worker eval end 2025-09-10T18:30:18 ====
+
+
+
+
+Score: -7.7 
+ Health: 317.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -7.0 
+ Health: 477 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.444, std=0.253, cost=23.0 ----
+==== Worker eval end 2025-09-10T18:40:37 ====
+
+
+
+
+Score: 17.2 
+ Health: 636 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 281
+---- Eval summary: adjusted_raw=0.257, mean=0.765, std=0.097, cost=24.0 ----
+==== Worker eval end 2025-09-10T18:41:20 ====
+
+
+
+
+Score: 18.4 
+ Health: 123 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 283
+---- Eval summary: adjusted_raw=0.033, mean=0.559, std=0.249, cost=19.0 ----
+==== Worker eval end 2025-09-10T18:44:46 ====
+
+
+==== Worker eval start 2025-09-10T18:44:46 ====
+seed_base=9059230, num_eval_seeds=3, max_steps=300
+seed_base=8850084, num_eval_seeds=3, max_steps=300
+
+seed_base=4597195, num_eval_seeds=3, max_steps=300
+
+seed_base=9974701, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -16.7 
+ Health: 44.0 
+ Enemy Health: 61 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -4.7 
+ Health: 211.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -23.2 
+ Health: 581.0 
+ Enemy Health: 100 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -7.5 
+ Health: 150 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -30.8 
+ Health: 0 
+ Enemy Health: 136 
+ Outpost Secured: False 
+ Steps Taken: 133
+
+
+
+Score: 21.6 
+ Health: 72 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 251
+
+
+
+Score: -23.5 
+ Health: 526.0 
+ Enemy Health: 100 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -38.6 
+ Health: 0 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 259
+---- Eval summary: adjusted_raw=0.082, mean=0.564, std=0.173, cost=11.0 ----
+==== Worker eval end 2025-09-10T19:10:42 ====
+
+
+==== Worker eval start 2025-09-10T19:10:42 ====
+seed_base=3729697, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -33.0 
+ Health: 96 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.074, mean=0.515, std=0.321, cost=10.0 ----
+==== Worker eval end 2025-09-10T19:11:58 ====
+
+
+==== Worker eval start 2025-09-10T19:11:58 ====
+seed_base=9914565, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 36 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -23.0 
+ Health: 408 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -23.0 
+ Health: 540.0 
+ Enemy Health: 100 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.094, mean=0.597, std=0.017, cost=27.0 ----
+==== Worker eval end 2025-09-10T19:18:15 ====
+
+
+==== Worker eval start 2025-09-10T19:18:15 ====
+seed_base=5082558, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -33.9 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 117
+
+
+
+Score: -34.1 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 122
+---- Eval summary: adjusted_raw=0.000, mean=0.100, std=0.141, cost=7.0 ----
+==== Worker eval end 2025-09-10T19:21:32 ====
+
+
+==== Worker eval start 2025-09-10T19:21:32 ====
+seed_base=3701850, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 102 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -34.8 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 143
+
+
+
+Score: -20.0 
+ Health: 480 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.210, mean=0.722, std=0.071, cost=22.0 ----
+==== Worker eval end 2025-09-10T19:31:04 ====
+
+
+==== Worker eval start 2025-09-10T19:31:04 ====
+seed_base=9900125, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 126 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 19.1 
+ Health: 801 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 294
+
+
+
+Score: -20.0 
+ Health: 294 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -26.9 
+ Health: 602.4 
+ Enemy Health: 4 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 102 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.225, mean=0.731, std=0.035, cost=16.0 ----
+==== Worker eval end 2025-09-10T19:58:28 ====
+
+
+==== Worker eval start 2025-09-10T19:58:28 ====
+seed_base=8487993, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 870 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 330 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.427, std=0.302, cost=28.0 ----
+==== Worker eval end 2025-09-10T20:03:26 ====
+
+
+==== Worker eval start 2025-09-10T20:03:26 ====
+seed_base=2285212, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 870 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.285, mean=0.820, std=0.227, cost=29.0 ----
+==== Worker eval end 2025-09-10T20:10:23 ====
+
+
+==== Worker eval start 2025-09-10T20:10:23 ====
+seed_base=2290008, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -21.6 
+ Health: 314.0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 60 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 306 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -27.0 
+ Health: 284.4 
+ Enemy Health: 30 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 180 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 60 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 342 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.387, std=0.019, cost=20.0 ----
+==== Worker eval end 2025-09-10T20:27:28 ====
+
+
+==== Worker eval start 2025-09-10T20:27:28 ====
+seed_base=7639581, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 174 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 60 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.488, std=0.000, cost=14.0 ----
+==== Worker eval end 2025-09-10T20:38:44 ====
+
+
+==== Worker eval start 2025-09-10T20:38:44 ====
+seed_base=890377, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 21.6 
+ Health: 216 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 252
+
+
+
+Score: -20.0 
+ Health: 174 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 174 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.012, mean=0.512, std=0.000, cost=14.0 ----
+==== Worker eval end 2025-09-10T20:48:29 ====
+
+
+==== Worker eval start 2025-09-10T20:48:29 ====
+seed_base=9077101, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -4.7 
+ Health: 712.4 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.223, mean=0.745, std=0.135, cost=36.0 ----
+==== Worker eval end 2025-09-10T20:51:18 ====
+
+
+==== Worker eval start 2025-09-10T20:51:18 ====
+seed_base=4182538, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 20.3 
+ Health: 270 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 290
+---- Eval summary: adjusted_raw=0.430, mean=0.911, std=0.068, cost=21.0 ----
+==== Worker eval end 2025-09-10T20:54:16 ====
+
+
+==== Worker eval start 2025-09-10T20:54:16 ====
+seed_base=6046746, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 156 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 486 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -27.0 
+ Health: 180 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 20.4 
+ Health: 444 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 289
+
+
+
+Score: -28.0 
+ Health: 165 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 486 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -34.2 
+ Health: 0 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 127
+---- Eval summary: adjusted_raw=0.174, mean=0.590, std=0.204, cost=8.0 ----
+==== Worker eval end 2025-09-10T21:17:43 ====
+
+
+==== Worker eval start 2025-09-10T21:17:43 ====
+seed_base=5202339, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -18.0 
+ Health: 168.0 
+ Enemy Health: 70 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 444 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 966 
+ Enemy Health: 140 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.356, std=0.153, cost=37.0 ----
+==== Worker eval end 2025-09-10T21:30:48 ====
+
+
+
+
+Score: -16.4 
+ Health: 138 
+ Enemy Health: 136 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 198 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.171, mean=0.691, std=0.122, cost=19.0 ----
+==== Worker eval end 2025-09-10T21:39:30 ====
+
+
+
+
+Score: 0.0 
+ Health: 444 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.505, mean=1.000, std=0.000, cost=23.0 ----
+==== Worker eval end 2025-09-10T21:45:40 ====
+
+
+
+
+Score: -31.1 
+ Health: 184.0 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.7 
+ Health: 400.0 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.057, mean=0.602, std=0.266, cost=20.0 ----
+==== Worker eval end 2025-09-10T21:55:45 ====
+
+
+==== Worker eval start 2025-09-10T21:55:45 ====
+seed_base=3376788, num_eval_seeds=3, max_steps=300
+
+==== Worker eval start 2025-09-10T21:55:45 ====
+seed_base=9859776, num_eval_seeds=3, max_steps=300
+
+==== Worker eval start 2025-09-10T21:55:45 ====
+seed_base=8824055, num_eval_seeds=3, max_steps=300
+seed_base=942629, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 108 
+ Enemy Health: 136 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 156 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -11.6 
+ Health: 213 
+ Enemy Health: 19 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 198 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -26.8 
+ Health: 214.0 
+ Enemy Health: 104 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 156 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 348 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.502, std=0.206, cost=13.0 ----
+==== Worker eval end 2025-09-10T22:16:25 ====
+
+
+==== Worker eval start 2025-09-10T22:16:25 ====
+seed_base=7664409, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 54 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 156 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.422, mean=0.922, std=0.000, cost=13.0 ----
+==== Worker eval end 2025-09-10T22:25:51 ====
+
+
+==== Worker eval start 2025-09-10T22:25:51 ====
+seed_base=2146864, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 402 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 54 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.241, std=0.247, cost=27.0 ----
+==== Worker eval end 2025-09-10T22:35:09 ====
+
+
+==== Worker eval start 2025-09-10T22:35:09 ====
+seed_base=9250099, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -28.4 
+ Health: 188.39999999999998 
+ Enemy Health: 104 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 402 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -0.9 
+ Health: 614.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -1.6 
+ Health: 415.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 20.2 
+ Health: 402 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 295
+---- Eval summary: adjusted_raw=0.502, mean=1.000, std=0.000, cost=17.0 ----
+==== Worker eval end 2025-09-10T22:49:23 ====
+
+
+==== Worker eval start 2025-09-10T22:49:23 ====
+seed_base=9114992, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -28.3 
+ Health: 189.2 
+ Enemy Health: 104 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.470, std=0.017, cost=17.0 ----
+==== Worker eval end 2025-09-10T22:57:23 ====
+
+
+==== Worker eval start 2025-09-10T22:57:23 ====
+seed_base=3209150, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.2 
+ Health: 599.0 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.7 
+ Health: 400.0 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 210 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 234 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 414 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.306, mean=0.823, std=0.098, cost=22.0 ----
+==== Worker eval end 2025-09-10T23:12:26 ====
+
+
+==== Worker eval start 2025-09-10T23:12:26 ====
+seed_base=9867460, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -33.2 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 96
+
+
+
+Score: -6.2 
+ Health: 592.0 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.397, mean=0.906, std=0.053, cost=23.0 ----
+==== Worker eval end 2025-09-10T23:17:18 ====
+
+
+==== Worker eval start 2025-09-10T23:17:18 ====
+seed_base=2592740, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -32.6 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 77
+
+
+
+Score: 0.0 
+ Health: 210 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -33.1 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 92
+---- Eval summary: adjusted_raw=0.000, mean=0.000, std=0.000, cost=4.0 ----
+==== Worker eval end 2025-09-10T23:21:23 ====
+
+
+==== Worker eval start 2025-09-10T23:21:23 ====
+seed_base=4762149, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -1.4 
+ Health: 195 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -17.9 
+ Health: 174 
+ Enemy Health: 125 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.228, mean=0.764, std=0.217, cost=22.0 ----
+==== Worker eval end 2025-09-10T23:32:36 ====
+
+
+==== Worker eval start 2025-09-10T23:32:36 ====
+seed_base=8742062, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 624 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -25.2 
+ Health: 258 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 210 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.500, mean=1.000, std=0.000, cost=17.0 ----
+==== Worker eval end 2025-09-10T23:36:50 ====
+
+
+==== Worker eval start 2025-09-10T23:36:50 ====
+seed_base=9507918, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 624 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 408 
+ Enemy Health: 100 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.2 
+ Health: 677.0 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -8.4 
+ Health: 181.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 624 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.470, std=0.000, cost=26.0 ----
+==== Worker eval end 2025-09-10T23:59:25 ====
+
+
+==== Worker eval start 2025-09-10T23:59:25 ====
+seed_base=8477071, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -21.2 
+ Health: 434.0 
+ Enemy Health: 100 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -8.8 
+ Health: 174 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.264, mean=0.767, std=0.018, cost=14.0 ----
+==== Worker eval end 2025-09-11T00:07:36 ====
+
+
+==== Worker eval start 2025-09-11T00:07:36 ====
+seed_base=1148627, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 12 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.3 
+ Health: 455.0 
+ Enemy Health: 100 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.151, mean=0.655, std=0.020, cost=26.0 ----
+==== Worker eval end 2025-09-11T00:17:38 ====
+
+
+==== Worker eval start 2025-09-11T00:17:38 ====
+seed_base=4955308, num_eval_seeds=3, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 696 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 12 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -25.4 
+ Health: 246 
+ Enemy Health: 126 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -27.5 
+ Health: 150 
+ Enemy Health: 126 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -39.4 
+ Health: 1.0 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.345, std=0.027, cost=10.0 ----
+==== Worker eval end 2025-09-11T00:29:58 ====
+
+
+==== Worker eval start 2025-09-11T00:29:58 ====
+seed_base=7280808, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.4 
+ Health: 323.0 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -22.5 
+ Health: 210 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 330 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 660 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.405, mean=0.921, std=0.095, cost=30.0 ----
+==== Worker eval end 2025-09-11T00:42:44 ====
+
+
+
+
+Score: -20.0 
+ Health: 240 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 330 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.008, mean=0.509, std=0.005, cost=12.0 ----
+==== Worker eval end 2025-09-11T00:45:36 ====
+
+
+
+
+Score: -22.6 
+ Health: 47.0 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.121, std=0.068, cost=27.0 ----
+==== Worker eval end 2025-09-11T00:45:45 ====
+
+
+
+
+Score: -20.0 
+ Health: 240 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.188, std=0.059, cost=25.0 ----
+==== Worker eval end 2025-09-11T00:51:54 ====
+
+
+==== Worker eval start 2025-09-11T00:51:54 ====
+
+==== Worker eval start 2025-09-11T00:51:54 ====0
+
+seed_base=9538693, num_eval_seeds=3, max_steps=300
+
+
+==== Worker eval start 2025-09-11T00:51:54 ====0
+
+seed_base=750858, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 54 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 276 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 228 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 54 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 276 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 54 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.173, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T01:15:03 ====
+
+
+==== Worker eval start 2025-09-11T01:15:03 ====
+seed_base=3884659, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 228 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 888 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 276 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.371, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T01:19:36 ====
+
+
+==== Worker eval start 2025-09-11T01:19:36 ====
+seed_base=4921379, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 756 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 276 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 228 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.374, mean=0.874, std=0.000, cost=23.0 ----
+==== Worker eval end 2025-09-11T01:31:01 ====
+
+
+==== Worker eval start 2025-09-11T01:31:01 ====
+seed_base=6142580, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -23.7 
+ Health: 522 
+ Enemy Health: 126 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 14.7 
+ Health: 528 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 277
+---- Eval summary: adjusted_raw=0.000, mean=0.515, std=0.272, cost=18.0 ----
+==== Worker eval end 2025-09-11T01:40:03 ====
+
+
+==== Worker eval start 2025-09-11T01:40:03 ====
+seed_base=2674083, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -24.7 
+ Health: 492 
+ Enemy Health: 126 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -25.9 
+ Health: 570 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 186 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -11.3 
+ Health: 12 
+ Enemy Health: 35 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -24.7 
+ Health: 492 
+ Enemy Health: 126 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.484, std=0.010, cost=27.0 ----
+==== Worker eval end 2025-09-11T01:53:21 ====
+
+
+==== Worker eval start 2025-09-11T01:53:21 ====
+seed_base=468798, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 198 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -11.4 
+ Health: 36 
+ Enemy Health: 80 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -13.6 
+ Health: 36 
+ Enemy Health: 95 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: -20.0 
+ Health: 198 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.502, std=0.014, cost=18.0 ----
+==== Worker eval end 2025-09-11T02:06:31 ====
+
+
+==== Worker eval start 2025-09-11T02:06:31 ====
+seed_base=3630513, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -21.7 
+ Health: 318 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 0.0 
+ Health: 888 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.376, mean=0.898, std=0.134, cost=32.0 ----
+==== Worker eval end 2025-09-11T02:12:46 ====
+
+
+==== Worker eval start 2025-09-11T02:12:46 ====
+seed_base=1443465, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 72 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.044, mean=0.574, std=0.175, cost=8.0 ----
+==== Worker eval end 2025-09-11T02:15:08 ====
+
+
+==== Worker eval start 2025-09-11T02:15:08 ====
+seed_base=517651, num_eval_seeds=3, max_steps=300
+
+
+
+Score: -1.0 
+ Health: 137.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+
+
+Score: 15.2 
+ Health: 351 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 253
+
+
+
+Score: -17.8 
+ Health: 54 
+ Enemy Health: 121 
+ Outpost Secured: False 
+ Steps Taken: 300
+
+==== Worker eval start 2025-09-11T09:48:43 ====
+seed_base=1214699, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:48:43 ====
+seed_base=9383426, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:48:43 ====
+seed_base=214225, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:48:43 ====
+seed_base=7817793, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:03 ====
+seed_base=8587762, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:03 ====
+==== Worker eval start 2025-09-11T09:49:03 ====seed_base=1116235, num_eval_seeds=1, max_steps=300
+
+seed_base=1586305, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:03 ====
+seed_base=5854011, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:04 ====
+seed_base=2253237, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:04 ====
+==== Worker eval start 2025-09-11T09:49:04 ====
+seed_base=2579234, num_eval_seeds=1, max_steps=300
+seed_base=1524359, num_eval_seeds=1, max_steps=300
+seed_base=7517752, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:04 ====
+seed_base=3273055, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:27 ====
+seed_base=1214699, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:27 ====
+seed_base=9383426, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:27 ====
+seed_base=214225, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:27 ====
+seed_base=7817793, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:27 ====
+seed_base=8587762, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:27 ====
+seed_base=1116235, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:27 ====
+seed_base=1586305, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T09:49:27 ====
+seed_base=5854011, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 54 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.173, std=0.000, cost=13.0 ----
+==== Worker eval end 2025-09-11T09:58:59 ====
+
+
+==== Worker eval start 2025-09-11T09:58:59 ====
+seed_base=2253237, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 276 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.371, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T10:03:51 ====
+
+
+==== Worker eval start 2025-09-11T10:03:51 ====
+seed_base=7517752, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 54 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.173, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T10:04:06 ====
+
+
+==== Worker eval start 2025-09-11T10:04:06 ====
+seed_base=2579234, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 186 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.470, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T10:04:44 ====
+
+
+==== Worker eval start 2025-09-11T10:04:44 ====
+seed_base=1524359, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 216 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.491, std=0.000, cost=23.0 ----
+==== Worker eval end 2025-09-11T10:07:00 ====
+
+
+==== Worker eval start 2025-09-11T10:07:00 ====
+seed_base=3273055, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 240 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.167, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T10:12:15 ====
+
+
+==== Worker eval start 2025-09-11T10:12:15 ====
+seed_base=235163, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 18.7 
+ Health: 295.0 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 276
+---- Eval summary: adjusted_raw=0.443, mean=0.903, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T10:20:21 ====
+
+
+==== Worker eval start 2025-09-11T10:20:21 ====
+seed_base=9694403, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -1.0 
+ Health: 330 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.474, mean=0.974, std=0.000, cost=17.0 ----
+==== Worker eval end 2025-09-11T10:21:28 ====
+
+
+==== Worker eval start 2025-09-11T10:21:28 ====
+seed_base=244430, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -34.9 
+ Health: 0 
+ Enemy Health: 147 
+ Outpost Secured: False 
+ Steps Taken: 204
+---- Eval summary: adjusted_raw=0.000, mean=0.057, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T10:22:46 ====
+
+
+==== Worker eval start 2025-09-11T10:22:46 ====
+seed_base=7971385, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 420 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.349, mean=0.849, std=0.000, cost=28.0 ----
+==== Worker eval end 2025-09-11T10:23:17 ====
+
+
+==== Worker eval start 2025-09-11T10:23:17 ====
+seed_base=6628663, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 120 
+ Enemy Health: 62 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.107, mean=0.607, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T10:24:37 ====
+
+
+
+
+Score: -20.0 
+ Health: 678 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.247, mean=0.747, std=0.000, cost=33.0 ----
+==== Worker eval end 2025-09-11T10:26:49 ====
+
+
+
+
+Score: -20.0 
+ Health: 162 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.012, mean=0.512, std=0.000, cost=12.0 ----
+==== Worker eval end 2025-09-11T10:28:47 ====
+
+
+
+
+Score: -20.0 
+ Health: 402 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.228, std=0.000, cost=27.0 ----
+==== Worker eval end 2025-09-11T10:30:39 ====
+
+
+
+
+Score: 0.0 
+ Health: 888 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.493, mean=0.993, std=0.000, cost=32.0 ----
+==== Worker eval end 2025-09-11T10:31:45 ====
+
+
+
+
+Score: 16.1 
+ Health: 383.0 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 234
+---- Eval summary: adjusted_raw=0.457, mean=0.847, std=0.000, cost=16.0 ----
+==== Worker eval end 2025-09-11T10:34:38 ====
+
+
+
+
+Score: -20.0 
+ Health: 330 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.274, mean=0.774, std=0.000, cost=21.0 ----
+==== Worker eval end 2025-09-11T10:35:12 ====
+
+
+
+
+Score: 0.0 
+ Health: 558 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.500, mean=1.000, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T10:37:22 ====
+
+
+==== Worker eval start 2025-09-11T10:37:22 ====
+seed_base=301649, num_eval_seeds=1, max_steps=300
+seed_base=7435509, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T10:37:22 ====
+seed_base=8533853, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T10:37:22 ====
+==== Worker eval start 2025-09-11T10:37:22 ====
+0
+
+==== Worker eval start 2025-09-11T10:37:22 ====0
+
+ed_base=4609533, num_eval_seeds=1, max_steps=300
+
+seed_base=1664069, num_eval_seeds=1, max_steps=300
+seed_base=8635021, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 13.5 
+ Health: 21 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 244
+---- Eval summary: adjusted_raw=0.312, mean=0.719, std=0.000, cost=5.0 ----
+==== Worker eval end 2025-09-11T10:41:52 ====
+
+
+==== Worker eval start 2025-09-11T10:41:52 ====
+seed_base=9223931, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -27.5 
+ Health: 150 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.167, mean=0.667, std=0.000, cost=11.0 ----
+==== Worker eval end 2025-09-11T10:47:36 ====
+
+
+==== Worker eval start 2025-09-11T10:47:36 ====
+seed_base=9113546, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 234 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.500, std=0.000, cost=21.0 ----
+==== Worker eval end 2025-09-11T10:49:52 ====
+
+
+==== Worker eval start 2025-09-11T10:49:52 ====
+seed_base=2846344, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.4 
+ Health: 341.0 
+ Enemy Health: 30 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.354, mean=0.854, std=0.000, cost=19.0 ----
+==== Worker eval end 2025-09-11T10:55:08 ====
+
+
+==== Worker eval start 2025-09-11T10:55:08 ====
+seed_base=4053676, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.5 
+ Health: 287.0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.469, std=0.000, cost=11.0 ----
+==== Worker eval end 2025-09-11T10:57:20 ====
+
+
+==== Worker eval start 2025-09-11T10:57:20 ====
+seed_base=4613156, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -4.4 
+ Health: 672 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.389, mean=0.889, std=0.000, cost=26.0 ----
+==== Worker eval end 2025-09-11T11:02:48 ====
+
+
+==== Worker eval start 2025-09-11T11:02:48 ====
+seed_base=323392, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 618 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.476, std=0.000, cost=27.0 ----
+==== Worker eval end 2025-09-11T11:03:00 ====
+
+
+==== Worker eval start 2025-09-11T11:03:00 ====
+seed_base=4664834, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -7.7 
+ Health: 192 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.276, mean=0.776, std=0.000, cost=14.0 ----
+==== Worker eval end 2025-09-11T11:06:37 ====
+
+
+==== Worker eval start 2025-09-11T11:06:37 ====
+seed_base=5302294, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 108 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.301, mean=0.801, std=0.000, cost=13.0 ----
+==== Worker eval end 2025-09-11T11:07:16 ====
+
+
+==== Worker eval start 2025-09-11T11:07:16 ====
+seed_base=618267, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 534 
+ Enemy Health: 30 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.364, mean=0.864, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T11:14:13 ====
+
+
+==== Worker eval start 2025-09-11T11:14:13 ====
+seed_base=1472258, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -21.6 
+ Health: 684 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.341, mean=0.841, std=0.000, cost=25.0 ----
+==== Worker eval end 2025-09-11T11:14:45 ====
+
+
+
+
+Score: -9.9 
+ Health: 390 
+ Enemy Health: 32 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.310, mean=0.810, std=0.000, cost=10.0 ----
+==== Worker eval end 2025-09-11T11:16:04 ====
+
+
+
+
+Score: -22.8 
+ Health: 774 
+ Enemy Health: 4 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.407, mean=0.907, std=0.000, cost=33.0 ----
+==== Worker eval end 2025-09-11T11:17:45 ====
+
+
+
+
+Score: -1.2 
+ Health: 321.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.399, mean=0.899, std=0.000, cost=21.0 ----
+==== Worker eval end 2025-09-11T11:22:32 ====
+
+
+
+
+Score: 0.0 
+ Health: 402 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.500, mean=1.000, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T11:23:39 ====
+
+
+
+
+Score: -20.0 
+ Health: 414 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.263, std=0.000, cost=37.0 ----
+==== Worker eval end 2025-09-11T11:27:46 ====
+
+
+
+
+Score: -20.0 
+ Health: 432 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.095, mean=0.595, std=0.000, cost=23.0 ----
+==== Worker eval end 2025-09-11T11:30:18 ====
+
+
+
+
+Score: -24.0 
+ Health: 676.4 
+ Enemy Health: 40 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.279, mean=0.779, std=0.000, cost=28.0 ----
+==== Worker eval end 2025-09-11T11:30:54 ====
+
+
+==== Worker eval start 2025-09-11T11:30:54 ====
+==== Worker eval start 2025-09-11T11:30:54 ====
+seed_base=2612210, num_eval_seeds=1, max_steps=300
+seed_base=9322741, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T11:30:54 ====
+seed_base=9253790, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T11:30:54 ====
+seed_base=5404448, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T11:30:54 ====
+seed_base=1323243, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T11:30:54 ====
+==== Worker eval start 2025-09-11T11:30:54 ====
+seed_base=1129770, num_eval_seeds=1, max_steps=
+ed_base=2699694, num_eval_seeds=1, max_steps=300
+seed_base=7492657, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 12 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.100, std=0.000, cost=7.0 ----
+==== Worker eval end 2025-09-11T11:39:52 ====
+
+
+==== Worker eval start 2025-09-11T11:39:52 ====
+seed_base=8958046, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -37.7 
+ Health: 0 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 230
+---- Eval summary: adjusted_raw=0.008, mean=0.392, std=0.000, cost=8.0 ----
+==== Worker eval end 2025-09-11T11:42:28 ====
+
+
+==== Worker eval start 2025-09-11T11:42:28 ====
+seed_base=6586083, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 384 
+ Enemy Health: 140 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.078, mean=0.578, std=0.000, cost=16.0 ----
+==== Worker eval end 2025-09-11T11:47:27 ====
+
+
+==== Worker eval start 2025-09-11T11:47:27 ====
+seed_base=9090118, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 492 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.267, mean=0.767, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T11:47:49 ====
+
+
+==== Worker eval start 2025-09-11T11:47:49 ====
+seed_base=4432474, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -22.9 
+ Health: 41.0 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.430, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T11:49:39 ====
+
+
+==== Worker eval start 2025-09-11T11:49:39 ====
+seed_base=3743174, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 588 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.500, mean=1.000, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T11:53:17 ====
+
+
+==== Worker eval start 2025-09-11T11:53:17 ====
+seed_base=6718328, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 294 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.224, mean=0.724, std=0.000, cost=13.0 ----
+==== Worker eval end 2025-09-11T11:55:38 ====
+
+
+==== Worker eval start 2025-09-11T11:55:38 ====
+seed_base=3857273, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 144 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.308, mean=0.808, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T11:55:48 ====
+
+
+==== Worker eval start 2025-09-11T11:55:48 ====
+seed_base=1788519, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -36.6 
+ Health: 0 
+ Enemy Health: 62 
+ Outpost Secured: False 
+ Steps Taken: 199
+---- Eval summary: adjusted_raw=0.000, mean=0.313, std=0.000, cost=11.0 ----
+==== Worker eval end 2025-09-11T11:57:38 ====
+
+
+==== Worker eval start 2025-09-11T11:57:38 ====
+seed_base=1185926, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 20.7 
+ Health: 384 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 278
+---- Eval summary: adjusted_raw=0.475, mean=0.938, std=0.000, cost=20.0 ----
+==== Worker eval end 2025-09-11T12:00:49 ====
+
+
+==== Worker eval start 2025-09-11T12:00:49 ====
+seed_base=5153448, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -1.1 
+ Health: 119.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.472, mean=0.972, std=0.000, cost=10.0 ----
+==== Worker eval end 2025-09-11T12:08:29 ====
+
+
+
+
+Score: -20.0 
+ Health: 108 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.312, std=0.000, cost=14.0 ----
+==== Worker eval end 2025-09-11T12:10:55 ====
+
+
+
+
+Score: -20.0 
+ Health: 426 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.500, std=0.000, cost=21.0 ----
+==== Worker eval end 2025-09-11T12:12:19 ====
+
+
+
+
+Score: -20.0 
+ Health: 240 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.421, std=0.000, cost=16.0 ----
+==== Worker eval end 2025-09-11T12:13:23 ====
+
+
+
+
+Score: -22.1 
+ Health: 809.0 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.368, mean=0.868, std=0.000, cost=32.0 ----
+==== Worker eval end 2025-09-11T12:15:36 ====
+
+
+
+
+Score: -5.1 
+ Health: 290.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.372, mean=0.872, std=0.000, cost=19.0 ----
+==== Worker eval end 2025-09-11T12:18:54 ====
+
+
+
+
+Score: -33.4 
+ Health: 5.0 
+ Enemy Health: 96 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.214, std=0.000, cost=30.0 ----
+==== Worker eval end 2025-09-11T12:21:42 ====
+
+
+
+
+Score: -20.0 
+ Health: 954 
+ Enemy Health: 104 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.174, mean=0.674, std=0.000, cost=37.0 ----
+==== Worker eval end 2025-09-11T12:23:07 ====
+
+
+==== Worker eval start 2025-09-11T12:23:07 ====
+seed_base=1218622, num_eval_seeds=1, max_steps=300
+
+seed_base=8527329, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T12:23:07 ====
+seed_base=172278, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T12:23:07 ====
+seed_base=7047362, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T12:23:07 ====
+seed_base=191127, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T12:23:07 ====
+seed_base=5629944, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T12:23:07 ====
+seed_base=1961925, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -33.4 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 101
+---- Eval summary: adjusted_raw=0.000, mean=0.000, std=0.000, cost=5.0 ----
+==== Worker eval end 2025-09-11T12:28:51 ====
+
+
+==== Worker eval start 2025-09-11T12:28:51 ====
+seed_base=5450299, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -36.4 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 192
+---- Eval summary: adjusted_raw=0.000, mean=0.000, std=0.000, cost=12.0 ----
+==== Worker eval end 2025-09-11T12:29:21 ====
+
+
+==== Worker eval start 2025-09-11T12:29:21 ====
+seed_base=9825240, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -36.3 
+ Health: 0 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 189
+---- Eval summary: adjusted_raw=0.077, mean=0.392, std=0.000, cost=5.0 ----
+==== Worker eval end 2025-09-11T12:31:14 ====
+
+
+==== Worker eval start 2025-09-11T12:31:14 ====
+seed_base=2309411, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 120 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.179, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T12:31:35 ====
+
+
+==== Worker eval start 2025-09-11T12:31:35 ====
+seed_base=7917741, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 306 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.274, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T12:39:54 ====
+
+
+==== Worker eval start 2025-09-11T12:39:54 ====
+seed_base=8536902, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 126 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.500, mean=1.000, std=0.000, cost=10.0 ----
+==== Worker eval end 2025-09-11T12:40:10 ====
+
+
+==== Worker eval start 2025-09-11T12:40:10 ====
+seed_base=1189842, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 402 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.500, std=0.000, cost=21.0 ----
+==== Worker eval end 2025-09-11T12:40:48 ====
+
+
+==== Worker eval start 2025-09-11T12:40:48 ====
+seed_base=8813928, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 36 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.055, std=0.000, cost=12.0 ----
+==== Worker eval end 2025-09-11T12:41:29 ====
+
+
+==== Worker eval start 2025-09-11T12:41:29 ====
+seed_base=4802791, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 19.5 
+ Health: 525.0 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 235
+---- Eval summary: adjusted_raw=0.542, mean=0.933, std=0.000, cost=20.0 ----
+==== Worker eval end 2025-09-11T12:42:02 ====
+
+
+==== Worker eval start 2025-09-11T12:42:02 ====
+seed_base=7603022, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 828 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.473, std=0.000, cost=28.0 ----
+==== Worker eval end 2025-09-11T12:52:05 ====
+
+
+==== Worker eval start 2025-09-11T12:52:05 ====
+seed_base=4925632, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -10.7 
+ Health: 480 
+ Enemy Health: 87 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.192, mean=0.692, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T12:55:01 ====
+
+
+
+
+Score: -35.5 
+ Health: 0 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 166
+---- Eval summary: adjusted_raw=0.115, mean=0.392, std=0.000, cost=27.0 ----
+==== Worker eval end 2025-09-11T12:55:23 ====
+
+
+
+
+Score: -20.0 
+ Health: 126 
+ Enemy Health: 140 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.498, std=0.000, cost=14.0 ----
+==== Worker eval end 2025-09-11T12:57:23 ====
+
+
+
+
+Score: -5.6 
+ Health: 312 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.325, mean=0.825, std=0.000, cost=26.0 ----
+==== Worker eval end 2025-09-11T12:58:51 ====
+
+
+
+
+Score: -26.3 
+ Health: 332.4 
+ Enemy Health: 40 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.221, mean=0.721, std=0.000, cost=25.0 ----
+==== Worker eval end 2025-09-11T13:01:04 ====
+
+
+
+
+Score: -20.0 
+ Health: 354 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.356, mean=0.856, std=0.000, cost=20.0 ----
+==== Worker eval end 2025-09-11T13:04:04 ====
+
+
+
+
+Score: 0.0 
+ Health: 444 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.500, mean=1.000, std=0.000, cost=23.0 ----
+==== Worker eval end 2025-09-11T13:04:49 ====
+
+
+
+
+Score: -2.0 
+ Health: 636 
+ Enemy Health: 10 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.470, mean=0.970, std=0.000, cost=23.0 ----
+==== Worker eval end 2025-09-11T13:05:10 ====
+
+
+==== Worker eval start 2025-09-11T13:05:10 ====
+seed_base=4639736, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T13:05:10 ====
+seed_base=6341484, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T13:05:10 ====
+==== Worker eval start 2025-09-11T13:05:10 ====
+seed_base=2244761, num_eval_seeds=1, max_steps=300
+seed_base=4557115, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T13:05:10 ====
+seed_base=3436454, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T13:05:10 ====
+seed_base=8417406, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T13:05:10 ====
+seed_base=6727282, num_eval_seeds=1, max_steps=300
+seed_base=4551764, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -29.9 
+ Health: 0 
+ Enemy Health: 51 
+ Outpost Secured: False 
+ Steps Taken: 132
+---- Eval summary: adjusted_raw=0.126, mean=0.346, std=0.000, cost=5.0 ----
+==== Worker eval end 2025-09-11T13:08:55 ====
+
+
+==== Worker eval start 2025-09-11T13:08:55 ====
+seed_base=7507619, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 78 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.500, std=0.000, cost=8.0 ----
+==== Worker eval end 2025-09-11T13:10:59 ====
+
+
+==== Worker eval start 2025-09-11T13:10:59 ====
+seed_base=2805980, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 12 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.008, std=0.000, cost=17.0 ----
+==== Worker eval end 2025-09-11T13:15:09 ====
+
+
+==== Worker eval start 2025-09-11T13:15:09 ====
+seed_base=8229885, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -38.7 
+ Health: 0 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 261
+---- Eval summary: adjusted_raw=0.000, mean=0.301, std=0.000, cost=7.0 ----
+==== Worker eval end 2025-09-11T13:18:49 ====
+
+
+==== Worker eval start 2025-09-11T13:18:49 ====
+seed_base=5093983, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 240 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.435, std=0.000, cost=8.0 ----
+==== Worker eval end 2025-09-11T13:19:45 ====
+
+
+==== Worker eval start 2025-09-11T13:19:45 ====
+seed_base=971572, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -21.5 
+ Health: 526.0 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.018, mean=0.518, std=0.000, cost=23.0 ----
+==== Worker eval end 2025-09-11T13:21:42 ====
+
+
+==== Worker eval start 2025-09-11T13:21:42 ====
+seed_base=5151109, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -23.9 
+ Health: 294 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.247, mean=0.747, std=0.000, cost=20.0 ----
+==== Worker eval end 2025-09-11T13:23:34 ====
+
+
+==== Worker eval start 2025-09-11T13:23:34 ====
+seed_base=8954954, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -34.8 
+ Health: 0 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 143
+---- Eval summary: adjusted_raw=0.063, mean=0.301, std=0.000, cost=9.0 ----
+==== Worker eval end 2025-09-11T13:24:57 ====
+
+
+==== Worker eval start 2025-09-11T13:24:57 ====
+seed_base=2191188, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 126 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.457, mean=0.957, std=0.000, cost=12.0 ----
+==== Worker eval end 2025-09-11T13:25:14 ====
+
+
+==== Worker eval start 2025-09-11T13:25:14 ====
+seed_base=721431, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 78 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.152, mean=0.652, std=0.000, cost=14.0 ----
+==== Worker eval end 2025-09-11T13:27:38 ====
+
+
+==== Worker eval start 2025-09-11T13:27:38 ====
+seed_base=6320925, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -4.5 
+ Health: 558 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.352, mean=0.852, std=0.000, cost=24.0 ----
+==== Worker eval end 2025-09-11T13:31:14 ====
+
+
+
+
+Score: -33.6 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 107
+---- Eval summary: adjusted_raw=0.000, mean=0.000, std=0.000, cost=4.0 ----
+==== Worker eval end 2025-09-11T13:32:00 ====
+
+
+
+
+Score: -20.9 
+ Health: 738 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.328, mean=0.828, std=0.000, cost=25.0 ----
+==== Worker eval end 2025-09-11T13:32:26 ====
+
+
+
+
+Score: -16.2 
+ Health: 63 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.095, mean=0.595, std=0.000, cost=12.0 ----
+==== Worker eval end 2025-09-11T13:33:57 ====
+
+
+
+
+Score: -20.0 
+ Health: 36 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.142, mean=0.642, std=0.000, cost=9.0 ----
+==== Worker eval end 2025-09-11T13:39:34 ====
+
+
+
+
+Score: 11.4 
+ Health: 156 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 297
+---- Eval summary: adjusted_raw=0.101, mean=0.596, std=0.000, cost=25.0 ----
+==== Worker eval end 2025-09-11T13:40:36 ====
+
+
+
+
+Score: 0.0 
+ Health: 456 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.500, mean=1.000, std=0.000, cost=22.0 ----
+==== Worker eval end 2025-09-11T13:43:12 ====
+
+
+
+
+Score: 0.0 
+ Health: 468 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.500, mean=1.000, std=0.000, cost=24.0 ----
+==== Worker eval end 2025-09-11T13:45:05 ====
+
+
+==== Worker eval start 2025-09-11T13:45:05 ====
+seed_base=6432175, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T13:45:05 ====
+seed_base=2358167, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T13:45:05 ====
+seed_base=8559455, num_eval_seeds=1, max_steps=300
+
+seed_base=9484076, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T13:45:05 ====
+seed_base=224676, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T13:45:05 ====
+seed_base=3775753, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T13:45:05 ====
+seed_base=54926, num_eval_seeds=1, max_steps=30
+
+seed_base=6062428, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -33.6 
+ Health: 0 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 108
+---- Eval summary: adjusted_raw=0.121, mean=0.301, std=0.000, cost=10.0 ----
+==== Worker eval end 2025-09-11T13:49:36 ====
+
+
+==== Worker eval start 2025-09-11T13:49:36 ====
+seed_base=6852220, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 12 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.100, std=0.000, cost=7.0 ----
+==== Worker eval end 2025-09-11T13:52:13 ====
+
+
+==== Worker eval start 2025-09-11T13:52:13 ====
+seed_base=1887253, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -5.1 
+ Health: 232.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.317, mean=0.817, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T14:00:29 ====
+
+
+==== Worker eval start 2025-09-11T14:00:29 ====
+seed_base=1138004, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -5.0 
+ Health: 378 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.375, mean=0.875, std=0.000, cost=14.0 ----
+==== Worker eval end 2025-09-11T14:00:57 ====
+
+
+==== Worker eval start 2025-09-11T14:00:57 ====
+seed_base=1725639, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 276 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.383, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T14:02:57 ====
+
+
+==== Worker eval start 2025-09-11T14:02:57 ====
+seed_base=342422, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 54 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.136, mean=0.636, std=0.000, cost=10.0 ----
+==== Worker eval end 2025-09-11T14:03:05 ====
+
+
+==== Worker eval start 2025-09-11T14:03:05 ====
+seed_base=7851170, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 22.0 
+ Health: 306 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 240
+---- Eval summary: adjusted_raw=0.600, mean=1.000, std=0.000, cost=27.0 ----
+==== Worker eval end 2025-09-11T14:03:11 ====
+
+
+==== Worker eval start 2025-09-11T14:03:11 ====
+seed_base=6947142, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.3 
+ Health: 431.0 
+ Enemy Health: 162 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.247, std=0.000, cost=30.0 ----
+==== Worker eval end 2025-09-11T14:04:24 ====
+
+
+==== Worker eval start 2025-09-11T14:04:24 ====
+seed_base=1424628, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 240 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.190, std=0.000, cost=24.0 ----
+==== Worker eval end 2025-09-11T14:05:14 ====
+
+
+==== Worker eval start 2025-09-11T14:05:14 ====
+seed_base=6492947, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 294 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.340, mean=0.840, std=0.000, cost=21.0 ----
+==== Worker eval end 2025-09-11T14:07:08 ====
+
+
+==== Worker eval start 2025-09-11T14:07:08 ====
+seed_base=2436140, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 36 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.058, std=0.000, cost=11.0 ----
+==== Worker eval end 2025-09-11T14:07:53 ====
+
+
+
+
+Score: 0.0 
+ Health: 570 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.470, mean=0.970, std=0.000, cost=20.0 ----
+==== Worker eval end 2025-09-11T14:18:19 ====
+
+
+
+
+Score: 0.0 
+ Health: 162 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.500, mean=1.000, std=0.000, cost=13.0 ----
+==== Worker eval end 2025-09-11T14:18:20 ====
+
+
+
+
+Score: -21.2 
+ Health: 294 
+ Enemy Health: 40 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.351, mean=0.851, std=0.000, cost=11.0 ----
+==== Worker eval end 2025-09-11T14:18:36 ====
+
+
+
+
+Score: -6.0 
+ Health: 412.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.350, mean=0.850, std=0.000, cost=19.0 ----
+==== Worker eval end 2025-09-11T14:19:43 ====
+
+
+
+
+Score: -10.0 
+ Health: 225 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.250, mean=0.750, std=0.000, cost=22.0 ----
+==== Worker eval end 2025-09-11T14:21:09 ====
+
+
+
+
+Score: -20.0 
+ Health: 36 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.447, std=0.000, cost=13.0 ----
+==== Worker eval end 2025-09-11T14:21:12 ====
+
+
+
+
+Score: -3.5 
+ Health: 660 
+ Enemy Health: 1 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.364, mean=0.864, std=0.000, cost=29.0 ----
+==== Worker eval end 2025-09-11T14:25:46 ====
+
+
+==== Worker eval start 2025-09-11T14:25:46 ====
+seed_base=9294842, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:25:46 ====
+seed_base=5165814, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:25:46 ====
+seed_base=7127181, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:25:46 ====
+seed_base=6852214, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:25:46 ====
+==== Worker eval start 2025-09-11T14:25:46 ====seed_base=7762537, num_eval_seeds=1, max_steps=30seed_base=8709523, num_eval_seeds=1, max_steps=300
+seed_base=8942399, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:25:46 ====
+seed_base=1838033, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 36 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.300, std=0.000, cost=7.0 ----
+==== Worker eval end 2025-09-11T14:31:18 ====
+
+
+==== Worker eval start 2025-09-11T14:31:18 ====
+seed_base=6759324, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -27.7 
+ Health: 0 
+ Enemy Health: 21 
+ Outpost Secured: False 
+ Steps Taken: 181
+---- Eval summary: adjusted_raw=0.135, mean=0.437, std=0.000, cost=9.0 ----
+==== Worker eval end 2025-09-11T14:31:50 ====
+
+
+==== Worker eval start 2025-09-11T14:31:50 ====
+seed_base=7889529, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 54 
+ Enemy Health: 40 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.144, mean=0.644, std=0.000, cost=9.0 ----
+==== Worker eval end 2025-09-11T14:33:54 ====
+
+
+==== Worker eval start 2025-09-11T14:33:54 ====
+seed_base=4553030, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 282 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.500, std=0.000, cost=23.0 ----
+==== Worker eval end 2025-09-11T14:34:12 ====
+
+
+==== Worker eval start 2025-09-11T14:34:12 ====
+seed_base=5732620, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -39.7 
+ Health: 0 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 290
+---- Eval summary: adjusted_raw=0.000, mean=0.392, std=0.000, cost=5.0 ----
+==== Worker eval end 2025-09-11T14:35:46 ====
+
+
+==== Worker eval start 2025-09-11T14:35:46 ====
+seed_base=7600828, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -2.2 
+ Health: 112.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.444, mean=0.944, std=0.000, cost=10.0 ----
+==== Worker eval end 2025-09-11T14:38:28 ====
+
+
+==== Worker eval start 2025-09-11T14:38:28 ====
+seed_base=4337758, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -33.3 
+ Health: 0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 98
+---- Eval summary: adjusted_raw=0.000, mean=0.000, std=0.000, cost=6.0 ----
+==== Worker eval end 2025-09-11T14:38:47 ====
+
+
+==== Worker eval start 2025-09-11T14:38:47 ====
+seed_base=8361263, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 0.0 
+ Health: 234 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.433, mean=0.933, std=0.000, cost=21.0 ----
+==== Worker eval end 2025-09-11T14:44:27 ====
+
+
+==== Worker eval start 2025-09-11T14:44:27 ====
+seed_base=4270603, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -8.1 
+ Health: 75.0 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.102, mean=0.602, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T14:44:47 ====
+
+
+==== Worker eval start 2025-09-11T14:44:47 ====
+seed_base=697112, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -25.1 
+ Health: 0 
+ Enemy Health: 46 
+ Outpost Secured: False 
+ Steps Taken: 250
+---- Eval summary: adjusted_raw=0.000, mean=0.361, std=0.000, cost=19.0 ----
+==== Worker eval end 2025-09-11T14:45:30 ====
+
+
+==== Worker eval start 2025-09-11T14:45:30 ====
+seed_base=797818, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 360 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.500, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T14:48:05 ====
+
+
+
+
+Score: -22.8 
+ Health: 0 
+ Enemy Health: 46 
+ Outpost Secured: False 
+ Steps Taken: 180
+---- Eval summary: adjusted_raw=0.061, mean=0.361, std=0.000, cost=5.0 ----
+==== Worker eval end 2025-09-11T14:50:59 ====
+
+
+
+
+Score: -19.8 
+ Health: 274.0 
+ Enemy Health: 136 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.407, std=0.000, cost=21.0 ----
+==== Worker eval end 2025-09-11T14:52:00 ====
+
+
+
+
+Score: -27.8 
+ Health: 22.0 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.053, mean=0.553, std=0.000, cost=8.0 ----
+==== Worker eval end 2025-09-11T14:52:34 ====
+
+
+
+
+Score: 0.0 
+ Health: 372 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.419, mean=0.919, std=0.000, cost=23.0 ----
+==== Worker eval end 2025-09-11T14:54:20 ====
+
+
+
+
+Score: -20.0 
+ Health: 126 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.420, std=0.000, cost=14.0 ----
+==== Worker eval end 2025-09-11T14:54:56 ====
+
+
+
+
+Score: -36.4 
+ Health: 0 
+ Enemy Health: 136 
+ Outpost Secured: False 
+ Steps Taken: 193
+---- Eval summary: adjusted_raw=0.000, mean=0.090, std=0.000, cost=12.0 ----
+==== Worker eval end 2025-09-11T14:54:59 ====
+
+
+
+
+Score: -21.0 
+ Health: 780.0 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.385, std=0.000, cost=40.0 ----
+==== Worker eval end 2025-09-11T14:59:00 ====
+
+
+==== Worker eval start 2025-09-11T14:59:00 ====
+seed_base=5206495, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:59:00 ====
+seed_base=7764679, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:59:00 ====
+seed_base=5730232, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:59:00 ====
+seed_base=806572, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:59:00 ====
+seed_base=6804491, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:59:00 ====
+seed_base=3063840, num_eval_seeds=1, max_steps=300
+
+==== Worker eval start 2025-09-11T14:59:00 ====
+seed_base=3134946, num_eval_seeds=1, max_steps=300
+seed_base=2821373, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -23.3 
+ Health: 0 
+ Enemy Health: 46 
+ Outpost Secured: False 
+ Steps Taken: 195
+---- Eval summary: adjusted_raw=0.036, mean=0.361, std=0.000, cost=6.0 ----
+==== Worker eval end 2025-09-11T15:04:03 ====
+
+
+==== Worker eval start 2025-09-11T15:04:03 ====
+seed_base=8940965, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 240 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.455, std=0.000, cost=9.0 ----
+==== Worker eval end 2025-09-11T15:07:53 ====
+
+
+==== Worker eval start 2025-09-11T15:07:53 ====
+seed_base=8450473, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -34.6 
+ Health: 0 
+ Enemy Health: 130 
+ Outpost Secured: False 
+ Steps Taken: 137
+---- Eval summary: adjusted_raw=0.000, mean=0.108, std=0.000, cost=10.0 ----
+==== Worker eval end 2025-09-11T15:07:54 ====
+
+
+==== Worker eval start 2025-09-11T15:07:54 ====
+seed_base=428547, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 20.9 
+ Health: 36 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 273
+---- Eval summary: adjusted_raw=0.345, mean=0.800, std=0.000, cost=7.0 ----
+==== Worker eval end 2025-09-11T15:08:35 ====
+
+
+==== Worker eval start 2025-09-11T15:08:35 ====
+seed_base=879642, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 174 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.439, std=0.000, cost=18.0 ----
+==== Worker eval end 2025-09-11T15:13:26 ====
+
+
+==== Worker eval start 2025-09-11T15:13:26 ====
+seed_base=6607194, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -39.6 
+ Health: 0 
+ Enemy Health: 36 
+ Outpost Secured: False 
+ Steps Taken: 289
+---- Eval summary: adjusted_raw=0.000, mean=0.392, std=0.000, cost=5.0 ----
+==== Worker eval end 2025-09-11T15:13:33 ====
+
+
+==== Worker eval start 2025-09-11T15:13:33 ====
+seed_base=5343815, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 72 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.176, mean=0.676, std=0.000, cost=10.0 ----
+==== Worker eval end 2025-09-11T15:14:39 ====
+
+
+==== Worker eval start 2025-09-11T15:14:39 ====
+seed_base=484928, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 894 
+ Enemy Health: 30 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.397, mean=0.897, std=0.000, cost=33.0 ----
+==== Worker eval end 2025-09-11T15:19:05 ====
+
+
+==== Worker eval start 2025-09-11T15:19:05 ====
+seed_base=6630236, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -37.9 
+ Health: 0 
+ Enemy Health: 30 
+ Outpost Secured: False 
+ Steps Taken: 237
+---- Eval summary: adjusted_raw=0.015, mean=0.410, std=0.000, cost=16.0 ----
+==== Worker eval end 2025-09-11T15:19:49 ====
+
+
+==== Worker eval start 2025-09-11T15:19:49 ====
+seed_base=7871064, num_eval_seeds=1, max_steps=300
+
+
+
+Score: 20.8 
+ Health: 126 
+ Enemy Health: 0 
+ Outpost Secured: True 
+ Steps Taken: 275
+---- Eval summary: adjusted_raw=0.542, mean=1.000, std=0.000, cost=10.0 ----
+==== Worker eval end 2025-09-11T15:21:44 ====
+
+
+==== Worker eval start 2025-09-11T15:21:44 ====
+seed_base=3850497, num_eval_seeds=1, max_steps=300
+
+
+
+Score: -20.0 
+ Health: 12 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.100, std=0.000, cost=7.0 ----
+==== Worker eval end 2025-09-11T15:22:06 ====
+
+
+
+
+Score: -20.0 
+ Health: 606 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.282, mean=0.782, std=0.000, cost=24.0 ----
+==== Worker eval end 2025-09-11T15:24:53 ====
+
+
+
+
+Score: -23.4 
+ Health: 444 
+ Enemy Health: 26 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.337, mean=0.837, std=0.000, cost=14.0 ----
+==== Worker eval end 2025-09-11T15:27:31 ====
+
+
+
+
+Score: -11.4 
+ Health: 12 
+ Enemy Health: 80 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.309, std=0.000, cost=11.0 ----
+==== Worker eval end 2025-09-11T15:28:05 ====
+
+
+
+
+Score: -21.1 
+ Health: 345.0 
+ Enemy Health: 66 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.273, mean=0.773, std=0.000, cost=15.0 ----
+==== Worker eval end 2025-09-11T15:28:37 ====
+
+
+
+
+Score: -20.0 
+ Health: 162 
+ Enemy Health: 166 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.000, mean=0.175, std=0.000, cost=24.0 ----
+==== Worker eval end 2025-09-11T15:30:47 ====
+
+
+
+
+Score: -1.3 
+ Health: 534 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.441, mean=0.941, std=0.000, cost=20.0 ----
+==== Worker eval end 2025-09-11T15:31:43 ====
+
+
+
+
+Score: 0.0 
+ Health: 642 
+ Enemy Health: 0 
+ Outpost Secured: False 
+ Steps Taken: 300
+---- Eval summary: adjusted_raw=0.364, mean=0.864, std=0.000, cost=28.0 ----
+==== Worker eval end 2025-09-11T15:32:30 ====
+

@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-09-08T23:59:40",
+  "workers_used": 7,
+  "pop_size": 20,
+  "generations": 10,
+  "num_eval_seeds": 1,
+  "best_final_gen_fitness": 83.33333333333334,
+  "pareto_size": 20,
+  "hypervolume": null
+}

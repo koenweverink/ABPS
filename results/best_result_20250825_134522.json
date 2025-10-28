@@ -1,0 +1,88 @@
+{
+  "generation": -1,
+  "fitness": 18.2,
+  "eval": {
+    "mean_raw": 23.2,
+    "std_raw": 0.0,
+    "adjusted_raw": 23.2,
+    "cost": 5.0,
+    "seed_base": 4240720,
+    "seeds": [
+      4240720
+    ]
+  },
+  "chromosome": {
+    "config": {
+      "FriendlyTankGroup": 1,
+      "FriendlyInfantryGroup": 0,
+      "FriendlyArtilleryGroup": 0,
+      "FriendlyAntiTankGroup": 0
+    },
+    "sequence": [
+      [
+        "EnemyInfantryGroup1",
+        "FlankAttack",
+        [
+          "FriendlyTankGroup_0"
+        ]
+      ],
+      [
+        "EnemyInfantryGroup3",
+        "FlankAttack",
+        [
+          "FriendlyTankGroup_0"
+        ]
+      ],
+      [
+        "EnemyInfantryGroup2",
+        "FlankAttack",
+        [
+          "FriendlyTankGroup_0"
+        ]
+      ]
+    ]
+  },
+  "key": [
+    [
+      [
+        "FriendlyTankGroup",
+        1
+      ],
+      [
+        "FriendlyInfantryGroup",
+        0
+      ],
+      [
+        "FriendlyArtilleryGroup",
+        0
+      ],
+      [
+        "FriendlyAntiTankGroup",
+        0
+      ]
+    ],
+    [
+      [
+        "EnemyInfantryGroup1",
+        "FlankAttack",
+        [
+          "FriendlyTankGroup_0"
+        ]
+      ],
+      [
+        "EnemyInfantryGroup3",
+        "FlankAttack",
+        [
+          "FriendlyTankGroup_0"
+        ]
+      ],
+      [
+        "EnemyInfantryGroup2",
+        "FlankAttack",
+        [
+          "FriendlyTankGroup_0"
+        ]
+      ]
+    ]
+  ]
+}

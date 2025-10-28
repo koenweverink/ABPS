@@ -1,0 +1,21 @@
+Simulation Animation Summary
+==========================
+
+Run Name: Verification Run With Time Weight
+Start Time: 2025-09-15T10:56:44.886268
+End Time: 2025-09-15T11:32:30.162246
+Total Steps: 297
+
+Simulation Results:
+  Score: 20.96888888888889
+  Final Friendly Health: 76.0
+  Final Enemy Health: 0
+  Outpost Secured: True
+  Steps Taken: 296
+
+Files:
+  Animation Viewer: animation.html
+  Images Directory: images/
+  Metadata: metadata.json
+  Summary: summary.txt
+  Gantt Chart: gantt_chart.png

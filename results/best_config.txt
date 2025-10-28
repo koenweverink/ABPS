@@ -1,0 +1,2 @@
+{'FriendlyTankGroup': 1, 'FriendlyInfantryGroup': 0, 'FriendlyArtilleryGroup': 0, 'FriendlyAntiTankGroup': 0}
+[('EnemyInfantryGroup1', 'FlankAttack', ['FriendlyTankGroup_0']), ('EnemyInfantryGroup3', 'FlankAttack', ['FriendlyTankGroup_0']), ('EnemyInfantryGroup2', 'FlankAttack', ['FriendlyTankGroup_0'])]

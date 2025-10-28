@@ -1,0 +1,10 @@
+{
+  "sequence": [
+    ["EnemyTankGroup1", "ConsolidateAttack", ["FriendlyAntiTankGroup_0", "FriendlyArtilleryGroup_0"]],
+    ["EnemyTankGroup2", "FlankAttack", ["FriendlyAntiTankGroup_0", "FriendlyArtilleryGroup_0"]],
+    ["EnemyInfantryGroup1", "FlankAttack", ["FriendlyAntiTankGroup_0", "FriendlyArtilleryGroup_0"]],
+    ["EnemyAntiTankGroup1", "FlankAttack", ["FriendlyAntiTankGroup_0", "FriendlyArtilleryGroup_0"]]
+  ],
+  "description": "Example attack sequence for testing animation system",
+  "strategy": "Mixed approach with consolidate and flank attacks"
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "gen": 0,
+    "mutate_p": 0.3947239101452471,
+    "front0_size": 3,
+    "best_scalar_fitness": 27.41269841269841,
+    "avg_adjusted_raw": 0.403925804703015,
+    "avg_cost": 20.4
+  },
+  {
+    "gen": 1,
+    "mutate_p": 0.3028147388582154,
+    "front0_size": 6,
+    "best_scalar_fitness": 32.14285714285714,
+    "avg_adjusted_raw": 0.3125962700288941,
+    "avg_cost": 15.6
+  },
+  {
+    "gen": 2,
+    "mutate_p": 0.2109055675711837,
+    "front0_size": 4,
+    "best_scalar_fitness": 35.714285714285715,
+    "avg_adjusted_raw": 0.2694012345679012,
+    "avg_cost": 13.9
+  },
+  {
+    "gen": 3,
+    "mutate_p": 0.11899639628415198,
+    "front0_size": 4,
+    "best_scalar_fitness": 35.714285714285715,
+    "avg_adjusted_raw": 0.2989359743174131,
+    "avg_cost": 13.3
+  },
+  {
+    "gen": 4,
+    "mutate_p": 0.027087224997120296,
+    "front0_size": 4,
+    "best_scalar_fitness": 35.714285714285715,
+    "avg_adjusted_raw": 0.2489359743174131,
+    "avg_cost": 11.0
+  }
+]

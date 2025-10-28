@@ -1,0 +1,21 @@
+Simulation Animation Summary
+==========================
+
+Run Name: Roster B With Time Penalty
+Start Time: 2025-09-15T20:24:42.517722
+End Time: 2025-09-15T20:55:08.636729
+Total Steps: 358
+
+Simulation Results:
+  Score: 21.075000000000003
+  Final Friendly Health: 294
+  Final Enemy Health: 0
+  Outpost Secured: True
+  Steps Taken: 357
+
+Files:
+  Animation Viewer: animation.html
+  Images Directory: images/
+  Metadata: metadata.json
+  Summary: summary.txt
+  Gantt Chart: gantt_chart.png

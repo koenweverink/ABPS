@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-09-08T13:06:11",
+  "n_evals": 30,
+  "mean_score": 13.767950617283953,
+  "std_score": 18.200385366952073,
+  "success_rate": 0.8333333333333334,
+  "mean_steps": 319.1333333333333,
+  "friendly_health_mean": 63.93333333333333,
+  "enemy_health_mean": 7.333333333333333,
+  "plan_source": "C:\\Users\\koenw\\Desktop\\Master - Computational Science\\Year 2\\Thesis\\ABPS\\final_ga_results_full.json"
+}
